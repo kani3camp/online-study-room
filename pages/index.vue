@@ -80,7 +80,7 @@
               <v-card class="ma-2 pa-3" :elevation="hover ? 10 : 2">
                 <v-layout justify-center>
                 <v-card-title>
-                  {{ room.room_body.name }}
+                  {{ room['room_body']['name'] }}
                 </v-card-title>
                 </v-layout>
               </v-card>
@@ -139,7 +139,6 @@
       loading: false,
     }),
     async mounted() {
-
       this.$vuetify.theme.primary = "cyan lighten-3"
       common.onAuthStateChanged(this)
 
@@ -160,7 +159,8 @@
         const vm = this
         const provider = new firebase.auth.GoogleAuthProvider()
         firebase.auth().signInWithPopup(provider).then(function(result) {
-          let token = result.credential.accessToken;
+          let token = result.credential['accessToken'];
+          console.log(token)
           let user = result.user;
           console.log(user)
           vm.dialog_message = 'ログインに成功しました。'
@@ -170,13 +170,14 @@
           let email = error.email
           // The firebase.auth.AuthCredential type that was used.
           let credential = error.credential
+          console.log(errorCode, errorMessage, email, credential)
           vm.dialog_message = 'ログインに失敗しました。'
         })
         vm.if_show_dialog_2 = true
       },
       confirmEntering(index) {
         this.selected_index = index
-        this.selected_room_name = this.rooms[this.selected_index].room_body.name
+        this.selected_room_name = this.rooms[this.selected_index]['room_body']['name']
         this.if_show_dialog = true
       },
       async enterRoom() {

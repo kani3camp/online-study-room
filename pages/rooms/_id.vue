@@ -115,13 +115,14 @@ export default {
         const vm = this;
         const room_id = vm.$store.state.room_id
         let url = new URL("https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus")
-        url.search = new URLSearchParams({room_id})
-        const resp = await fetch(url.toString(), {method: "GET"}).then(response =>
-          response.json()
-        )
+        url.search = new URLSearchParams({room_id}).toString()
+        const resp = await fetch(
+          url.toString(),
+          {method: "GET"}
+          ).then(response => response.json())
         if (resp.result === "ok") {
-          this.room_name = resp.room_status.room_body.name
-          const users = resp.room_status.room_body.users
+          this.room_name = resp.room_status['room_body']['name']
+          const users = resp.room_status['room_body']['users']
           if (!users.includes(vm.$store.state.user.user_id)) {
             await this.$router.push('/')
             return
@@ -139,15 +140,15 @@ export default {
       const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
       const vm = this
       let info = []
-      for (const user of this.room_status.room_body.users) {
+      for (const user of this.room_status['room_body']['users']) {
         if (user !== vm.$store.state.user.user_id) {
-          url.search = new URLSearchParams({user_id: user})
+          url.search = new URLSearchParams({user_id: user}).toString()
           const resp = await fetch(url.toString(), {method: 'GET'}).then(r => r.json())
-          const data = resp.user_status
+          const data = resp['user_status']
 
-          const study_seconds = new Date().getTime() - new Date(data.user_body.last_entered).getTime()
+          const study_seconds = new Date().getTime() - new Date(data['user_body']['last_entered']).getTime()
           info.push({
-            user_name: data.user_body.name.substr(0, 3),
+            user_name: data['user_body'].name.substr(0, 3),
             time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
           })
         }
