@@ -139,8 +139,6 @@
       loading: false,
     }),
     async mounted() {
-
-      this.$vuetify.theme.primary = "cyan lighten-3"
       common.onAuthStateChanged(this)
 
       this.loading = true
