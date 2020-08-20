@@ -1,0 +1,23 @@
+{
+  "name": "online-study-room",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "./node_modules/.bin/nuxt",
+    "build": "./node_modules/.bin/nuxt build",
+    "start": "./node_modules/.bin/nuxt start",
+    "export": "./node_modules/.bin/nuxt export",
+    "serve": "./node_modules/.bin/nuxt serve",
+    "generate": "./node_modules/.bin/nuxt generate"
+  },
+  "dependencies": {
+    "firebase": "^7.17.2",
+    "firebaseui": "^4.6.1",
+    "nuxt": "^2.13.0"
+  },
+  "devDependencies": {
+    "@mdi/font": "^5.4.55",
+    "@nuxtjs/vuetify": "^1.11.2",
+    "axios": "^0.19.2"
+  }
+}
