@@ -1,0 +1,23 @@
+<template>
+  <div id="title">
+    <h1>{{ title }}</h1>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'Title',
+  data: () => ({
+    title: 'タイトル'
+  })
+}
+</script>
+
+<style scoped>
+#title {
+  background-color: #ecc6a1;
+  width: 70vw;
+}
+
+</style>
