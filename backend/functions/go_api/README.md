@@ -13,3 +13,4 @@ firebase.google.com/goそのもののモジュールはself importエラーと�
 ## 解決法
 プロジェクト内で`go mod init test.module`を実行する。
 go.modファイルの名前（ここではtest.module）は適当で良いが、必ずドットで区切ること。ここがハマった原因。
+そして、あとはコード内のパッケージを自動でダウンロードしてくれるという優れもの。

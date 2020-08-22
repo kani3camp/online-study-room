@@ -39,7 +39,7 @@
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-layout justify-center>
-        <v-toolbar-title>部屋を選ぼう</v-toolbar-title>
+        <v-toolbar-title>オンライン勉強部屋</v-toolbar-title>
       </v-layout>
 <!--      <v-btn v-show="!($store.state.isSignedIn)" @click="signInWithGoogle" outlined>Googleアカウントでログイン</v-btn>-->
       <img
