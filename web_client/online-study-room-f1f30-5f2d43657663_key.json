@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "online-study-room-f1f30",
+  "private_key_id": "5f2d43657663047a1840970ab0c408685e3d866e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC0/xbLScIzi+yp\nE9sNUYH1NSt+ufWCMB/tHf+KVwFoKywaSvlRYD4uDppTP7czisId7hXzTa97/kIz\nDu/6bOGr1+5fYHZgX0Mcn1HuTAh9ucdTLh4D3j8hz3gT/8UWilX+jz0ZduLCr+Qi\nAvdHuhB4VIMY8vpSR8DYtkQ98ERlpLbwkBCnK9giWzHXrUAw1zIUOoqe7PswR1kz\n2Q/zGl8+9ySW6dUjfNSSo+EcmSrEZmz92cNRKT/mRQ3Ob8SVR2yAHuleu/zUTTI5\nXoikHIGy18gvbiYLxOvV10J9ZtNLKkqGMRYXKHGQtZUpH//MlBqafGHetAeDWICw\n2BuochzzAgMBAAECggEADQaYsNunjscgqpBjwOMfS7LeZPnkGdD10z5H8EBPuRv2\nShQgOkOHZhAl+hzJRfvT+YxzZvWtzeogAIWwLqEcYp4hKRsLmebxMQOkRVaSe93d\nYvacMWISwA+q0CGloPgmtTHAz27XZfR7ohj9i9tvqQFICAkgi8BfOBlx8tUyTvA7\nLKf2r6mWRmXMSbU9ZnxJz6Hiq9+ITHe1WhoSKKsNGJywur1TRbL8DLbaTWUiBnvK\nI4gOzpZgnbDCwoN1vNQ/0rsVmh0D/faxUhNqY42kVpZn1Ysh49oNuzK+kyQ/5gh5\nHzSOqsiYcGuWZQxutyFht1M0IxJTGFz5PEcNRKamTQKBgQDnDHJJDDAc/VUkQHWd\nInTmcCWJZoLNyeBPrDGw0WPTKhFZ3WGSma+wXrYDRyGKVEvkBU0MQC26tgJkyqYR\nHsru4Yd0c3goZah145eXX4QqC3XaQHKStrriVSNoa7XTehy570IcjJa6mOUdo+qR\njj+gngXcf4MgIS7RlW1NI07EBQKBgQDIiudZD/a2uMpPgqv5luirqYa6E1v5dNcF\nhg6J/3rM6EQUoJ2r+JhQ3Mq4jxKlzhhiapptz5hfDguLSG/inUSvZKDUI2GtPrTX\nNwsQC4VFDSPCPizq2wa/suIps0/y6Qz1lyQQrBJCTC/ze5xobq+d6Bz+BA+mWUjj\nY87Pg2DmlwKBgBh+tU8RP7iTEwe43b8+++3CTfh3Kb7vfBx2QP5h9JdaimRgmAuW\nx42HPPyz+dZUgYc3GKgH1dFJoo9U/K4r+Y/B0T6DT2XZATceXd/qfHSIqoHs+zia\nrs14ATz8zlYRSCJeP0APl5tIwmGWEzRDRHOezThHPHuXiQMnOGNJLvyRAoGBAJTU\n8clZXaJSFmNX+UXsx5TO5dwnDfVez02cJiIoZvy3y/77DMlaX8BzfEfodtBy2goA\nT8f7b3vsMokWI2MtkJISvoFyGMW4agHnKeCojCmpDMbV2gQatTGEEvEb0NPYPfPu\nTafJ7Gsjm9q5/GRM8Szh3NJwNSUh0kRgCFZdjIbVAoGAZILkXaApPQv+wLBlMQY+\ny3GPfn32e+aGc1BtSYSi+lHXXXascl3vsxxgW6uhpKFvSrTJMoLMnlmOT81+WPcg\nz3DWB+kwYkUgA/CnvoLJ3Yhc1K54wRIJqT9qYAGqBo2JWHRW/aUSZ3GVSQQet6Tm\n1WT4nUEDKtEY1GPr8FhL9os=\n-----END PRIVATE KEY-----\n",
+  "client_email": "online-study-room-f1f30@appspot.gserviceaccount.com",
+  "client_id": "101745681380058691061",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/online-study-room-f1f30%40appspot.gserviceaccount.com"
+}
