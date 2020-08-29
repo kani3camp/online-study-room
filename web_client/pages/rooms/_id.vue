@@ -119,7 +119,6 @@ export default {
         const resp = await fetch(url.toString(), {method: "GET"}).then(response =>
           response.json()
         )
-        if (resp.result === "ok") {
         if (resp.result === 'ok') {
           this.room_name = resp.room_status.room_body.name
           const users = resp.room_status.room_body.users
