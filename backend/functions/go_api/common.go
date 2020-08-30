@@ -33,6 +33,7 @@ const OK = "ok"
 const ERROR = "error"
 const UserAuthFailed = "User authentication failed."
 const UserDoesNotExist = "User does not exist."
+const Failed = "Failed"
 
 type RoomStruct struct {
 	RoomId string `json:"room_id"`

@@ -1,6 +1,5 @@
 <template>
   <div id="message">
-    message
     {{ message }}
   </div>
 </template>
@@ -9,14 +8,15 @@
 export default {
   name: 'Message',
   props: {
-    message: String
+    message: { type: String, required: true }
   }
 }
 </script>
 
 <style scoped>
 #message {
-  background-color: lightgreen;
+  /*background-color: lightgreen;*/
   width: 100vw;
+  height: 10vh;
 }
 </style>

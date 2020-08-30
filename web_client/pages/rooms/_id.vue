@@ -130,7 +130,7 @@ export default {
         this.room_status = resp.room_status
         this.room_timeout = setTimeout(() => {
           this.updateRoomInfo()
-        }, 30000)
+        }, 10000)
       } else {
         await this.$router.push('/')
       }
@@ -155,7 +155,7 @@ export default {
       this.other_users_info = info
       this.timeout = setTimeout(() => {
         this.getUsersData()
-      }, 30000)
+      }, 10000)
     },
     async exitRoom() {
       this.exiting = true

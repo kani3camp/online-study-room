@@ -9,15 +9,15 @@
 export default {
   name: 'Title',
   data: () => ({
-    title: 'タイトル'
+    title: 'オンライン勉強部屋'
   })
 }
 </script>
 
 <style scoped>
 #title {
-  background-color: #ecc6a1;
-  width: 70vw;
+  /*background-color: #ecc6a1;*/
+  width: 80vw;
 }
 
 </style>

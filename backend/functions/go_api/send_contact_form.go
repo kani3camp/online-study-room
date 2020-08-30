@@ -37,7 +37,7 @@ func SendContactForm(w http.ResponseWriter, r *http.Request)  {
 		if IsUserVerified(userId, idToken, ctx) {
 			messageDestinationId := os.Getenv("DESTINATION_LINE_ID")
 			bot, err := linebot.New(
-				os.Getenv("CHANNEL_SECRET"), // todo
+				os.Getenv("CHANNEL_SECRET"),
 				os.Getenv("CHANNEL_TOKEN"),
 			)
 			if err != nil {
