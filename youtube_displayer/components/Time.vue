@@ -25,7 +25,11 @@ export default {
       return this.date.getHours()
     },
     minutes () {
-      return this.date.getMinutes()
+      let min = this.date.getMinutes().toString()
+      if (min.length === 1) {
+        min = '0' + min
+      }
+      return min
     }
   },
   created () {
@@ -41,7 +45,9 @@ export default {
 
 <style scoped>
 #time {
-  /*background-color: aquamarine;*/
+  padding-top: 1rem;
+  font-size: larger;
+  background-color: aquamarine;
   width: 20vw;
 }
 

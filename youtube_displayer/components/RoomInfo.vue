@@ -23,26 +23,6 @@ export default {
   },
   data: () => ({
     room_name: '',
-    userIds: [
-      'fafda',
-      'fajowef',
-      'jifdoajfdoi',
-      'jda',
-      'jfaio',
-      'jofaji',
-      'jfiwoaj',
-      'wour',
-      'hvanonvaL',
-      'fafda',
-      'fajowef',
-      'jifdoajfdoi',
-      'jda',
-      'jfaio',
-      'jofaji',
-      'jfiwoaj',
-      'wour',
-      'hvanonvaL'
-    ],
     userNames: [],
     users: []
   }),
@@ -86,9 +66,9 @@ export default {
 
 <style scoped>
 #roomInfo {
-  /*background-color: lightgoldenrodyellow;*/
+  background-color: lightgoldenrodyellow;
   width: 100vw;
-  height: 82vh;
+  height: 75vh;
   overflow: auto;
 }
 

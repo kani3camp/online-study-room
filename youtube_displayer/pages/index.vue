@@ -84,6 +84,7 @@ export default {
 html {
   padding: 0;
   margin: 0;
+  font-size: larger;
 }
 
 body {
@@ -93,7 +94,7 @@ body {
 
 #header {
   width: 100vw;
-  height: 8vh;
+  height: 15vh;
   display: flex;
 }
 
@@ -103,7 +104,7 @@ body {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Hannari', Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

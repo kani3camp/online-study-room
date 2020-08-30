@@ -56,7 +56,17 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
+    ['nuxt-webfontloader']
   ],
+  webfontloader: {
+    google: {
+      families: [
+        'Josefin+Sans',
+        'Hannari',
+        'M PLUS Rounded 1c'
+      ]
+    }
+  },
   /*
   ** vuetify module configuration
   ** https://github.com/nuxt-community/vuetify-module
@@ -84,6 +94,7 @@ export default {
   */
   build: {
   },
+  // Github pages にデプロイする静的ファイルをgenerateするときだけ以下をコメントアウト。
   router: {
     base: '/youtube-displayer-hosting/'
   }
