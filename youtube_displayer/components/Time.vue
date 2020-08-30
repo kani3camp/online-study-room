@@ -41,8 +41,8 @@ export default {
 
 <style scoped>
 #time {
-  background-color: aquamarine;
-  width: 30vw;
+  /*background-color: aquamarine;*/
+  width: 20vw;
 }
 
 .clock {

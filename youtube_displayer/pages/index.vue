@@ -12,7 +12,7 @@
       </div>
 
       <div id="footer">
-        <Message message="メッセージ" />
+        <Message message="" />
       </div>
     </div>
   </div>
@@ -55,17 +55,14 @@ export default {
       // room_idを次のものに進める。ない場合はリストの先頭から
       const vm = this
       const currentIndex = this.roomIdList.indexOf(vm.$store.state.roomId)
-      console.log('current index : ' + currentIndex)
       if (currentIndex === -1) {
         this.$store.commit('setRoomId', vm.roomIdList[0])
       } else {
         const nextIndex = (currentIndex + 1) % this.roomIdList.length
-        console.log('next index : ' + nextIndex)
         this.$store.commit('setRoomId', vm.roomIdList[nextIndex])
       }
     },
     async retrieveRoomIdList () {
-      console.log('retrieveRoomIdList ()')
       const vm = this
       const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
       const resp = await fetch(url.toString(), { method: 'GET' }).then(response => response.json())
@@ -120,7 +117,7 @@ body {
 
 .block {
   width: 100vw;
-  background-color: pink;
+  /*background-color: pink;*/
 }
 
 </style>

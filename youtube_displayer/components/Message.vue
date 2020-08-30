@@ -1,6 +1,5 @@
 <template>
   <div id="message">
-    message
     {{ message }}
   </div>
 </template>
@@ -16,7 +15,7 @@ export default {
 
 <style scoped>
 #message {
-  background-color: lightgreen;
+  /*background-color: lightgreen;*/
   width: 100vw;
   height: 10vh;
 }

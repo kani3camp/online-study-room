@@ -16,8 +16,8 @@ export default {
 
 <style scoped>
 #title {
-  background-color: #ecc6a1;
-  width: 70vw;
+  /*background-color: #ecc6a1;*/
+  width: 80vw;
 }
 
 </style>
