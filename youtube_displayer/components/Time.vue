@@ -48,7 +48,7 @@ export default {
   padding-top: 1rem;
   font-size: larger;
   background-color: aquamarine;
-  width: 20vw;
+  width: 384px;
 }
 
 .clock {

@@ -18,7 +18,7 @@ export default {
 #title {
   padding-top: 1rem;
   background-color: #ecc6a1;
-  width: 80vw;
+  width: 1536px;
 }
 
 </style>

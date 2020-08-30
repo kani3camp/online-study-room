@@ -67,8 +67,8 @@ export default {
 <style scoped>
 #roomInfo {
   background-color: lightgoldenrodyellow;
-  width: 100vw;
-  height: 75vh;
+  width: 1920px;
+  height: 818px;
   overflow: auto;
 }
 

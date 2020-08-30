@@ -16,7 +16,7 @@ export default {
 <style scoped>
 #message {
   background-color: lightgreen;
-  width: 100vw;
-  height: 10vh;
+  width: 1920px;
+  height: 100px;
 }
 </style>

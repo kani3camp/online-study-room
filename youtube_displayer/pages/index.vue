@@ -85,6 +85,9 @@ html {
   padding: 0;
   margin: 0;
   font-size: larger;
+  width: 1920px;
+  height: 1080px;
+  overflow: auto;
 }
 
 body {
@@ -93,13 +96,13 @@ body {
 }
 
 #header {
-  width: 100vw;
-  height: 15vh;
+  width: 1920px;
+  height: 160px;
   display: flex;
 }
 
 #main {
-  width: 100vw;
+  width: 1920px;
   display: flex;
 }
 
@@ -112,12 +115,12 @@ body {
 }
 
 #footer {
-  width: 100vw;
-  height: 10vh;
+  width: 1920px;
+  /*height: 100px;*/
 }
 
 .block {
-  width: 100vw;
+  width: 1920px;
   /*background-color: pink;*/
 }
 
