@@ -9,7 +9,7 @@
 export default {
   name: 'Message',
   props: {
-    message: String
+    message: { type: String, required: true }
   }
 }
 </script>
@@ -18,5 +18,6 @@ export default {
 #message {
   background-color: lightgreen;
   width: 100vw;
+  height: 10vh;
 }
 </style>

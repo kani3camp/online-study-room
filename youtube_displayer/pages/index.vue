@@ -12,7 +12,7 @@
       </div>
 
       <div id="footer">
-        <Message />
+        <Message message="メッセージ" />
       </div>
     </div>
   </div>
@@ -54,13 +54,7 @@ body {
 
 #main {
   width: 100vw;
-  height: 10vh;
   display: flex;
-}
-.block {
-  width: 100vw;
-  height: 100vh;
-  background-color: pink;
 }
 
 #app {
@@ -69,6 +63,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+#footer {
+  width: 100vw;
+  height: 10vh;
+}
+
+.block {
+  width: 100vw;
+  background-color: pink;
 }
 
 </style>

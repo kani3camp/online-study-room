@@ -37,6 +37,7 @@ export default {
 #roomInfo {
   background-color: lightgoldenrodyellow;
   width: 100vw;
+  height: 72vh;
 }
 
 </style>
