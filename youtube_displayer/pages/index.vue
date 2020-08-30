@@ -2,7 +2,7 @@
   <div id="app">
     <div class="block">
       <div id="header">
-        <Title msg="Welcome to " />
+        <Title />
         <Time />
       </div>
 
@@ -30,6 +30,54 @@ export default {
     Time,
     RoomInfo,
     Message
+  },
+  data: () => ({
+    roomIdList: [],
+    timeout: null
+  }),
+  created () {
+    this.switchRoom()
+
+    const switchRoomInterval = 6 * 1000
+    const vm = this
+    setInterval(() => {
+      vm.switchRoom()
+    }, switchRoomInterval)
+  },
+  destroyed () {
+    clearInterval(this.timeout)
+  },
+  methods: {
+    async switchRoom () {
+      // 全てのroom_idのリストを更新
+      await this.retrieveRoomIdList()
+
+      // room_idを次のものに進める。ない場合はリストの先頭から
+      const vm = this
+      const currentIndex = this.roomIdList.indexOf(vm.$store.state.roomId)
+      console.log('current index : ' + currentIndex)
+      if (currentIndex === -1) {
+        this.$store.commit('setRoomId', vm.roomIdList[0])
+      } else {
+        const nextIndex = (currentIndex + 1) % this.roomIdList.length
+        console.log('next index : ' + nextIndex)
+        this.$store.commit('setRoomId', vm.roomIdList[nextIndex])
+      }
+    },
+    async retrieveRoomIdList () {
+      console.log('retrieveRoomIdList ()')
+      const vm = this
+      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
+      const resp = await fetch(url.toString(), { method: 'GET' }).then(response => response.json())
+      if (resp.result === 'ok') {
+        vm.roomIdList = []
+        resp.rooms.forEach((room) => {
+          vm.roomIdList.push(room.room_id)
+        })
+      } else {
+        console.log(resp.message)
+      }
+    }
   }
 }
 
@@ -48,7 +96,7 @@ body {
 
 #header {
   width: 100vw;
-  height: 18vh;
+  height: 8vh;
   display: flex;
 }
 

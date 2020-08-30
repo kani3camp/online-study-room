@@ -12,7 +12,7 @@ import (
 // 環境変数はコンソールの関数の編集から設定してる
 func LineWebhookCallBack(w http.ResponseWriter, r *http.Request)  {
 	client, err := linebot.New(
-		os.Getenv("CHANNEL_SECRET"),	// todo
+		os.Getenv("CHANNEL_SECRET"),
 		os.Getenv("CHANNEL_TOKEN"),
 		)
 	if err != nil {

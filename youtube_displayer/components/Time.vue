@@ -1,7 +1,7 @@
 <template>
   <div id="time">
-    time
-    {{ date }}
+    <p>{{ year }}年 {{ month }}月 {{ day }}日</p>
+    <p class="clock">{{ hours }}：{{ minutes }}</p>
   </div>
 </template>
 
@@ -13,22 +13,19 @@ export default {
   }),
   computed: {
     year () {
-      return this.date().getFullYear()
+      return this.date.getFullYear()
     },
     month () {
-      return this.date().getMonth()
+      return this.date.getMonth() + 1
     },
     day () {
-      return this.date().getDay()
+      return this.date.getDate()
     },
     hours () {
-      return this.date().getHours()
+      return this.date.getHours()
     },
     minutes () {
-      return this.date().getMinutes()
-    },
-    seconds () {
-      return this.date()
+      return this.date.getMinutes()
     }
   },
   created () {
@@ -46,5 +43,10 @@ export default {
 #time {
   background-color: aquamarine;
   width: 30vw;
+}
+
+.clock {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 </style>

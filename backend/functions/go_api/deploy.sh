@@ -1,5 +1,5 @@
 #!/bin/zsh
-function_name="CreateNewRoom"
+function_name="UserStatus"
 project_id="online-study-room-f1f30"
 
 gcloud functions deploy $function_name \
