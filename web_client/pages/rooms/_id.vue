@@ -84,7 +84,7 @@ export default {
     timeout: null,
     room_timeout: null,
   }),
-  async mounted() {
+  async created() {
     common.onAuthStateChanged(this)
 
     if (this.$store.state.isSignedIn) {
@@ -101,7 +101,6 @@ export default {
       await this.getUsersData()
 
       // todo staying awake
-
     } else {
       await this.$router.push('/')
     }

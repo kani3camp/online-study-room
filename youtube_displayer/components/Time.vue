@@ -30,6 +30,9 @@ export default {
         min = '0' + min
       }
       return min
+    },
+    seconds () {
+      return this.date.getSeconds()
     }
   },
   created () {
@@ -45,14 +48,15 @@ export default {
 
 <style scoped>
 #time {
-  padding-top: 1rem;
+  padding-top: 0.6rem;
   font-size: larger;
-  background-color: aquamarine;
+  background-color: #e2fcfc;
   width: 384px;
+  overflow: visible;
 }
 
 .clock {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   font-weight: bold;
 }
 </style>

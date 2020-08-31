@@ -170,13 +170,16 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 	return statement, err
 }
 
-func _OnlineUsers(client *firestore.Client, ctx context.Context) []UserStruct {
+func _OnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
 	userDocs, err := client.Collection(USERS).Documents(ctx).GetAll()
-	if err != nil {log.Println(err)}
+	if err != nil {
+		log.Println(err)
+		return []UserStruct{}, err
+	}
 	
 	if len(userDocs) == 0 {
 		log.Println("There is no user.")
-		return []UserStruct{}
+		return []UserStruct{}, nil
 	} else {
 		var userList []UserStruct
 		for _, doc := range userDocs {
@@ -189,7 +192,7 @@ func _OnlineUsers(client *firestore.Client, ctx context.Context) []UserStruct {
 				})
 			}
 		}
-		return userList
+		return userList, nil
 	}
 }
 

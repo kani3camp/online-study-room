@@ -39,7 +39,7 @@
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-layout justify-center>
-        <v-toolbar-title>オンライン勉強部屋</v-toolbar-title>
+        <v-toolbar-title><h1>オンライン作業部屋</h1></v-toolbar-title>
       </v-layout>
 <!--      <v-btn v-show="!($store.state.isSignedIn)" @click="signInWithGoogle" outlined>Googleアカウントでログイン</v-btn>-->
       <img
@@ -144,7 +144,12 @@
       this.loading = true
       const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
       const response = await fetch(url.toString())
-      this.rooms = await response.json()
+      const resp = await response.json()
+      if (resp.result === 'ok') {
+        this.rooms = resp.rooms
+      } else {
+        console.log(resp.message)
+      }
       this.loading = false
     },
     methods: {

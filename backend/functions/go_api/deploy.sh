@@ -1,5 +1,5 @@
 #!/bin/zsh
-function_name="UserStatus"
+function_name="OnlineUsers"
 project_id="online-study-room-f1f30"
 
 gcloud functions deploy $function_name \
