@@ -29,6 +29,14 @@
             <v-list-item-title>ご意見・お問い合わせ</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="goToNewsPage" link>
+          <v-list-item-action>
+            <v-icon>mdi-bell</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>お知らせ</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -121,6 +129,9 @@ export default {
     },
     goToSettingsPage() {
       this.$router.push('/settings')
+    },
+    goToNewsPage() {
+      this.$router.push('/news')
     },
     async submit() {
       if (this.selected_contact_type || this.mail_address || this.message) {

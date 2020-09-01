@@ -29,7 +29,7 @@
             <v-list-item-title>ご意見・お問い合わせ</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click="goToNewsPage" link>
+        <v-list-item @click="drawer=false" link>
           <v-list-item-action>
             <v-icon>mdi-bell</v-icon>
           </v-list-item-action>
@@ -45,7 +45,7 @@
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-layout justify-center>
-        <v-toolbar-title>利用規約</v-toolbar-title>
+        <v-toolbar-title>お知らせ</v-toolbar-title>
       </v-layout>
     </v-app-bar>
 
@@ -57,7 +57,7 @@
 
 <script>
 export default {
-  name: "terms_of_service",
+  name: "news",
   data: () => ({
     drawer: null
   }),
@@ -70,9 +70,6 @@ export default {
     },
     goToContactFormPage() {
       this.$router.push('/contact_form')
-    },
-    goToNewsPage() {
-      this.$router.push('/news')
     }
   }
 }
