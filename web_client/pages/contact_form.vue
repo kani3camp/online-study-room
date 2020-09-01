@@ -42,7 +42,6 @@
       </v-layout>
     </v-app-bar>
 
-
     <v-main>
     <v-form class="mx-auto">
       <v-container>
@@ -72,6 +71,8 @@
       </v-container>
     </v-form>
     </v-main>
+
+    <Footer></Footer>
 
     <v-dialog v-model="if_show_dialog" width=500>
       <v-card>
