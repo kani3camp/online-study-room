@@ -23,7 +23,7 @@ func retrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([
 	var err error
 
 	// roomsのコレクションを取得
-	iter := client.Collection(NEWS).OrderBy("updated", firestore.Desc).Limit(numNews).Documents(ctx)
+	iter := client.Collection(NEWS).OrderBy("updated", firestore.Asc).Limit(numNews).Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
