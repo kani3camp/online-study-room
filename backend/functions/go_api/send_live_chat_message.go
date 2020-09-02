@@ -102,14 +102,18 @@ func RefreshLiveChatId(config *ApiConfigStruct,client *firestore.Client, ctx con
 		err = json.Unmarshal(body, &responseBody)
 		if err != nil {log.Println(err)}
 		
-		//log.Println(string(body))
 		log.Println(responseBody)
-		config.LiveChatId = responseBody.Items[0].Snippet.LiveChatId
-		_, err = client.Collection(CONFIG).Doc(API).Set(ctx, map[string]interface{}{
-			"live-chat-id" : config.LiveChatId,
-		}, firestore.MergeAll)
-		if err != nil {log.Fatalln(err)}
-		
+		if len(responseBody.Items) > 0 {
+			config.LiveChatId = responseBody.Items[0].Snippet.LiveChatId
+			_, err = client.Collection(CONFIG).Doc(API).Set(ctx, map[string]interface{}{
+				"live-chat-id": config.LiveChatId,
+			}, firestore.MergeAll)
+			if err != nil {
+				log.Fatalln(err)
+			}
+		} else {
+			log.Fatalln("No live streaming now.")
+		}
 		return err
 	} else {
 		return err
