@@ -49,7 +49,34 @@
       </v-layout>
     </v-app-bar>
 
-    <v-main></v-main>
+    <v-main>
+      <v-container v-show="loading"
+                   class="fill-height"
+                   fluid
+      >
+        <v-row
+          align="center"
+          justify="center"
+        >
+          <v-col class="text-center">
+            <div class="big-char">Loading...</div>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <v-container v-show="! loading">
+        <v-row dense>
+          <v-col v-for="(news, index) in newsList" :key="news.news_id" cols="12" dense>
+            <v-card>
+              <v-card-title v-text="news.news_body.title"></v-card-title>
+              <v-card-subtitle v-text="formatDateString(news.news_body.updated)"></v-card-subtitle>
+              <v-card-text v-text="news.news_body.text_body"></v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+
+    </v-main>
 
     <Footer></Footer>
   </v-app>
@@ -59,8 +86,26 @@
 export default {
   name: "news",
   data: () => ({
-    drawer: null
+    drawer: null,
+    newsList: [],
+    loading: false,
   }),
+  async created() {
+    this.loading = true
+    const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/News')
+    url.search = new URLSearchParams({
+      num_news: 10
+    }).toString()
+    const response = await fetch(url.toString())
+    const resp = await response.json()
+    if (resp.result === 'ok') {
+      this.newsList = resp.news_list
+    } else {
+      console.log(resp.message)
+    }
+    this.loading = false
+
+  },
   methods: {
     goToHomePage() {
       this.$router.push('/')
@@ -70,6 +115,15 @@ export default {
     },
     goToContactFormPage() {
       this.$router.push('/contact_form')
+    },
+    formatDateString(_date) {
+      const date = new Date(_date)
+      const y = date.getFullYear()
+      const mo = date.getMonth() + 1
+      const d = date.getDate()
+      const h = date.getHours()
+      const mi = date.getMinutes()
+      return `${y}/${mo}/${d} ${h}:${mi}`
     }
   }
 }

@@ -146,7 +146,7 @@
       entering: false,
       loading: false,
     }),
-    async mounted() {
+    async created() {
       common.onAuthStateChanged(this)
 
       this.loading = true
