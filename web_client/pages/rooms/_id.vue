@@ -82,22 +82,19 @@ export default {
     other_users_info: [],
     timeout: null,
     room_timeout: null,
+    user_timeout: null
   }),
   async created() {
     common.onAuthStateChanged(this)
 
     if (this.$store.state.isSignedIn) {
       // 入室時刻を取得
-      await common.getUserData(this)
-      const date_time = this.$store.state.user.last_entered
-      if (date_time) {
-        this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
-      }
+      await this.updateUserData()
 
       await this.updateRoomInfo()
 
       // users読み込み
-      await this.getUsersData()
+      await this.getOtherUsersData()
 
       // todo staying awake
     } else {
@@ -133,7 +130,18 @@ export default {
         await this.$router.push('/')
       }
     },
-    async getUsersData() {
+    async updateUserData() {
+      await common.getUserData(this)
+      const date_time = this.$store.state.user.last_entered
+      if (date_time) {
+        this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
+      }
+
+      this.user_timeout = setTimeout(() => {
+        this.updateUserData()
+      }, 15000)
+    },
+    async getOtherUsersData() {
       const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
       const vm = this
       let info = []
@@ -152,7 +160,7 @@ export default {
       }
       this.other_users_info = info
       this.timeout = setTimeout(() => {
-        this.getUsersData()
+        this.getOtherUsersData()
       }, 10000)
     },
     async exitRoom() {

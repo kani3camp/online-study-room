@@ -195,6 +195,7 @@
       },
       async enterRoom() {
         if (this.$store.state.isSignedIn) {
+          const vm = this
 
           this.entering = true
 
@@ -208,7 +209,12 @@
           const res = await fetch(url, {
             method: 'POST',
             body: params
-          }).then(response => response.json())
+          }).then(response => response.json()).catch((e) => {
+            console.log(e)
+            vm.if_show_dialog = false
+            vm.dialog_message = '通信に失敗しました。もう一度試してください。'
+            vm.if_show_dialog_2 = true
+          })
 
           if (res.result === 'ok') {
             this.if_show_dialog = false
