@@ -139,7 +139,7 @@ export default {
 
         const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/SendContactForm')
         const params = new URLSearchParams({
-          mail_address: this.mail_address,
+          mail_address: this.mail_address.toString(),
           user_id: this.$store.state.user.user_id,
           id_token: this.$store.state.user.id_token,
           contact_type: this.selected_contact_type,

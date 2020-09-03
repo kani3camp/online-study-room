@@ -45,7 +45,7 @@ common.getUserData = async (vm) => {
   if (user_data.result !== 'ok') {
     console.log(user_data)
   } else {
-    const user_body = user_data.user_status.user_body
+    const user_body = user_data['user_status']['user_body']
     vm.$store.commit("user/setUserName", user_body.name)
     vm.$store.commit('user/setStatusMessage', user_body.status)
     // this.$store.commit('user/setSumStudyTime', use) // Todo
