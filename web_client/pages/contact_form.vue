@@ -29,6 +29,14 @@
             <v-list-item-title>ご意見・お問い合わせ</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="goToNewsPage" link>
+          <v-list-item-action>
+            <v-icon>mdi-bell</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>お知らせ</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -41,7 +49,6 @@
         <v-toolbar-title>意見・お問い合わせ</v-toolbar-title>
       </v-layout>
     </v-app-bar>
-
 
     <v-main>
     <v-form class="mx-auto">
@@ -72,6 +79,8 @@
       </v-container>
     </v-form>
     </v-main>
+
+    <Footer></Footer>
 
     <v-dialog v-model="if_show_dialog" width=500>
       <v-card>
@@ -120,6 +129,9 @@ export default {
     },
     goToSettingsPage() {
       this.$router.push('/settings')
+    },
+    goToNewsPage() {
+      this.$router.push('/news')
     },
     async submit() {
       if (this.selected_contact_type || this.mail_address || this.message) {

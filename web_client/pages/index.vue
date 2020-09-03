@@ -29,6 +29,14 @@
             <v-list-item-title>ご意見・お問い合わせ</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item @click="goToNewsPage" link>
+          <v-list-item-action>
+            <v-icon>mdi-bell</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>お知らせ</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -39,7 +47,7 @@
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-layout justify-center>
-        <v-toolbar-title>オンライン勉強部屋</v-toolbar-title>
+        <v-toolbar-title><h1>オンライン作業部屋</h1></v-toolbar-title>
       </v-layout>
 <!--      <v-btn v-show="!($store.state.isSignedIn)" @click="signInWithGoogle" outlined>Googleアカウントでログイン</v-btn>-->
       <img
@@ -138,13 +146,18 @@
       entering: false,
       loading: false,
     }),
-    async mounted() {
+    async created() {
       common.onAuthStateChanged(this)
 
       this.loading = true
       const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
       const response = await fetch(url.toString())
-      this.rooms = await response.json()
+      const resp = await response.json()
+      if (resp.result === 'ok') {
+        this.rooms = resp.rooms
+      } else {
+        console.log(resp.message)
+      }
       this.loading = false
     },
     methods: {
@@ -153,6 +166,9 @@
       },
       goToContactFormPage() {
         this.$router.push('/contact_form')
+      },
+      goToNewsPage() {
+        this.$router.push('/news')
       },
       signInWithGoogle() {
         const vm = this

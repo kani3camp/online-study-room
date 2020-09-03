@@ -12,7 +12,7 @@ import (
 func UpdateDatabase(client *firestore.Client, ctx context.Context)  {
 	fmt.Println("updating database...")
 	
-	var users []UserStruct = _OnlineUsers(client, ctx)
+	users, _ := _OnlineUsers(client, ctx)	// todo err処理
 	log.Println("users: ", users)
 	if len(users) > 0 {
 		log.Println("len(users) > 0")

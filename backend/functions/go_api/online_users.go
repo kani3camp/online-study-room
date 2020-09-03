@@ -5,11 +5,25 @@ import (
 	"net/http"
 )
 
+type OnlineUsersResponse struct {
+	Result string `json:"result"`
+	Message string `json:"message"`
+	OnlineUsers []UserStruct `json:"online_users"`
+}
+
 func OnlineUsers(w http.ResponseWriter, r *http.Request)  {
 	ctx, client := InitializeHttpFunc(&w)
 	defer client.Close()
 	
-	onlineUsers := _OnlineUsers(client, ctx)
-	res, _ := json.Marshal(onlineUsers)
-	_, _ = w.Write(res)
+	var apiResp OnlineUsersResponse
+	onlineUsers, err := _OnlineUsers(client, ctx)
+	if err != nil {
+		apiResp.Result = ERROR
+		apiResp.Message = err.Error()
+	} else {
+		apiResp.Result = OK
+		apiResp.OnlineUsers = onlineUsers
+	}
+	bytes, _ := json.Marshal(apiResp)
+	_, _ = w.Write(bytes)
 }

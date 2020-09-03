@@ -15,6 +15,7 @@ const USERS = "users"
 const HISTORY = "history"
 const CONFIG = "config"
 const API = "api"
+const NEWS = "news"
 
 const ProjectId = "online-study-room-f1f30"
 //var ProjectId = os.Getenv("GOOGLE_CLOUD_PROJECT")	// なんか代入されない
@@ -29,6 +30,7 @@ const RoomDoesNotExist = "Room does not exist."
 const InvalidParams = "Invalid parameters."
 const NoRoom = "There is no room."
 const InvalidUser = "Invalid user."
+const InvalidValue = "Invalid value."
 const OK = "ok"
 const ERROR = "error"
 const UserAuthFailed = "User authentication failed."
@@ -61,6 +63,18 @@ type UserBodyStruct struct {
 	Online      bool      `firestore:"online" json:"online"`
 	Status      string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
+}
+
+type NewsStruct struct {
+	NewsId string `json:"news_id"`
+	NewsBody NewsBodyStruct `json:"news_body"`
+}
+
+type NewsBodyStruct struct {
+	Created time.Time `firestore:"created" json:"created"`
+	Updated time.Time `firestore:"updated" json:"updated"`
+	Title string `firestore:"title" json:"title"`
+	TextBody string `firestore:"text-body" json:"text_body"`
 }
 
 
@@ -170,13 +184,16 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 	return statement, err
 }
 
-func _OnlineUsers(client *firestore.Client, ctx context.Context) []UserStruct {
+func _OnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
 	userDocs, err := client.Collection(USERS).Documents(ctx).GetAll()
-	if err != nil {log.Println(err)}
+	if err != nil {
+		log.Println(err)
+		return []UserStruct{}, err
+	}
 	
 	if len(userDocs) == 0 {
 		log.Println("There is no user.")
-		return []UserStruct{}
+		return []UserStruct{}, nil
 	} else {
 		var userList []UserStruct
 		for _, doc := range userDocs {
@@ -189,7 +206,7 @@ func _OnlineUsers(client *firestore.Client, ctx context.Context) []UserStruct {
 				})
 			}
 		}
-		return userList
+		return userList, nil
 	}
 }
 

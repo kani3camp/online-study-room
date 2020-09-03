@@ -11,9 +11,11 @@
     "generate": "./node_modules/.bin/nuxt generate"
   },
   "dependencies": {
-    "firebase": "^7.17.2",
+    "firebase": "^7.19.1",
     "firebaseui": "^4.6.1",
-    "nuxt": "^2.13.0"
+    "nuxt": "^2.13.0",
+    "vue": "^2.6.12",
+    "vue-template-compiler": "^2.6.12"
   },
   "devDependencies": {
     "@mdi/font": "^5.4.55",
