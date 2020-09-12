@@ -16,7 +16,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   bool _initialized = false;
-  bool _error = true;
+  bool _error = false;
 
   void initializeFlutterFire() async {
     try {
@@ -105,7 +105,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    print('init stateします');
     initializeFlutterFire();
     super.initState();
   }
@@ -115,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       setState(() async {
         _auth.authStateChanges().listen((User user) {
-          if (user == null) { // todo
+          if (user == null) {
             print('User is currently signed out!');
           } else {
             print('User is signed in!');
