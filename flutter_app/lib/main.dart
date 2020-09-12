@@ -7,7 +7,65 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(App());
+}
+
+class App extends StatefulWidget {
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  bool _initialized = false;
+  bool _error = true;
+
+  void initializeFlutterFire() async {
+    try {
+      // Wait for Firebase to initialize and set `_initialized` state to true
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch(e) {
+      // Set `_error` state to true if Firebase initialization fails
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Show error message if initialization failed
+    if(_error) {
+      return MaterialApp(
+        home: Scaffold(
+          body: AlertDialog(
+            title: Text('error'),
+            content: Text('error'),
+          ),
+        ),
+      );
+    }
+
+    // Show a loader until FlutterFire is initialized
+    if (!_initialized) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+              child: CircularProgressIndicator()
+          ),
+        ),
+      );
+    }
+
+    return MyApp();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -45,18 +103,32 @@ class _MyHomePageState extends State<MyHomePage> {
     SettingPage()
   ];
 
+  @override
+  void initState() {
+    print('init stateします');
+    initializeFlutterFire();
+    super.initState();
+  }
+
   void initializeFlutterFire() async {
+    print('initializeFlutterFire()');
     try {
       setState(() async {
-        await Firebase.initializeApp();
-
-        FirebaseAuth auth = FirebaseAuth.instance;
-        auth.authStateChanges().listen((User user) {
+        _auth.authStateChanges().listen((User user) {
           if (user == null) { // todo
+            print('User is currently signed out!');
           } else {
+            print('User is signed in!');
           }
         });
-        signInWithGoogle().then((User user) => null);
+        signInWithGoogle().then((User user) {
+          print('google sign in が終わりました');
+          if (user == null) {
+            setState(() {
+              _error = true;
+            });
+          }
+        });
 
         _initialized = true;
       });
@@ -74,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<User> signInWithGoogle() async {
+    print('signInWithGoogle()');
     GoogleSignInAccount googleCurrentUser = _googleSignIn.currentUser;
     try {
       if (googleCurrentUser == null) googleCurrentUser = await _googleSignIn.signInSilently();
@@ -86,19 +159,13 @@ class _MyHomePageState extends State<MyHomePage> {
         idToken: googleAuth.idToken,
       );
       final User user = (await _auth.signInWithCredential(credential)).user;
-      print("signed in " + user.displayName);
 
       return user;
     } catch (e) {
+      print('エラー発生');
       print(e);
       return null;
     }
-  }
-
-  @override
-  void initState() {
-    initializeFlutterFire();
-    super.initState();
   }
 
   @override
