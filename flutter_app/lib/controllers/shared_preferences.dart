@@ -31,6 +31,8 @@ class SharedPrefs {
   static const MAIL_ADDRESS = 'mail-address';
   static const SUM_STUDY_TIME = 'sum-study-time';
   static const REGISTRATION_DATE = 'registration-date';
+  static const CURRENT_ROOM_ID = 'current-room-id';
+  static const CURRENT_ROOM_NAME = 'current-room-name';
 
   // static const ID_TOKEN = 'id-token';
 
@@ -81,6 +83,20 @@ class SharedPrefs {
   }
   DateTime getRegistrationDate() {
     return DateTime.fromMillisecondsSinceEpoch(_prefs.getInt(REGISTRATION_DATE) ?? 0);
+  }
+
+  Future<bool> setCurrentRoomId(String roomId) {
+    return _prefs.setString(CURRENT_ROOM_ID, roomId);
+  }
+  Future<String> getCurrentRoomId() async {
+    return _prefs.getString(CURRENT_ROOM_ID) ?? '';
+  }
+
+  Future<bool> setCurrentRoomName(String roomName) {
+    return _prefs.setString(CURRENT_ROOM_NAME, roomName);
+  }
+  Future<String> getCurrentRoomName() async {
+    return _prefs.getString(CURRENT_ROOM_NAME) ?? '';
   }
 
   // Future<void> setIdToken(String idToken) {

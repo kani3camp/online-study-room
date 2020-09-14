@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_app/pages/in_room.dart';
 
 import 'home_page.dart';
 import 'login_page.dart';
@@ -77,6 +78,7 @@ class _AppState extends State<App> {
       routes: <String, WidgetBuilder>{
         '/login': (_) => new LoginPage(),
         '/home': (_) => new MyHomePage(),
+        '/in_room': (_) => new InRoom(),
       }
     );
   }

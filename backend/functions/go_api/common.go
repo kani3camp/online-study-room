@@ -242,6 +242,7 @@ func RecordExitedTime(userId string, client *firestore.Client, ctx context.Conte
 }
 
 func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (string, error) {
+	println("InWhichRoom() running.")
 	rooms, err := retrieveRooms(client, ctx)
 	if err != nil {
 		log.Println(err)

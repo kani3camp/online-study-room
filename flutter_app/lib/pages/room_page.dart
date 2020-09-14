@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class RoomPage extends StatefulWidget {
@@ -10,12 +12,68 @@ class RoomPage extends StatefulWidget {
 }
 
 class _RoomPageState extends State<RoomPage> {
-  Future<List> futureList;
+  Future<List<Room>> _futureList;
+  SharedPrefs _prefs;
+
+  Future<void> _init() async {
+    _futureList = fetchRooms();
+    _prefs = await generateSharedPrefs();
+  }
 
   @override
   void initState() {
-    futureList = fetchRooms();
+    _init();
     super.initState();
+  }
+
+  void showEnterRoomDialog(BuildContext context, Room roomInfo) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text(roomInfo.roomBody.name + 'の部屋に入りますか？'),
+            content: null,
+            actions: <Widget>[
+              // ボタン領域
+              FlatButton(
+                child: Text("キャンセル"),
+                onPressed: () => Navigator.pop(context),
+              ),
+              FlatButton(
+                child: Text("OK"),
+                onPressed: () async {
+                  await enterRoom(roomInfo);
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  Future<void> enterRoom(Room roomInfo) async {
+    final _body = {
+      'room_id': roomInfo.roomId,
+      'user_id': await _prefs.getUserId(),
+      'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
+    };
+    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/EnterRoom');
+
+    final response = await http.post(
+        uri,
+        body: _body);
+    if (response.statusCode == 200) {
+      EnterRoomResponse enterRoomResp = EnterRoomResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+      if (enterRoomResp.result == 'ok') {
+        await _prefs.setCurrentRoomId(roomInfo.roomId);
+        await _prefs.setCurrentRoomName(roomInfo.roomBody.name);
+        Navigator.of(context).pushNamed('/in_room');
+      } else {
+        throw Exception('Failed to enter room : ' + enterRoomResp.message);
+      }
+    } else {
+      throw Exception('http request failed');
+    }
   }
 
   @override
@@ -26,18 +84,21 @@ class _RoomPageState extends State<RoomPage> {
             child: Text('カテゴリ一覧')
         ),
       ),
-      body: FutureBuilder<List>(
-        future: futureList,
+      body: FutureBuilder<List<Room>>(
+        future: _futureList,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            final List<Room> rooms = snapshot.data;
             return ListView.separated(
               padding: const EdgeInsets.all(8),
-              itemCount: snapshot.data.length,
+              itemCount: rooms.length,
               itemBuilder: (BuildContext context, int index) {
                 return Container(
                   child: ListTile(
-                    title: Text(snapshot.data[index].roomBody.name),
-                    onTap: () {},
+                    title: Text(rooms[index].roomBody.name),
+                    onTap: () {
+                      showEnterRoomDialog(context, rooms[index]);
+                    },
                   ),
                 );
               },
@@ -54,7 +115,7 @@ class _RoomPageState extends State<RoomPage> {
   }
 }
 
-Future<List> fetchRooms() async {
+Future<List<Room>> fetchRooms() async {
   print('fetchRooms()');
   const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms';
   final response = await http.get(url);
@@ -103,15 +164,31 @@ class Room {
 class RoomBody {
   final DateTime created;
   final String name;
-  final String users;
+  final String type;
+  final List<dynamic> users; // List<String>だとエラーなる
 
-  RoomBody({this.created, this.name, this.users});
+  RoomBody({this.created, this.name, this.type, this.users});
 
   factory RoomBody.fromJson(Map<String, dynamic> json) {
     return RoomBody(
       created: DateTime.parse(json['created'] as String),
       name: json['name'] as String,
-      users: json['users'] as String,
+      type: json['type'] as String,
+      users: json['users'] as List<dynamic>,
+    );
+  }
+}
+
+class EnterRoomResponse {
+  final String result;
+  final String message;
+
+  EnterRoomResponse({this.result, this.message});
+
+  factory EnterRoomResponse.fromJson(Map<String, dynamic> json) {
+    return EnterRoomResponse(
+      result: json['result'] as String,
+      message: json['message'] as String,
     );
   }
 }
