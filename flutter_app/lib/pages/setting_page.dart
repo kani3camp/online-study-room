@@ -111,9 +111,14 @@ class SettingPageState extends State<SettingPage> {
 
         await _initPreferences();
       } else {
+        await _initPreferences();
+        setState(() {
+          _isButtonDisabled = false;
+        });
         throw Exception('Failed to change user info: ' + changeUserInfoResp.message);
       }
     } else {
+      await _initPreferences();
       setState(() {
         _isButtonDisabled = false;
       });
