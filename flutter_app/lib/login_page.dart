@@ -2,11 +2,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/shared_preferences.dart';
+import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key}) : super(key: key);
+  LoginPage({Key key}) : super(key: key); // what is this ?
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -41,17 +41,13 @@ class _LoginPageState extends State<LoginPage> {
       if (googleCurrentUser == null) googleCurrentUser = await _googleSignIn.signIn();
       if (googleCurrentUser == null) return null;
 
-      print('p1');
       GoogleSignInAuthentication googleAuth = await googleCurrentUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      print('p2');
       final User user = (await _auth.signInWithCredential(credential)).user;
 
-      print('p3');
-      print('p4');
       // final SharedPrefs _prefs = await SharedPrefs.create();
       SharedPrefs _prefs = new SharedPrefs();
       await _prefs.init();
@@ -59,7 +55,6 @@ class _LoginPageState extends State<LoginPage> {
       await _prefs.setUserId(user.uid);
       await _prefs.setMailAddress(user.email);
       await _prefs.setAccountType(user.providerData[0].providerId);
-      print('p5');
 
       print('google sign in が終わりました');
       if (user == null) {

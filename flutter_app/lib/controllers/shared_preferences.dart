@@ -2,6 +2,13 @@ import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+
+Future<SharedPrefs> generateSharedPrefs() async {
+  SharedPrefs _prefs = new SharedPrefs();
+  await _prefs.init();
+  return _prefs;
+}
+
 class SharedPrefs {
   SharedPreferences _prefs;
 
@@ -14,6 +21,7 @@ class SharedPrefs {
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     // _secureStorage = new FlutterSecureStorage();
+    return;
   }
 
   static const USES_ID = 'user-id';

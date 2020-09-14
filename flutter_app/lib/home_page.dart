@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/room_page.dart';
-import 'package:flutter_app/setting_page.dart';
+import 'package:flutter_app/pages/room_page.dart';
+import 'package:flutter_app/pages/setting_page.dart';
 
-import 'news_page.dart';
+import 'pages/news_page.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -49,14 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (!_initialized) {
-    //   return Scaffold(
-    //     body: Center(
-    //         child: CircularProgressIndicator()
-    //     ),
-    //   );
-    // }
-
     return Scaffold(
       body: _pageList[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

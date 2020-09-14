@@ -4,11 +4,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class RoomPage extends StatelessWidget {
+class RoomPage extends StatefulWidget {
+  @override
+  _RoomPageState createState() => _RoomPageState();
+}
+
+class _RoomPageState extends State<RoomPage> {
+  Future<List> futureList;
+
+  @override
+  void initState() {
+    futureList = fetchRooms();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<List> futureList = fetchRooms();
-
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -44,6 +55,7 @@ class RoomPage extends StatelessWidget {
 }
 
 Future<List> fetchRooms() async {
+  print('fetchRooms()');
   const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms';
   final response = await http.get(url);
   if (response.statusCode == 200) {
