@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefs {
   SharedPreferences _prefs;
-  FlutterSecureStorage _secureStorage;
+  // FlutterSecureStorage _secureStorage;
 
   SharedPrefs();
 
   Future<void> _init() async {
     _prefs = await SharedPreferences.getInstance();
-    _secureStorage = new FlutterSecureStorage();
+    // _secureStorage = new FlutterSecureStorage();
   }
   SharedPrefs._create() {
     _init();
@@ -29,7 +29,7 @@ class SharedPrefs {
   static const SUM_STUDY_TIME = 'sum-study-time';
   static const REGISTRATION_DATE = 'registration-date';
 
-  static const ID_TOKEN = 'id-token';
+  // static const ID_TOKEN = 'id-token';
 
   Future<bool> setUserId(String userId) {
     return _prefs.setString(USES_ID, userId);
@@ -80,10 +80,10 @@ class SharedPrefs {
     return DateTime.fromMillisecondsSinceEpoch(_prefs.getInt(REGISTRATION_DATE) ?? 0);
   }
 
-  Future<void> setIdToken(String idToken) {
-    return _secureStorage.write(key: ID_TOKEN, value: idToken);
-  }
-  Future<String> getIdToken() {
-    return _secureStorage.read(key: ID_TOKEN) ?? '';
-  }
+  // Future<void> setIdToken(String idToken) {
+  //   return _secureStorage.write(key: ID_TOKEN, value: idToken);
+  // }
+  // Future<String> getIdToken() {
+  //   return _secureStorage.read(key: ID_TOKEN) ?? '';
+  // }
 }

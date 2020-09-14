@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
       final User user = (await _auth.signInWithCredential(credential)).user;
 
       SharedPrefs _prefs = await SharedPrefs.create();
-      await _prefs.setIdToken(await user.getIdToken());
+      // await _prefs.setIdToken(await user.getIdToken());
       await _prefs.setUserId(user.uid);
       await _prefs.setMailAddress(user.email);
       await _prefs.setAccountType(user.providerData[0].providerId);

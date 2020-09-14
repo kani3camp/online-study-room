@@ -23,12 +23,16 @@ class SettingPageState extends State<SettingPage> {
   Duration _sumStudyTime = new Duration();
   DateTime _registrationDate = DateTime.now();
 
+  final _displayNameController = TextEditingController();
+  final _quickWordController = TextEditingController();
+
+  bool _isButtonDisabled = true;
 
   @override
   void initState() {
     _initPreferences();
-    super.initState();
     _fetchPreferences();
+    super.initState();
   }
 
   Future<void> _initPreferences() async {
@@ -40,14 +44,22 @@ class SettingPageState extends State<SettingPage> {
     _sumStudyTime = _prefs.getSumStudyTime();
     _registrationDate = _prefs.getRegistrationDate();
 
+    _displayNameController.text = _displayName;
+    _quickWordController.text = _quickWord;
+
+    _displayNameController.addListener(updateButtonState);
+    _quickWordController.addListener(updateButtonState);
+
     setState(() {});
   }
 
   Future<void> _fetchPreferences() async {
-    SharedPrefs _prefs = await SharedPrefs.create();
+    if (_prefs == null) {
+      _prefs = await SharedPrefs.create();
+    }
     String userId = await _prefs.getUserId();
     Map<String, String> queryParams = {
-      'user_id': userId
+      'user_id': await _prefs.getUserId()
     };
     Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/UserStatus', queryParams);
     final response = await http.get(uri);
@@ -55,10 +67,10 @@ class SettingPageState extends State<SettingPage> {
       UserStatusResponse userStatusResp = UserStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       if (userStatusResp.result == 'ok') {
         UserBody user = userStatusResp.userStatus.userBody;
-        _prefs.setDisplayName(user.name);
-        _prefs.setQuickWord(user.status);
-        // _prefs.setSumStudyTime(user.); todo
-        _prefs.setRegistrationDate(user.registrationDate);
+        await _prefs.setDisplayName(user.name);
+        await _prefs.setQuickWord(user.status);
+        // await _prefs.setSumStudyTime(user.); todo
+        await _prefs.setRegistrationDate(user.registrationDate);
 
         await _initPreferences();
       } else {
@@ -67,7 +79,47 @@ class SettingPageState extends State<SettingPage> {
     } else {
       throw Exception('http request failed');
     }
+  }
 
+  void updateButtonState() {
+    setState(() {
+      _isButtonDisabled =
+          _displayName == _displayNameController.text
+          && _quickWord == _quickWordController.text;
+    });
+  }
+
+  Future<void> saveNewValues() async {
+    setState(() {
+      _isButtonDisabled = true;
+    });
+    final _body = {
+      'display_name': _displayNameController.text,
+      'status_message': _quickWordController.text,
+      'user_id': await _prefs.getUserId(),
+      'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
+    };
+    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/ChangeUserInfo');
+
+    final response = await http.post(
+        uri,
+        body: _body);
+    if (response.statusCode == 200) {
+      ChangeUserInfoResponse changeUserInfoResp = ChangeUserInfoResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+      if (changeUserInfoResp.result == 'ok') {
+        await _prefs.setDisplayName(_displayNameController.text);
+        await _prefs.setQuickWord(_quickWordController.text);
+
+        await _initPreferences();
+      } else {
+        throw Exception('Failed to change user info: ' + changeUserInfoResp.message);
+      }
+    } else {
+      setState(() {
+        _isButtonDisabled = false;
+      });
+      throw Exception('http request failed');
+    }
   }
 
   @override
@@ -80,53 +132,45 @@ class SettingPageState extends State<SettingPage> {
       ),
       body: ListView(
         children: [
-          Container(
-            child: Row(
-              children: [
-                Text('表示名：'),
-                Text(_displayName),
-              ],
+          Text('表示名：'),
+          ListTile(
+            title: TextField(
+              controller: _displayNameController,
+              decoration: InputDecoration(
+                hintText: '表示名'
+              ),
             ),
           ),
-          Container(
-            child: Row(
-              children: [
-                Text('ひとこと：'),
-                Text(_quickWord),
-              ],
+          Text('ひとこと：'),
+          ListTile(
+            title: TextField(
+              controller: _quickWordController,
+              decoration: InputDecoration(
+                hintText: 'ひとこと'
+              ),
             ),
           ),
           Divider(),
-          Container(
-            child: Row(
-              children: [
-                Text('ログイン中のアカウントの種類：'),
-                Text(_accountType),
-              ],
-            ),
+          Text('ログイン中のアカウントの種類：'),
+          ListTile(
+            title: Text(_accountType),
+          ),
+          Text('メールアドレス：'),
+          ListTile(
+            title: Text(_mailAddress),
+          ),
+          Text('合計学習時間：'),
+          ListTile(
+            title: Text(_sumStudyTime.toString() + '分'),
+          ),
+          Text('登録日：'),
+          ListTile(
+            title: Text(_registrationDate.toString()),
           ),
           Container(
-            child: Row(
-              children: [
-                Text('メールアドレス：'),
-                Text(_mailAddress),
-              ],
-            ),
-          ),
-          Container(
-            child: Row(
-              children: [
-                Text('合計学習時間：'),
-                Text(_sumStudyTime.toString() + '分'),
-              ],
-            ),
-          ),
-          Container(
-            child: Row(
-              children: [
-                Text('登録日：'),
-                Text(_registrationDate.toString()),
-              ],
+            child: RaisedButton(
+              child: Text('保存'),
+              onPressed: _isButtonDisabled ? null : saveNewValues,
             ),
           ),
           Container(
@@ -144,6 +188,14 @@ class SettingPageState extends State<SettingPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    _displayNameController.dispose();
+    super.dispose();
   }
 }
 
@@ -201,6 +253,20 @@ class UserBody {
       online: json['online'] as bool,
       status: json['status'] as String,
       registrationDate: DateTime.parse(json['registration_date'])
+    );
+  }
+}
+
+class ChangeUserInfoResponse {
+  final String result;
+  final String message;
+
+  ChangeUserInfoResponse({this.result, this.message});
+
+  factory ChangeUserInfoResponse.fromJson(Map<String, dynamic> json) {
+    return ChangeUserInfoResponse(
+        result: json['result'] as String,
+        message: json['message'] as String,
     );
   }
 }
