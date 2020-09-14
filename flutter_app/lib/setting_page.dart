@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,14 +14,7 @@ class SettingPage extends StatefulWidget {
 }
 
 class SettingPageState extends State<SettingPage> {
-  SharedPreferences _prefs;
-
-  static const DISPLAY_NAME = 'display-name';
-  static const QUICK_WORD = 'quick-word';
-  static const ACCOUNT_TYPE = 'account-type';
-  static const MAIL_ADDRESS = 'mail-address';
-  static const SUM_STUDY_TIME = 'sum-study-time';
-  static const REGISTRATION_DATE = 'registration-date';
+  SharedPrefs _prefs;
 
   String _displayName = '';
   String _quickWord = '';
@@ -36,20 +32,22 @@ class SettingPageState extends State<SettingPage> {
   }
 
   Future<void> _initPreferences() async {
-    _prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _displayName = _prefs.getString(DISPLAY_NAME) ?? '';
-      _quickWord = _prefs.getString(QUICK_WORD) ?? '';
-      _accountType = _prefs.getString(ACCOUNT_TYPE) ?? '';
-      _mailAddress = _prefs.getString(MAIL_ADDRESS) ?? '';
-      _sumStudyTime = new Duration(minutes: _prefs.getInt(SUM_STUDY_TIME) ?? 0);
-      _registrationDate = DateTime.fromMillisecondsSinceEpoch(_prefs.getInt(REGISTRATION_DATE) ?? 0);
-    });
+    _prefs = await SharedPrefs.create();
+    _displayName = await _prefs.getDisplayName();
+    _quickWord = await _prefs.getQuickWord();
+    _accountType = await _prefs.getAccountType();
+    _mailAddress = await _prefs.getMailAddress();
+    _sumStudyTime = _prefs.getSumStudyTime();
+    _registrationDate = _prefs.getRegistrationDate();
+
+    setState(() {});
   }
 
   Future<void> _fetchPreferences() async {
+    SharedPrefs _prefs = await SharedPrefs.create();
+    String userId = await _prefs.getUserId();
     Map<String, String> queryParams = {
-      'user_id': 'test01'
+      'user_id': userId
     };
     Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/UserStatus', queryParams);
     final response = await http.get(uri);
@@ -57,10 +55,10 @@ class SettingPageState extends State<SettingPage> {
       UserStatusResponse userStatusResp = UserStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       if (userStatusResp.result == 'ok') {
         UserBody user = userStatusResp.userStatus.userBody;
-        _prefs.setString(DISPLAY_NAME, user.name);
-        _prefs.setString(QUICK_WORD, user.status);
-        // todo _prefs.setInt(SUM_STUDY_TIME, )
-        _prefs.setInt(REGISTRATION_DATE, user.registrationDate.millisecondsSinceEpoch);
+        _prefs.setDisplayName(user.name);
+        _prefs.setQuickWord(user.status);
+        // _prefs.setSumStudyTime(user.); todo
+        _prefs.setRegistrationDate(user.registrationDate);
 
         await _initPreferences();
       } else {
@@ -102,7 +100,7 @@ class SettingPageState extends State<SettingPage> {
           Container(
             child: Row(
               children: [
-                Text('ログイン中のアカウント：'),
+                Text('ログイン中のアカウントの種類：'),
                 Text(_accountType),
               ],
             ),
@@ -127,10 +125,22 @@ class SettingPageState extends State<SettingPage> {
             child: Row(
               children: [
                 Text('登録日：'),
-                Text(_registrationDate.toString()), // todo
+                Text(_registrationDate.toString()),
               ],
             ),
           ),
+          Container(
+            child: RaisedButton(
+              child: Text('ログアウト'),
+              onPressed: () {
+                setState(() {
+                  FirebaseAuth.instance.signOut();
+                  GoogleSignIn().signOut();
+                  Navigator.of(context).pushReplacementNamed('/login');
+                });
+              },
+            ),
+          )
         ],
       ),
     );

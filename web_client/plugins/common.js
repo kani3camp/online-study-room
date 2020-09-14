@@ -16,8 +16,6 @@ common.onAuthStateChanged = (vm) => {
       vm.$store.commit('user/setUserId', user.uid)
       vm.$store.commit('user/setProviderId', user.providerData[0].providerId)
 
-      // var emailVerified = user.emailVerified
-
       console.log('User is signed in.')
       vm.$store.commit('setSignInState', true)
 
