@@ -41,7 +41,14 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     if(_error) {
-      // return SomethingWentWrong();
+      return MaterialApp(
+        title: 'エラー発生',
+        home: Scaffold(
+          body: AlertDialog(
+            content: Text('エラーが発生しました'),
+          ),
+        ),
+      );
     }
 
     if (!_initialized) {
