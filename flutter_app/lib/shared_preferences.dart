@@ -1,24 +1,19 @@
 import 'dart:async';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefs {
   SharedPreferences _prefs;
+
   // FlutterSecureStorage _secureStorage;
+
+  Future _doneFuture;
 
   SharedPrefs();
 
-  Future<void> _init() async {
+  Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     // _secureStorage = new FlutterSecureStorage();
-  }
-  SharedPrefs._create() {
-    _init();
-  }
-  static Future<SharedPrefs> create() async {
-    var component = SharedPrefs._create();
-    return component;
   }
 
   static const USES_ID = 'user-id';

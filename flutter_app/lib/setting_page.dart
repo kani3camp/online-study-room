@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class SettingPage extends StatefulWidget {
@@ -36,7 +35,8 @@ class SettingPageState extends State<SettingPage> {
   }
 
   Future<void> _initPreferences() async {
-    _prefs = await SharedPrefs.create();
+    _prefs = new SharedPrefs();
+    await _prefs.init();
     _displayName = await _prefs.getDisplayName();
     _quickWord = await _prefs.getQuickWord();
     _accountType = await _prefs.getAccountType();
@@ -55,9 +55,9 @@ class SettingPageState extends State<SettingPage> {
 
   Future<void> _fetchPreferences() async {
     if (_prefs == null) {
-      _prefs = await SharedPrefs.create();
+      _prefs = new SharedPrefs();
+      await _prefs.init();
     }
-    String userId = await _prefs.getUserId();
     Map<String, String> queryParams = {
       'user_id': await _prefs.getUserId()
     };

@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/room_page.dart';
 import 'package:flutter_app/setting_page.dart';
-import 'package:flutter_app/shared_preferences.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 import 'news_page.dart';
 
@@ -16,9 +14,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  SharedPrefs _prefs;
   int _selectedIndex = 0;
-  bool _initialized = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   static List<Widget> _pageList = [
@@ -35,7 +31,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initializeFlutterFire() async {
     print('initializeFlutterFire()');
-    _prefs = await SharedPrefs.create();
     _auth.authStateChanges().listen((User user) async {
       if (user == null) {
         print('User is currently signed out!');
