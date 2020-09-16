@@ -17,15 +17,20 @@ class _InRoomState extends State<InRoom> {
   String _roomId;
   String _roomName = '';
 
+  bool _isButtonDisabled = true;
+
   Future _init() async {
     _prefs = await generateSharedPrefs();
     _roomId = await _prefs.getCurrentRoomId();
     _roomName = await _prefs.getCurrentRoomName();
+    setState(() {
+      _isButtonDisabled = false;
+    });
   }
   @override
   void initState() {
-    _init();
     super.initState();
+    _init();
   }
 
   void showExitRoomDialog(BuildContext context) {
@@ -84,11 +89,10 @@ class _InRoomState extends State<InRoom> {
       appBar: AppBar(
         title: Text(_roomName + 'の部屋'),
         leading: FlatButton(
-          onPressed: () {
-            showExitRoomDialog(context);
-          },
+          onPressed: () => _isButtonDisabled ? null : showExitRoomDialog(context),
           child: Icon(
-            Icons.close
+            Icons.close,
+            color: _isButtonDisabled ? Colors.black : Colors.white,
           ),
         ),
       ),

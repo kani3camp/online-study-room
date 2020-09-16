@@ -199,6 +199,7 @@ class SettingPageState extends State<SettingPage> {
     // Clean up the controller when the widget is removed from the
     // widget tree.
     _displayNameController.dispose();
+    _quickWordController.dispose();
     super.dispose();
   }
 }
