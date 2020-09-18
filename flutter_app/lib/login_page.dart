@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
+import 'package:flutter_app/home_page.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
+  static const routeName = '/login';
   LoginPage({Key key}) : super(key: key); // what is this ?
 
   @override
@@ -62,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
         //   _error = true;
         // }); todo
       } else {
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed(MyHomePage.routeName);
       }
     } catch (e) {
       print('エラー発生');

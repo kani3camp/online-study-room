@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/controllers/loading_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+
+import 'in_room.dart';
 
 class RoomPage extends StatefulWidget {
   @override
@@ -20,36 +23,9 @@ class _RoomPageState extends State<RoomPage> {
     _prefs = await generateSharedPrefs();
   }
 
-  @override
-  void initState() {
-    _init();
-    super.initState();
-  }
+  Future<void> enterRoom(BuildContext context, Room roomInfo) async {
+    _prefs = await generateSharedPrefs();
 
-  void showEnterRoomDialog(BuildContext context, Room roomInfo) {
-    showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: Text(roomInfo.roomBody.name + 'の部屋に入りますか？'),
-            content: null,
-            actions: <Widget>[
-              // ボタン領域
-              FlatButton(
-                child: Text("キャンセル"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              FlatButton(
-                child: Text("OK"),
-                onPressed: () => enterRoom(roomInfo),
-              ),
-            ],
-          );
-        }
-    );
-  }
-
-  Future<void> enterRoom(Room roomInfo) async {
     final _body = {
       'room_id': roomInfo.roomId,
       'user_id': await _prefs.getUserId(),
@@ -65,14 +41,63 @@ class _RoomPageState extends State<RoomPage> {
       if (enterRoomResp.result == 'ok') {
         await _prefs.setCurrentRoomId(roomInfo.roomId);
         await _prefs.setCurrentRoomName(roomInfo.roomBody.name);
-        Navigator.of(context).pushNamed('/in_room');
+        Navigator.of(context).pushNamed(
+            InRoom.routeName,
+            arguments: InRoomArguments(roomInfo)
+        );
       } else {
+        Navigator.pop(context);
         throw Exception('Failed to enter room : ' + enterRoomResp.message);
       }
     } else {
+      Navigator.pop(context);
       throw Exception('http request failed');
     }
   }
+
+  @override
+  void initState() {
+    _init();
+    super.initState();
+  }
+
+  void showEnterRoomDialog(BuildContext context, Room roomInfo) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(roomInfo.roomBody.name + 'の部屋に入りますか？'),
+            content: null,
+            actions: <Widget>[
+              // ボタン領域
+              FlatButton(
+                child: Text("キャンセル"),
+                onPressed: () => Navigator.pop(context),
+              ),
+              FlatButton(
+                child: Text("OK"),
+                onPressed: () {
+                  LoadingDialog.show(context, title: '入室中');
+                  enterRoom(context, roomInfo);
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  // void showLoadingDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) {
+  //       return AlertDialog(
+  //         title: Text('入室中'),
+  //         content: CircularProgressIndicator(),
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

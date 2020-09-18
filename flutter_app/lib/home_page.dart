@@ -7,6 +7,7 @@ import 'package:flutter_app/pages/setting_page.dart';
 import 'pages/news_page.dart';
 
 class MyHomePage extends StatefulWidget {
+  static const routeName = '/home';
   MyHomePage({Key key}) : super(key: key);
 
   @override

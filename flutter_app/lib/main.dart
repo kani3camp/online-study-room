@@ -76,9 +76,9 @@ class _AppState extends State<App> {
       ),
       home: Splash(),
       routes: <String, WidgetBuilder>{
-        '/login': (_) => new LoginPage(),
-        '/home': (_) => new MyHomePage(),
-        '/in_room': (_) => new InRoom(),
+        LoginPage.routeName: (_) => LoginPage(),
+        MyHomePage.routeName: (_) => MyHomePage(),
+        InRoom.routeName: (_) => InRoom(),
       }
     );
   }
