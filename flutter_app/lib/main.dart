@@ -71,7 +71,7 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: 'オンライン作業部屋',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Splash(),

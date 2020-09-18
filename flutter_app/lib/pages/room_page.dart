@@ -41,9 +41,7 @@ class _RoomPageState extends State<RoomPage> {
               ),
               FlatButton(
                 child: Text("OK"),
-                onPressed: () async {
-                  await enterRoom(roomInfo);
-                },
+                onPressed: () => enterRoom(roomInfo),
               ),
             ],
           );
