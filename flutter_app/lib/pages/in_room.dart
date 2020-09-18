@@ -69,18 +69,6 @@ class _InRoomState extends State<InRoom> {
     }
   }
 
-  // void showLoadingDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (_) {
-  //       return AlertDialog(
-  //         title: Text('入室中'),
-  //         content: CircularProgressIndicator(),
-  //       );
-  //     },
-  //   );
-  // }
-
   @override
   void initState() {
     super.initState();

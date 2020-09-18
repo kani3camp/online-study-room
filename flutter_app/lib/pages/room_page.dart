@@ -87,18 +87,6 @@ class _RoomPageState extends State<RoomPage> {
     );
   }
 
-  // void showLoadingDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (_) {
-  //       return AlertDialog(
-  //         title: Text('入室中'),
-  //         content: CircularProgressIndicator(),
-  //       );
-  //     },
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
