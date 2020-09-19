@@ -49,6 +49,15 @@ func EnterRoom(w http.ResponseWriter, r *http.Request)  {
 								apiResponse.Message = "You are already in the " + currentRoomId
 							} else {
 								_, _ = LeaveRoom(currentRoomId, userId, client, ctx)
+								client.Close()
+
+								client, err = firestore.NewClient(ctx, ProjectId)
+								if err != nil {
+									log.Println(err)
+									apiResponse.Result = ERROR
+									apiResponse.Message = "Failed enterRoom()"
+								}
+
 								_, err := enterRoom(roomId, userId, client, ctx)
 								if err != nil {
 									log.Println(err)

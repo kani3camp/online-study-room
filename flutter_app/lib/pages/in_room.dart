@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/loading_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:flutter_app/pages/room_page.dart';
+import 'package:flutter_app/pages/setting_page.dart';
 import 'package:http/http.dart' as http;
 
 import '../home_page.dart';
@@ -28,6 +29,7 @@ class _InRoomState extends State<InRoom> {
   String _roomId;
   String _roomName = '';
   Room _roomInfo;
+  String _enteredTime = '　時　分';
 
   bool _isButtonDisabled = true;
 
@@ -35,9 +37,24 @@ class _InRoomState extends State<InRoom> {
     _prefs = await generateSharedPrefs();
     _roomId = await _prefs.getCurrentRoomId();
     _roomName = await _prefs.getCurrentRoomName();
-    setState(() {
+    await updateUserData();
+    setState(() {});
+  }
 
-    });
+  Future updateUserData() async {
+    Map<String, String> queryParams = {
+      'user_id': await _prefs.getUserId()
+    };
+    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/UserStatus', queryParams);
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      UserStatusResponse userStatusResp = UserStatusResponse.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
+      if (userStatusResp.result == 'ok') {
+        UserBody user = userStatusResp.userStatus.userBody;
+        _enteredTime = user.lastEntered.hour.toString() + '時' + user.lastEntered.minute.toString() + '分';
+      }
+    }
   }
 
   Future<void> exitRoom(BuildContext context, Room roomInfo) async {
@@ -124,6 +141,16 @@ class _InRoomState extends State<InRoom> {
           ),
         ),
       ),
+      body: Column(
+        children: [
+          Text('入室時刻：' + _enteredTime),
+          Divider(),
+          Align(
+              child: Text('入室中の他のユーザー'),
+              alignment: Alignment.centerLeft
+          ),
+        ]
+      )
     );
   }
 }

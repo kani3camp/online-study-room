@@ -251,10 +251,10 @@ class UserBody {
   factory UserBody.fromJson(Map<String, dynamic> json) {
     return UserBody(
       inRoom: json['in'] as String,
-      lastAccess: DateTime.parse(json['last_access']),
-      lastEntered: DateTime.parse(json['last_entered']),
-      lastExited: DateTime.parse(json['last_exited']),
-      lastStudied: DateTime.parse(json['last_studied']),
+      lastAccess: DateTime.parse(json['last_access']).toLocal(),
+      lastEntered: DateTime.parse(json['last_entered']).toLocal(),
+      lastExited: DateTime.parse(json['last_exited']).toLocal(),
+      lastStudied: DateTime.parse(json['last_studied']).toLocal(),
       name: json['name'] as String,
       online: json['online'] as bool,
       status: json['status'] as String,
