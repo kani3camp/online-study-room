@@ -61,9 +61,6 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	previousUsers := e.OldValue.Fields.Users.ArrayValue.Values
 	newUsers := e.Value.Fields.Users.ArrayValue.Values
 	
-	log.Println(previousUsers)
-	log.Println(newUsers)
-	
 	var enteredUser, leftUser []string
 	
 	for _, newUser := range newUsers {
@@ -95,6 +92,10 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	
 	if len(enteredUser) > 1 {log.Fatalln("More than 1 people entered : ",  enteredUser)}
 	if len(leftUser) > 1 {log.Fatalln("More than 1 people left : ",  leftUser)}
+	if len(enteredUser) > 1 || len(leftUser) > 1 {
+		log.Println("previousUsers : ", previousUsers)
+		log.Println("newUsers : ", newUsers)
+	}
 	
 	usersCollectionRef := client.Collection(USERS)
 	fullPath := strings.Split(e.Value.Name, "/documents/")[1]
@@ -102,7 +103,7 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	doc := strings.Join(pathParts[1:], "/")
 	
 	if len(enteredUser) > 0 {
-		log.Printf("Entered! entered_user is %s while left_user.length is %d\n", enteredUser[0], len(leftUser))
+		log.Printf("Entered! entered_user is %s\n", enteredUser[0])
 		userId := enteredUser[0]
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
 			"online": true,
@@ -130,7 +131,7 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 			defer SendLiveChatMessage(userBody.Name + "さんが" + roomBody.Name + "の部屋に入室しました。", client, ctx)
 		}
 	} else if len(leftUser) > 0 {
-		log.Printf("Left! left_user is %s while entered_user.length is %d\n", leftUser[0], len(enteredUser))
+		log.Printf("Left! left_user is %s\n", leftUser[0])
 		userId := leftUser[0]
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
 			"online":       false,
