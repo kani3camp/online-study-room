@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 type CreateNewUserResponseStruct struct {
@@ -33,7 +34,7 @@ func CreateNewUser(w http.ResponseWriter, r *http.Request)  {
 	password := r.FormValue("password")
 	var apiResp CreateNewUserResponseStruct
 	
-	if password == "fjinwoe21aj7857pjwoqpei9q2mp83c92q3j44j9r48cn9jfvadfk90wofiwjfw" {
+	if password == os.Getenv("password") {
 		if userId == "" || userName == "" {
 			apiResp.Result = ERROR
 			apiResp.Message = InvalidParams
