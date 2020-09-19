@@ -4,46 +4,73 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class NewsPage extends StatelessWidget {
+class NewsPage extends StatefulWidget {
+  @override
+  _NewsPageState createState() => _NewsPageState();
+}
+
+class _NewsPageState extends State<NewsPage> {
+  Future<List> _futureList;
+
+  Future<void> _init() async {
+    _futureList = fetchNewsList();
+  }
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<bool> _onRefresh() async {
+    _futureList = fetchNewsList();
+    await _futureList;
+    setState(() {});
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<List> futureList = fetchNewsList();
-
     return Scaffold(
       appBar: AppBar(
         title: Center(
           child: Text('お知らせ')
         ),
       ),
-      body: FutureBuilder<List>(
-        future: futureList,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.separated(
-              padding: const EdgeInsets.all(8),
-              itemCount: snapshot.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  child: ListTile(
-                    title: Text(snapshot.data[index].newsBody.title),
-                    subtitle: Text(snapshot.data[index].newsBody.textBody),
-                  ),
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
-            );
-          } else if (snapshot.hasError) {
-            print(snapshot.error);
-          } else {
-          }
-          return Center(child: CircularProgressIndicator());
+      body: RefreshIndicator(
+        onRefresh: () {
+          return _onRefresh();
         },
+        child: FutureBuilder<List>(
+          future: _futureList,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.separated(
+                padding: const EdgeInsets.all(8),
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    child: ListTile(
+                      title: Text(snapshot.data[index].newsBody.title),
+                      subtitle: Text(snapshot.data[index].newsBody.textBody),
+                    ),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) => const Divider(),
+              );
+            } else if (snapshot.hasError) {
+              print(snapshot.error);
+            } else {
+            }
+            return Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
 }
 
 Future<List> fetchNewsList() async {
+  print('fetchNewsList()');
   Map<String, String> queryParams = {
     'num_news': '10'
   };

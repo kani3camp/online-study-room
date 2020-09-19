@@ -23,6 +23,13 @@ class _RoomPageState extends State<RoomPage> {
     _prefs = await generateSharedPrefs();
   }
 
+  Future<bool> _onRefresh() async {
+    _futureList = fetchRooms();
+    await _futureList;
+    setState(() {});
+    return true;
+  }
+
   Future<void> enterRoom(BuildContext context, Room roomInfo) async {
     _prefs = await generateSharedPrefs();
 
@@ -95,32 +102,37 @@ class _RoomPageState extends State<RoomPage> {
             child: Text('カテゴリ一覧')
         ),
       ),
-      body: FutureBuilder<List<Room>>(
-        future: _futureList,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final List<Room> rooms = snapshot.data;
-            return ListView.separated(
-              padding: const EdgeInsets.all(8),
-              itemCount: rooms.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  child: ListTile(
-                    title: Text(rooms[index].roomBody.name),
-                    onTap: () {
-                      showEnterRoomDialog(context, rooms[index]);
-                    },
-                  ),
+      body: RefreshIndicator(
+          onRefresh: () {
+            return _onRefresh();
+          },
+          child: FutureBuilder<List<Room>>(
+            future: _futureList,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final List<Room> rooms = snapshot.data;
+                return ListView.separated(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: rooms.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Container(
+                      child: ListTile(
+                        title: Text(rooms[index].roomBody.name),
+                        onTap: () {
+                          showEnterRoomDialog(context, rooms[index]);
+                        },
+                      ),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) => const Divider(),
                 );
-              },
-              separatorBuilder: (BuildContext context, int index) => const Divider(),
-            );
-          } else if (snapshot.hasError) {
-            print(snapshot.error);
-          } else {
-          }
-          return Center(child: CircularProgressIndicator());
-        },
+              } else if (snapshot.hasError) {
+                print(snapshot.error);
+              } else {
+              }
+              return Center(child: CircularProgressIndicator());
+            },
+          )
       ),
     );
   }
