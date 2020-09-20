@@ -84,7 +84,9 @@ class SettingPageState extends State<SettingPage> {
     setState(() {
       _isButtonDisabled =
           _displayName == _displayNameController.text
-          && _quickWord == _quickWordController.text;
+              && _quickWord == _quickWordController.text
+              || _displayNameController.text == ''
+              || _quickWordController.text == '';
     });
   }
 
