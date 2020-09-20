@@ -37,6 +37,11 @@ func UserStatus(w http.ResponseWriter, r *http.Request)  {
 		apiResp.Message = InvalidParams
 	} else {
 		// todo userが存在するか？
+
+		app, _ := InitializeFirebaseApp(ctx)
+		authClient, _ := app.Auth(ctx)
+		user, _ := authClient.GetUser(ctx, userId)
+
 		userInfo, err := GetUserInfo(userId, client, ctx)
 		if err != nil {
 			log.Println(err)
@@ -45,6 +50,7 @@ func UserStatus(w http.ResponseWriter, r *http.Request)  {
 		} else {
 			apiResp.UserStatus = UserStruct{
 				UserId: userId,
+				DisplayName: user.DisplayName,
 				Body:   userInfo,
 			}
 			apiResp.Result = OK

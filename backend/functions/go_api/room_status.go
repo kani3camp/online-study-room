@@ -12,24 +12,33 @@ type RoomStatusResponseStruct struct {
 	Result string `json:"result"`
 	Message string `json:"message"`
 	RoomStatus RoomStruct `json:"room_status"`
-	UserNames []string `json:"user_names"`
+	Users []UserStruct `json:"users"`
 }
 
-func GetRoomUserNames(roomId string, client *firestore.Client, ctx context.Context) ([]string, error) {
+func GetRoomUsers(roomId string, client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
 	var err error
-	var userNames []string
+	var users []UserStruct
+
+	app, _ := InitializeFirebaseApp(ctx)
+	authClient, _ := app.Auth(ctx)
+
 	roomInfo, err := GetRoomInfo(roomId, client, ctx)
 	if err != nil {
 	} else {
-		for _, id := range roomInfo.Users {
-			userInfo, err := GetUserInfo(id, client, ctx)
+		for _, userId := range roomInfo.Users {
+			userBody, err := GetUserInfo(userId, client, ctx)
 			if err != nil {
 			} else {
-				userNames = append(userNames, userInfo.Name)
+				user, _ := authClient.GetUser(ctx, userId)
+				users = append(users, UserStruct{
+					UserId: userId,
+					DisplayName: user.DisplayName,
+					Body: userBody,
+				})
 			}
 		}
 	}
-	return userNames, err
+	return users, err
 }
 
 func GetRoomInfo(roomId string, client *firestore.Client, ctx context.Context) (RoomBodyStruct, error) {
@@ -64,12 +73,12 @@ func RoomStatus(w http.ResponseWriter, r *http.Request) {
 				Body:   roomInfo,
 			}
 			
-			userNames, err := GetRoomUserNames(roomId, client, ctx)
+			users, err := GetRoomUsers(roomId, client, ctx)
 			if err != nil {
 				apiResp.Result = ERROR
 				apiResp.Message = err.Error()
 			} else {
-				apiResp.UserNames = userNames
+				apiResp.Users = users
 				apiResp.Result = OK
 			}
 		}

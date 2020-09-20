@@ -121,14 +121,14 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 			"user-id":  userId,
 			"time":     firestore.ServerTimestamp,
 		}, client, ctx)
-		userBody, err1 := GetUserInfo(userId, client, ctx)
 		roomBody, err2 := GetRoomInfo(doc, client, ctx)
-		if err1 != nil {
-			log.Fatalln(err1)
-		} else if err2 != nil {
+		if err2 != nil {
 			log.Fatalln(err2)
 		} else {
-			defer SendLiveChatMessage(userBody.Name + "さんが" + roomBody.Name + "の部屋に入室しました。", client, ctx)
+			app, _ := InitializeFirebaseApp(ctx)
+			authClient, _ := app.Auth(ctx)
+			user, _ := authClient.GetUser(ctx, userId)
+			defer SendLiveChatMessage(user.DisplayName + "さんが" + roomBody.Name + "の部屋に入室しました。", client, ctx)
 		}
 	} else if len(leftUser) > 0 {
 		log.Printf("Left! left_user is %s\n", leftUser[0])
@@ -150,14 +150,14 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 			"user-id":  userId,
 			"time":     firestore.ServerTimestamp,
 		}, client, ctx)
-		userBody, err1 := GetUserInfo(userId, client, ctx)
 		roomBody, err2 := GetRoomInfo(doc, client, ctx)
-		if err1 != nil {
-			log.Fatalln(err1)
-		} else if err2 != nil {
+		if err2 != nil {
 			log.Fatalln(err2)
 		} else {
-			defer SendLiveChatMessage(userBody.Name + "さんが" + roomBody.Name + "の部屋を退室しました。", client, ctx)
+			app, _ := InitializeFirebaseApp(ctx)
+			authClient, _ := app.Auth(ctx)
+			user, _ := authClient.GetUser(ctx, userId)
+			defer SendLiveChatMessage(user.DisplayName + "さんが" + roomBody.Name + "の部屋を退室しました。", client, ctx)
 		}
 	} else {
 		log.Println("No changes?")

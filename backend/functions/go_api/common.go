@@ -50,6 +50,7 @@ type RoomBodyStruct struct {
 
 type UserStruct struct {
 	UserId string `json:"user_id"`
+	DisplayName string `json:"display_name"`
 	Body   UserBodyStruct `json:"user_body"`
 }
 
@@ -59,7 +60,7 @@ type UserBodyStruct struct {
 	LastEntered time.Time `firestore:"last-entered" json:"last_entered"`
 	LastExited  time.Time `firestore:"last-exited" json:"last_exited"`
 	LastStudied time.Time `firestore:"last-studied" json:"last_studied"`
-	Name        string    `firestore:"name" json:"name"`
+	//Name        string    `firestore:"name" json:"name"` todo firestoreの方でも消す
 	Online      bool      `firestore:"online" json:"online"`
 	Status      string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
@@ -104,12 +105,12 @@ func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
 
 func IsUserVerified(userId string, idToken string, ctx context.Context) bool {
 	app, _ := InitializeFirebaseApp(ctx)
-	client, err := app.Auth(ctx)
+	authClient, err := app.Auth(ctx)
 	if err != nil {
 		log.Fatalf("error getting Auth client: %v\n", err)
 	}
 	
-	token, err := client.VerifyIDToken(ctx, idToken)
+	token, err := authClient.VerifyIDToken(ctx, idToken)
 	if err != nil {
 		log.Fatalf("error verifying ID token: %v\n", err)
 	}
@@ -190,6 +191,9 @@ func _OnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, 
 		log.Println(err)
 		return []UserStruct{}, err
 	}
+
+	app, _ := InitializeFirebaseApp(ctx)
+	authClient, _ := app.Auth(ctx)
 	
 	if len(userDocs) == 0 {
 		log.Println("There is no user.")
@@ -200,8 +204,10 @@ func _OnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, 
 			var _user UserBodyStruct
 			_ = doc.DataTo(&_user)
 			if _user.Online {
+				user, _ := authClient.GetUser(ctx, doc.Ref.ID)
 				userList = append(userList, UserStruct{
 					UserId: doc.Ref.ID,
+					DisplayName: user.DisplayName,
 					Body:   _user,
 				})
 			}

@@ -3,6 +3,7 @@ package go_api
 import (
 	"cloud.google.com/go/firestore"
 	"encoding/json"
+	"firebase.google.com/go/auth"
 	"log"
 	"net/http"
 )
@@ -25,7 +26,15 @@ func ChangeUserInfo(w http.ResponseWriter, r *http.Request)  {
 		apiResponse.Message = InvalidParams
 	} else {
 		if IsUserVerified(userId, idToken, ctx) {
-			_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+			app, _ := InitializeFirebaseApp(ctx)
+			authClient, _ := app.Auth(ctx)
+			params := (&auth.UserToUpdate{}).DisplayName(displayName)
+			_, err := authClient.UpdateUser(ctx, userId, params)
+			if err != nil {
+				log.Fatalln("Failed to update display name of " + userId)
+			}
+
+			_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 				"last-access": firestore.ServerTimestamp,
 				"name": displayName,
 				"status": statusMessage,
