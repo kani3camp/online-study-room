@@ -72,8 +72,9 @@
             @click="submit"
             color="primary"
             block elevation="3"
-            :disabled="submitting"
-          >送信
+            :disabled="submitting || !selected_contact_type || !message"
+          >
+            送信
           </v-btn>
         </div>
       </v-container>
