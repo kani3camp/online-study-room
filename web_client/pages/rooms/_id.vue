@@ -92,7 +92,7 @@ export default {
       await this.updateUserData()
 
       await this.updateRoomInfo()
-      
+
       // todo staying awake
     } else {
       await this.$router.push('/')
@@ -106,12 +106,13 @@ export default {
         // 存在する部屋のroom_idでなければならない
         const vm = this;
         const room_id = vm.$store.state.room_id
-        let url = new URL("https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus")
-        url.search = new URLSearchParams({room_id}).toString()
-        const resp = await fetch(url.toString(), {method: "GET"}).then(r => r.json())
+        let url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus'
+        let params = {room_id}
+        const resp = await common.httpGet(url, params)
+
         if (resp.result === 'ok') {
-          this.room_name = resp.room_status.room_body.name
-          const users = resp.room_status.room_body.users
+          this.room_name = resp.room_status['room_body'].name
+          const users = resp.room_status['room_body']['users']
           if (!users.includes(vm.$store.state.user.user_id)) {
             console.log('部屋に自分がいないので退室処理')
             await this.$router.push('/')
@@ -148,42 +149,17 @@ export default {
         this.updateUserData()
       }, 15000)
     },
-    // async getOtherUsersData() {
-    //   const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
-    //   const vm = this
-    //   let info = []
-    //   for (const user of this.room_status.room_body.users) {
-    //     if (user !== vm.$store.state.user.user_id) {
-    //       url.search = new URLSearchParams({user_id: user}).toString()
-    //       const resp = await fetch(url.toString(), {method: 'GET'}).then(r => r.json())
-    //       const data = resp['user_status']
-    //
-    //       const study_seconds = new Date().getTime() - new Date(data['user_body'].last_entered).getTime()
-    //       info.push({
-    //         display_name: data['user_body'].name.substr(0, 3),
-    //         time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
-    //       })
-    //     }
-    //   }
-    //   this.other_users_info = info
-    //   this.timeout = setTimeout(() => {
-    //     this.getOtherUsersData()
-    //   }, 10000)
-    // },
     async exitRoom() {
       this.exiting = true
       const vm = this
 
-      const url = "https://us-central1-online-study-room-f1f30.cloudfunctions.net/ExitRoom"
-      const params = new URLSearchParams({
+      const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/ExitRoom'
+      const params = {
         user_id: vm.$store.state.user.user_id,
         room_id: vm.$store.state.room_id,
         id_token: vm.$store.state.user.id_token,
-      })
-      const resp = await fetch(url, {
-        method: 'POST',
-        body: params
-      }).then(response => response.json())
+      }
+      const resp = await common.httpPost(url, params)
 
       if (resp.result === 'ok') {
         this.$store.commit('setRoomId', null)

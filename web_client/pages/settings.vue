@@ -143,6 +143,7 @@
 
 <script>
   import firebase from '../plugins/firebase'
+  import common from "@/plugins/common";
 
   export default {
     name: "settings",
@@ -200,16 +201,13 @@
         this.saving = true
 
         const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/ChangeUserInfo'
-        const params = new URLSearchParams({
+        const params = {
           user_id: this.$store.state.user.user_id,
           id_token: this.$store.state.user.id_token,
           display_name: this.display_name,
           status_message: this.status_message,
-        })
-        const resp = await fetch(url, {
-          method: 'POST',
-          body: params
-        }).then(response => response.json())
+        }
+        const resp = await common.httpPost(url, params)
         if (resp.result === 'ok') {
           console.log('設定変更成功')
           this.$store.commit('user/setDisplayName', this.display_name)

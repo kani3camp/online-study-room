@@ -37,9 +37,10 @@ common.onAuthStateChanged = (vm) => {
 common.getUserData = async (vm) => {
   const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
   const params = { user_id: vm.$store.state.user.user_id }
-  url.search = new URLSearchParams(params).toString()
-  const response = (await fetch(url.toString(), {method: 'GET'}))
-  const user_data = await response.json()
+  // url.search = new URLSearchParams(params).toString()
+  // const response = (await fetch(url.toString(), {method: 'GET'}))
+  // const user_data = await response.json()
+  const user_data = await common.httpGet(url, params)
   if (user_data.result !== 'ok') {
     console.log(user_data)
   } else {
@@ -51,5 +52,19 @@ common.getUserData = async (vm) => {
   }
 }
 
+common.httpGet = async (url_str, params) => {
+  const url = new URL(url_str)
+  url.search = new URLSearchParams(params).toString()
+  const response = (await fetch(url.toString(), {method: 'GET'}))
+  return await response.json()
+}
+
+common.httpPost = async (url_str, _params) => {
+  const params = new URLSearchParams(_params)
+  return await fetch(url_str, {
+    method: 'POST',
+    body: params
+  }).then(r => r.json())
+}
 
 export default common

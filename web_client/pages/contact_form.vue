@@ -137,18 +137,15 @@ export default {
       if (this.selected_contact_type || this.mail_address || this.message) {
         this.submitting = true
 
-        const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/SendContactForm')
-        const params = new URLSearchParams({
+        const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/SendContactForm'
+        const params = {
           mail_address: this.mail_address.toString(),
           user_id: this.$store.state.user.user_id,
           id_token: this.$store.state.user.id_token,
           contact_type: this.selected_contact_type,
           message: this.message,
-        })
-        const resp = await fetch(url.toString(), {
-          method: 'POST',
-          body: params
-        }).then(response => response.json())
+        }
+        const resp = await common.httpPost(url, params)
 
         if (resp.result === 'ok') {
           this.message = null

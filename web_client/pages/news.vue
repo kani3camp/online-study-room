@@ -83,6 +83,8 @@
 </template>
 
 <script>
+import common from "@/plugins/common";
+
 export default {
   name: "news",
   data: () => ({
@@ -92,14 +94,13 @@ export default {
   }),
   async created() {
     this.loading = true
-    const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/News')
-    url.search = new URLSearchParams({
+    const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/News'
+    const params = {
       num_news: 10
-    }).toString()
-    const response = await fetch(url.toString())
-    const resp = await response.json()
+    }
+    const resp = await common.httpGet(url, params)
     if (resp.result === 'ok') {
-      this.newsList = resp.news_list
+      this.newsList = resp['news_list']
     } else {
       console.log(resp.message)
     }

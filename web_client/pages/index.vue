@@ -150,9 +150,8 @@
       common.onAuthStateChanged(this)
 
       this.loading = true
-      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
-      const response = await fetch(url.toString())
-      const resp = await response.json()
+      const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms'
+      const resp = await common.httpGet(url, {})
       if (resp.result === 'ok') {
         this.rooms = resp.rooms
       } else {
@@ -174,8 +173,8 @@
         const vm = this
         const provider = new firebase.auth.GoogleAuthProvider()
         firebase.auth().signInWithPopup(provider).then(function(result) {
-          let token = result.credential.accessToken;
-          let user = result.user;
+          let token = result.credential['accessToken']
+          let user = result.user
           console.log(user)
           vm.dialog_message = 'ログインに成功しました。'
         }).catch(function(error) {
@@ -190,7 +189,7 @@
       },
       confirmEntering(index) {
         this.selected_index = index
-        this.selected_room_name = this.rooms[this.selected_index].room_body.name
+        this.selected_room_name = this.rooms[this.selected_index]['room_body'].name
         this.if_show_dialog = true
       },
       async enterRoom() {
@@ -201,15 +200,12 @@
 
           const selected_room_id = this.rooms[this.selected_index].room_id
           const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/EnterRoom'
-          const params = new URLSearchParams({
+          const params = {
             user_id: this.$store.state.user.user_id,
             room_id: selected_room_id,
             id_token: this.$store.state.user.id_token,
-          })
-          const res = await fetch(url, {
-            method: 'POST',
-            body: params
-          }).then(response => response.json()).catch((e) => {
+          }
+          const res = await common.httpPost(url, params).catch((e) => {
             console.log(e)
             vm.if_show_dialog = false
             vm.dialog_message = '通信に失敗しました。もう一度試してください。'
