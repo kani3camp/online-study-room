@@ -128,7 +128,7 @@
 
         <v-list-item>
           <v-list-item-content>
-            <v-btn color="primary" @click="saveNewValues" :disabled="!is_some_value_changed || saving">保存</v-btn>
+            <v-btn color="primary" @click="saveNewValues" :disabled="!is_some_value_changed || is_some_value_blank || saving">保存</v-btn>
           </v-list-item-content>
         </v-list-item>
 
@@ -159,7 +159,7 @@
       provider_id: null,
       saving: false,
     }),
-    mounted() {
+    created() {
       this.display_name = this.$store.state.user.display_name
       this.status_message = this.$store.state.user.status_message
       this.mail_address = this.$store.state.user.mail_address
@@ -172,6 +172,9 @@
         const bool1 = this.display_name !== this.$store.state.user.display_name
         const bool2 = this.status_message !== this.$store.state.user.status_message
         return bool1 || bool2;
+      },
+      is_some_value_blank: function () {
+        return !this.display_name || !this.status_message
       }
     },
     methods: {
