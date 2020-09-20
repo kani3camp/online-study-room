@@ -51,7 +51,7 @@
                     </v-layout>
                     <v-layout justify-center>
                       <v-card-title>
-                        {{ user_info.user_name }}
+                        {{ user_info.display_name }}
                       </v-card-title>
                     </v-layout>
                     <v-layout justify-center>
@@ -92,10 +92,7 @@ export default {
       await this.updateUserData()
 
       await this.updateRoomInfo()
-
-      // users読み込み
-      await this.getOtherUsersData()
-
+      
       // todo staying awake
     } else {
       await this.$router.push('/')
@@ -111,16 +108,26 @@ export default {
         const room_id = vm.$store.state.room_id
         let url = new URL("https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus")
         url.search = new URLSearchParams({room_id}).toString()
-        const resp = await fetch(url.toString(), {method: "GET"}).then(response =>
-          response.json()
-        )
+        const resp = await fetch(url.toString(), {method: "GET"}).then(r => r.json())
         if (resp.result === 'ok') {
           this.room_name = resp.room_status.room_body.name
           const users = resp.room_status.room_body.users
           if (!users.includes(vm.$store.state.user.user_id)) {
+            console.log('部屋に自分がいないので退室処理')
             await this.$router.push('/')
             return
           }
+          let info = []
+          for (const user of resp.users) {
+            if (user.user_id !== vm.$store.state.user.user_id) {
+              const study_seconds = new Date().getTime() - new Date(user['user_body'].last_entered).getTime()
+              info.push({
+                display_name: user.display_name.substr(0, 3),
+                time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
+              })
+            }
+          }
+          this.other_users_info = info
         }
         this.room_status = resp.room_status
         this.room_timeout = setTimeout(() => {
@@ -141,28 +148,28 @@ export default {
         this.updateUserData()
       }, 15000)
     },
-    async getOtherUsersData() {
-      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
-      const vm = this
-      let info = []
-      for (const user of this.room_status.room_body.users) {
-        if (user !== vm.$store.state.user.user_id) {
-          url.search = new URLSearchParams({user_id: user}).toString()
-          const resp = await fetch(url.toString(), {method: 'GET'}).then(r => r.json())
-          const data = resp['user_status']
-
-          const study_seconds = new Date().getTime() - new Date(data['user_body'].last_entered).getTime()
-          info.push({
-            user_name: data['user_body'].name.substr(0, 3),
-            time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
-          })
-        }
-      }
-      this.other_users_info = info
-      this.timeout = setTimeout(() => {
-        this.getOtherUsersData()
-      }, 10000)
-    },
+    // async getOtherUsersData() {
+    //   const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
+    //   const vm = this
+    //   let info = []
+    //   for (const user of this.room_status.room_body.users) {
+    //     if (user !== vm.$store.state.user.user_id) {
+    //       url.search = new URLSearchParams({user_id: user}).toString()
+    //       const resp = await fetch(url.toString(), {method: 'GET'}).then(r => r.json())
+    //       const data = resp['user_status']
+    //
+    //       const study_seconds = new Date().getTime() - new Date(data['user_body'].last_entered).getTime()
+    //       info.push({
+    //         display_name: data['user_body'].name.substr(0, 3),
+    //         time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
+    //       })
+    //     }
+    //   }
+    //   this.other_users_info = info
+    //   this.timeout = setTimeout(() => {
+    //     this.getOtherUsersData()
+    //   }, 10000)
+    // },
     async exitRoom() {
       this.exiting = true
       const vm = this
