@@ -36,7 +36,6 @@ func ChangeUserInfo(w http.ResponseWriter, r *http.Request)  {
 
 			_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 				"last-access": firestore.ServerTimestamp,
-				"name": displayName,
 				"status": statusMessage,
 			}, firestore.MergeAll)
 			if err != nil {
