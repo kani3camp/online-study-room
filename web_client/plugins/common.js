@@ -11,10 +11,10 @@ common.onAuthStateChanged = (vm) => {
   // const vm = this
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
-      // user.displayNameは使わない。firestoreのnameを使う
       vm.$store.commit('user/setMailAddress', user.email)
       vm.$store.commit('user/setUserId', user.uid)
       vm.$store.commit('user/setProviderId', user.providerData[0].providerId)
+      vm.$store.commit('user/setDisplayName', user.displayName)
 
       console.log('User is signed in.')
       vm.$store.commit('setSignInState', true)
@@ -44,7 +44,6 @@ common.getUserData = async (vm) => {
     console.log(user_data)
   } else {
     const user_body = user_data['user_status']['user_body']
-    vm.$store.commit("user/setUserName", user_body.name)
     vm.$store.commit('user/setStatusMessage', user_body.status)
     // this.$store.commit('user/setSumStudyTime', use) // Todo
     vm.$store.commit('user/setRegistrationDate', new Date(user_body.registration_date))

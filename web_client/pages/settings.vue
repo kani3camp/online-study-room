@@ -159,7 +159,7 @@
       saving: false,
     }),
     mounted() {
-      this.display_name = this.$store.state.user.user_name
+      this.display_name = this.$store.state.user.display_name
       this.status_message = this.$store.state.user.status_message
       this.mail_address = this.$store.state.user.mail_address
       this.sum_study_time = this.$store.state.user.sum_study_time
@@ -168,7 +168,7 @@
     },
     computed: {
       is_some_value_changed: function () {
-        const bool1 = this.display_name !== this.$store.state.user.user_name
+        const bool1 = this.display_name !== this.$store.state.user.display_name
         const bool2 = this.status_message !== this.$store.state.user.status_message
         return bool1 || bool2;
       }
@@ -196,6 +196,7 @@
       //   this.if_show_dialog_1 = false
       // },
       async saveNewValues() {
+        console.log('saveNewValues()')
         this.saving = true
 
         const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/ChangeUserInfo'
@@ -210,11 +211,12 @@
           body: params
         }).then(response => response.json())
         if (resp.result === 'ok') {
-          this.$store.commit('user/setUserName', this.display_name)
+          console.log('設定変更成功')
+          this.$store.commit('user/setDisplayName', this.display_name)
           this.$store.commit('user/setStatusMessage', this.status_message)
         } else {
           console.log(resp)
-          this.display_name = this.$store.state.user.user_name
+          this.display_name = this.$store.state.user.display_name
           this.status_message = this.$store.state.user.status_message
         }
         this.saving = false
