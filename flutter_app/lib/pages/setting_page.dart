@@ -67,7 +67,6 @@ class SettingPageState extends State<SettingPage> {
       UserStatusResponse userStatusResp = UserStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       if (userStatusResp.result == 'ok') {
         UserBody user = userStatusResp.userStatus.userBody;
-        await _prefs.setDisplayName(user.name);
         await _prefs.setQuickWord(user.status);
         // await _prefs.setSumStudyTime(user.); todo
         await _prefs.setRegistrationDate(user.registrationDate);
@@ -90,6 +89,7 @@ class SettingPageState extends State<SettingPage> {
   }
 
   Future<void> saveNewValues() async {
+    print('saveNewValues()');
     setState(() {
       _isButtonDisabled = true;
     });
@@ -107,6 +107,7 @@ class SettingPageState extends State<SettingPage> {
     if (response.statusCode == 200) {
       ChangeUserInfoResponse changeUserInfoResp = ChangeUserInfoResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       if (changeUserInfoResp.result == 'ok') {
+        print('設定変更成功');
         await _prefs.setDisplayName(_displayNameController.text);
         await _prefs.setQuickWord(_quickWordController.text);
 
@@ -223,13 +224,19 @@ class UserStatusResponse {
 
 class UserStatus {
   final String userId;
+  final String displayName;
   final UserBody userBody;
 
-  UserStatus({this.userId, this.userBody});
+  UserStatus({
+    this.userId,
+    this.displayName,
+    this.userBody
+  });
 
   factory UserStatus.fromJson(Map<String, dynamic> json) {
     return UserStatus(
       userId: json['user_id'] as String,
+      displayName: json['display_name'] as String,
       userBody: UserBody.fromJson(json['user_body'])
     );
   }
@@ -241,12 +248,22 @@ class UserBody {
   final DateTime lastEntered;
   final DateTime lastExited;
   final DateTime lastStudied;
-  final String name;
+  // final String name;
   final bool online;
   final String status;
   final DateTime registrationDate;
   
-  UserBody({this.inRoom, this.lastAccess, this.lastEntered, this.lastExited, this.lastStudied, this.name, this.online, this.status, this.registrationDate});
+  UserBody({
+    this.inRoom,
+    this.lastAccess,
+    this.lastEntered,
+    this.lastExited,
+    this.lastStudied,
+    // this.name,
+    this.online,
+    this.status,
+    this.registrationDate
+  });
   
   factory UserBody.fromJson(Map<String, dynamic> json) {
     return UserBody(
@@ -255,7 +272,7 @@ class UserBody {
       lastEntered: DateTime.parse(json['last_entered']).toLocal(),
       lastExited: DateTime.parse(json['last_exited']).toLocal(),
       lastStudied: DateTime.parse(json['last_studied']).toLocal(),
-      name: json['name'] as String,
+      // name: json['name'] as String,
       online: json['online'] as bool,
       status: json['status'] as String,
       registrationDate: DateTime.parse(json['registration_date'])

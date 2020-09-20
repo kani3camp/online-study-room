@@ -54,7 +54,8 @@ class _LoginPageState extends State<LoginPage> {
       SharedPrefs _prefs = new SharedPrefs();
       await _prefs.init();
       // await _prefs.setIdToken(await user.getIdToken());
-      await _prefs.setUserId(user.uid);
+      await _prefs.setUserId(user.uid); // todo shared preferencesには保存しない
+      await _prefs.setDisplayName(user.displayName); // todo 同上
       await _prefs.setMailAddress(user.email);
       await _prefs.setAccountType(user.providerData[0].providerId);
 
