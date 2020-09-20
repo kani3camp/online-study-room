@@ -30,6 +30,7 @@ class _InRoomState extends State<InRoom> {
   String _roomName = '';
   Room _roomInfo;
   String _enteredTime = '　時　分';
+  List _otherUsers = [];
 
   bool _isButtonDisabled = true;
 
@@ -39,6 +40,26 @@ class _InRoomState extends State<InRoom> {
     _roomName = await _prefs.getCurrentRoomName();
     await updateUserData();
     setState(() {});
+    await updateRoomInfo();
+  }
+
+  Future updateRoomInfo() async {
+    Map<String, String> queryParams = {
+      'room_id': _roomId
+    };
+    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/RoomStatus', queryParams);
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      RoomStatusResponse roomStatusResponse = RoomStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
+      List users = roomStatusResponse.userNames;
+      print(users);
+
+      SharedPrefs _prefs = await generateSharedPrefs();
+      // todo
+      setState(() {
+        _otherUsers = users;
+      });
+    }
   }
 
   Future updateUserData() async {
@@ -149,8 +170,69 @@ class _InRoomState extends State<InRoom> {
               child: Text('入室中の他のユーザー'),
               alignment: Alignment.centerLeft
           ),
+          Flexible(
+            child: GridView.builder(
+              itemCount: _otherUsers.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return GridTile(
+                  child: Text(_otherUsers[index]),
+                );
+              },
+            ),
+          )
         ]
       )
+    );
+  }
+}
+
+class RoomStatusResponse {
+  final String result;
+  final String message;
+  final RoomStatus roomStatus;
+  final List<dynamic> userNames;
+
+  RoomStatusResponse({this.result, this.message, this.roomStatus, this.userNames});
+
+  factory RoomStatusResponse.fromJson(Map<String, dynamic> json) {
+    return RoomStatusResponse(
+        result: json['result'] as String,
+        message: json['message'] as String,
+        roomStatus: RoomStatus.fromJson(json['room_status']),
+        userNames: json['user_names'] as List<dynamic>
+    );
+  }
+}
+
+class RoomStatus {
+  final String roomId;
+  final RoomBody roomBody;
+
+  RoomStatus({this.roomId, this.roomBody});
+
+  factory RoomStatus.fromJson(Map<String, dynamic> json) {
+    return RoomStatus(
+        roomId: json['room_id'] as String,
+        roomBody: RoomBody.fromJson(json['room_body'])
+    );
+  }
+}
+
+class RoomBody {
+  final DateTime created;
+  final String name;
+  final List<dynamic> users;
+
+  RoomBody({this.created, this.name, this.users});
+
+  factory RoomBody.fromJson(Map<String, dynamic> json) {
+    return RoomBody(
+        created: DateTime.parse(json['created']).toLocal(),
+        name: json['name'] as String,
+        users: json['users'] as List<dynamic>,
     );
   }
 }
