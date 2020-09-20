@@ -30,7 +30,7 @@ class _InRoomState extends State<InRoom> {
   String _roomName = '';
   Room _roomInfo;
   String _enteredTime = '　時　分';
-  List _otherUsers = [];
+  List<UserStatus> _roomUsers = [];
 
   bool _isButtonDisabled = true;
 
@@ -51,13 +51,11 @@ class _InRoomState extends State<InRoom> {
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       RoomStatusResponse roomStatusResponse = RoomStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
-      List users = roomStatusResponse.userNames;
+      List<UserStatus> users = roomStatusResponse.users;
       print(users);
 
-      SharedPrefs _prefs = await generateSharedPrefs();
-      // todo
       setState(() {
-        _otherUsers = users;
+        _roomUsers = users;
       });
     }
   }
@@ -172,14 +170,18 @@ class _InRoomState extends State<InRoom> {
           ),
           Flexible(
             child: GridView.builder(
-              itemCount: _otherUsers.length,
+              itemCount: _roomUsers.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2
               ),
               itemBuilder: (BuildContext context, int index) {
-                return GridTile(
-                  child: Text(_otherUsers[index]),
-                );
+                if (_roomUsers[index].userId != FirebaseAuth.instance.currentUser.uid) {
+                  return GridTile(
+                    child: Text(_roomUsers[index].displayName),
+                  );
+                } else {
+                  return null;
+                }
               },
             ),
           )
@@ -193,16 +195,21 @@ class RoomStatusResponse {
   final String result;
   final String message;
   final RoomStatus roomStatus;
-  final List<dynamic> userNames;
+  final List<UserStatus> users;
 
-  RoomStatusResponse({this.result, this.message, this.roomStatus, this.userNames});
+  RoomStatusResponse({
+    this.result,
+    this.message,
+    this.roomStatus,
+    this.users
+  });
 
   factory RoomStatusResponse.fromJson(Map<String, dynamic> json) {
     return RoomStatusResponse(
         result: json['result'] as String,
         message: json['message'] as String,
         roomStatus: RoomStatus.fromJson(json['room_status']),
-        userNames: json['user_names'] as List<dynamic>
+        users: (json['users'] as List<dynamic>).map((i) => UserStatus.fromJson(i)).toList()
     );
   }
 }
