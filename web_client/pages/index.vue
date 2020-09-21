@@ -169,10 +169,10 @@
       goToNewsPage() {
         this.$router.push('/news')
       },
-      signInWithGoogle() {
+      async signInWithGoogle() {
         const vm = this
         const provider = new firebase.auth.GoogleAuthProvider()
-        firebase.auth().signInWithPopup(provider).then(function(result) {
+        await firebase.auth().signInWithPopup(provider).then(function(result) {
           let token = result.credential['accessToken']
           let user = result.user
           console.log(user)
