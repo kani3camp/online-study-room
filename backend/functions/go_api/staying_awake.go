@@ -10,6 +10,7 @@ import (
 type StayingAwakeResponseStruct struct {
 	Result string `json:"result"`
 	Message string `json:"message"`
+	Users []UserStruct `json:"users"`
 }
 
 func StayingAwake(w http.ResponseWriter, r *http.Request)  {
@@ -29,10 +30,29 @@ func StayingAwake(w http.ResponseWriter, r *http.Request)  {
 					"last-access": firestore.ServerTimestamp,
 				}, firestore.MergeAll)
 				if err != nil {
-					log.Fatalln(err)
+					log.Println(err)
+					apiResp.Result = ERROR
+					apiResp.Message = "failed to refresh your last-access"
 				} else {
-					apiResp.Result = OK
-					apiResp.Message = "Successfully updated your last-access."
+					userBody, err := GetUserInfo(userId, client, ctx)
+					if err != nil {
+						apiResp.Result = ERROR
+						apiResp.Message = "failed to retrieve user info"
+					} else {
+						if userBody.In == "" {
+							apiResp.Result = ERROR
+							apiResp.Message = "failed to retrieve users in the room"
+						} else {
+							users, err := GetRoomUsers(userBody.In, client, ctx)
+							if err != nil {
+								apiResp.Result = ERROR
+								apiResp.Message = "failed to retrieve users in the room"
+							} else {
+								apiResp.Result = OK
+								apiResp.Users = users
+							}
+						}
+					}
 				}
 			} else {
 				apiResp.Result = ERROR
