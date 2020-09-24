@@ -37,6 +37,9 @@ func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Cont
 			}
 		}
 	}
+	if users == nil {
+		users = []UserStruct{}
+	}
 	return users, err
 }
 
@@ -49,6 +52,9 @@ func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Conte
 		return RoomBodyStruct{}, err
 	} else {
 		_ = room.DataTo(&roomBodyStruct)
+		if roomBodyStruct.Users == nil {
+			roomBodyStruct.Users = []string{}	// jsonにした時、中身がない場合にnullではなく[]にする
+		}
 		return roomBodyStruct, nil
 	}
 }
