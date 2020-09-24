@@ -120,7 +120,7 @@ func RefreshLiveChatId(config *ApiConfigStruct,client *firestore.Client, ctx con
 	}
 }
 
-func RefreshToken(config *ApiConfigStruct, client *firestore.Client, ctx context.Context) error {
+func RefreshAccessToken(config *ApiConfigStruct, client *firestore.Client, ctx context.Context) error {
 	data := url.Values{}
 	data.Set("client_id", config.ClientId)
 	data.Add("client_secret", config.ClientSecret)
@@ -213,27 +213,30 @@ func PostMessage(message string, config *ApiConfigStruct) (int, error) {
 func SendLiveChatMessage(message string, client *firestore.Client, ctx context.Context) {
 	var config ApiConfigStruct
 	configDoc, err := client.Collection(CONFIG).Doc(API).Get(ctx)
-	if err != nil {log.Fatalln(err)}
+	if err != nil {
+		log.Println(err)
+	}
 	_ = configDoc.DataTo(&config)
 	
 	if config.ExpireDate.Before(time.Now()) {
-		log.Println("Access token is expired. Refreshing...")
-		_ = RefreshToken(&config, client, ctx)
-		//log.Println("New access_token is : " + config.AccessToken)
+		log.Println("access token is expired. refreshing...")
+		_ = RefreshAccessToken(&config, client, ctx)
 	}
 	
 	statusCode, err := PostMessage(message, &config)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	} else if statusCode != 200 {
-		log.Println("First request has failed. Response status code: ", statusCode)
+		log.Println("first post has failed. response status code: ", statusCode)
 		err1 := RefreshLiveChatId(&config, client, ctx)
-		if err1 != nil {log.Fatalln(err1)}
+		if err1 != nil {
+			log.Println(err1)
+		}
 		statusCode, err2 := PostMessage(message, &config)
 		if err2 != nil {
-			log.Fatalln(err2)
+			log.Println(err2)
 		} else if statusCode != 200 {
-			log.Fatalln("Second request has failed. Response status code: ", statusCode)
+			log.Println("second post has also failed. response status code: ", statusCode)
 		}
 	}
 }

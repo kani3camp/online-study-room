@@ -138,7 +138,7 @@ export default {
         await this.$router.push('/')
       }
     },
-    async updateUserData() {
+    async updateUserData() { // todo これは最初の1回だけでいいのでは？
       await common.getUserData(this)
       const date_time = this.$store.state.user.last_entered
       if (date_time) {

@@ -9,12 +9,12 @@ import (
 )
 
 type UserStatusResponseStruct struct {
-	Result string `json:"result"`
-	Message string `json:"message"`
+	Result     string     `json:"result"`
+	Message    string     `json:"message"`
 	UserStatus UserStruct `json:"user_status"`
 }
 
-func GetUserInfo(userId string, client *firestore.Client, ctx context.Context) (UserBodyStruct, error) {
+func RetrieveUserInfo(userId string, client *firestore.Client, ctx context.Context) (UserBodyStruct, error) {
 	var userBodyStruct UserBodyStruct
 	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
 	if err != nil {
@@ -25,7 +25,7 @@ func GetUserInfo(userId string, client *firestore.Client, ctx context.Context) (
 	return userBodyStruct, err
 }
 
-func UserStatus(w http.ResponseWriter, r *http.Request)  {
+func UserStatus(w http.ResponseWriter, r *http.Request) {
 	ctx, client := InitializeHttpFunc(&w)
 	defer client.Close()
 	
@@ -35,26 +35,20 @@ func UserStatus(w http.ResponseWriter, r *http.Request)  {
 	if userId == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
+	} else if isInUsers, _ := IsInUsers(userId, client, ctx); !isInUsers {
+		apiResp.Result = ERROR
+		apiResp.Message = InvalidUser
 	} else {
-		// todo userが存在するか？
-
-		app, _ := InitializeFirebaseApp(ctx)
-		authClient, _ := app.Auth(ctx)
+		authClient, _ := InitializeFirebaseAuthClient(ctx)
 		user, _ := authClient.GetUser(ctx, userId)
-
-		userInfo, err := GetUserInfo(userId, client, ctx)
-		if err != nil {
-			log.Println(err)
-			apiResp.Result = ERROR
-			apiResp.Message = Failed
-		} else {
-			apiResp.UserStatus = UserStruct{
-				UserId: userId,
-				DisplayName: user.DisplayName,
-				Body:   userInfo,
-			}
-			apiResp.Result = OK
+		
+		userInfo, _ := RetrieveUserInfo(userId, client, ctx)
+		apiResp.UserStatus = UserStruct{
+			UserId:      userId,
+			DisplayName: user.DisplayName,
+			Body:        userInfo,
 		}
+		apiResp.Result = OK
 	}
 	
 	bytes, _ := json.Marshal(apiResp)

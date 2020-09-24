@@ -15,13 +15,18 @@ type AuthEvent struct {
 	UID string `json:"uid"`
 }
 
-func createNewUser(userId string, client *firestore.Client, ctx context.Context) (*firestore.WriteResult, error) {
-	return client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
-		"registration-date": firestore.ServerTimestamp, // todo この書き方でいいんだっけ？
-		"last-access":       firestore.ServerTimestamp,
+func CreateNewUser(userId string, client *firestore.Client, ctx context.Context) error {
+	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+		"registration-date": time.Now(),
+		"last-access":       time.Now(),
 		"online":            false,
 		"status":            "",
 	})
+	if err != nil {
+		log.Println("failed to create new user")
+		log.Println(err)
+	}
+	return err
 }
 
 func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent)  error {
@@ -29,9 +34,6 @@ func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent)  error {
 	defer client.Close()
 	
 	userId := e.UID
-	_, err := createNewUser(userId, client, ctx)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	_ = CreateNewUser(userId, client, ctx)
 	return nil
 }

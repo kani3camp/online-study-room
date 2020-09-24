@@ -5,14 +5,18 @@ import (
 	"net/http"
 )
 
+type TestResponse struct {
+	Result string `json:"result"`
+	Message string `json:"message"`
+}
+
 func Test(w http.ResponseWriter, r *http.Request)  {
-	ctx, client := InitializeHttpFunc(&w)
+	_, client := InitializeHttpFunc(&w)
 	defer client.Close()
 
-	userId := r.FormValue("user_id")
-	idToken := r.FormValue("id_token")
-	token := IsUserVerified(userId, idToken, ctx)
+	var apiResp TestResponse
+	apiResp.Result = OK
 	
-	bytes, _ := json.Marshal(token)
+	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)
 }

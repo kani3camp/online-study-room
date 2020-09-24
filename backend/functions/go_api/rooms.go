@@ -12,14 +12,13 @@ import (
 // なぜか、構造体のキーを小文字から始めるとそのデータが返せないので大文字にするように。
 
 type RoomsResponseStruct struct {
-	Result string `json:"result"`
-	Message string `json:"message"`
-	Rooms []RoomStruct `json:"rooms"`
+	Result  string       `json:"result"`
+	Message string       `json:"message"`
+	Rooms   []RoomStruct `json:"rooms"`
 }
 
-func retrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
+func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
 	var rooms []RoomStruct
-	var err error
 	
 	// roomsのコレクションを取得
 	iter := client.Collection(ROOMS).Documents(ctx)
@@ -29,16 +28,19 @@ func retrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 			err = nil
 			break
 		}
-		if err != nil {log.Fatalf("Failed to iterate: %v", err)}
+		if err != nil {
+			log.Printf("Failed to iterate: %v", err)
+			return []RoomStruct{}, err
+		}
 		var _room RoomBodyStruct
 		_ = doc.DataTo(&_room)
-		room := RoomStruct {
+		room := RoomStruct{
 			RoomId: doc.Ref.ID,
 			Body:   _room,
 		}
 		rooms = append(rooms, room)
 	}
-	return rooms, err
+	return rooms, nil
 }
 
 func Rooms(w http.ResponseWriter, r *http.Request) {
@@ -49,15 +51,9 @@ func Rooms(w http.ResponseWriter, r *http.Request) {
 	
 	var apiResp RoomsResponseStruct
 	
-	rooms, err := retrieveRooms(client, ctx)
-	if err != nil {
-		log.Println(err)
-		apiResp.Result = ERROR
-		apiResp.Message = err.Error()
-	} else {
-		apiResp.Result = OK
-		apiResp.Rooms = rooms
-	}
+	rooms, _ := RetrieveRooms(client, ctx)
+	apiResp.Result = OK
+	apiResp.Rooms = rooms
 	
 	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)
