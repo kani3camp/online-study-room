@@ -1,5 +1,5 @@
 
-function_name="RoomStatus"
+function_name="Rooms"
 project_id="online-study-room-f1f30"
 
 gcloud functions deploy $function_name \

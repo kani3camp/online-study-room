@@ -232,6 +232,9 @@ func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserS
 				})
 			}
 		}
+		if userList == nil {
+			userList = []UserStruct{}
+		}
 		return userList, nil
 	}
 }
