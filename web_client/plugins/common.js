@@ -8,7 +8,6 @@ common.c = (m) => {
 }
 
 common.onAuthStateChanged = (vm) => {
-  // const vm = this
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
       vm.$store.commit('user/setMailAddress', user.email)
@@ -37,9 +36,6 @@ common.onAuthStateChanged = (vm) => {
 common.getUserData = async (vm) => {
   const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
   const params = { user_id: vm.$store.state.user.user_id }
-  // url.search = new URLSearchParams(params).toString()
-  // const response = (await fetch(url.toString(), {method: 'GET'}))
-  // const user_data = await response.json()
   const user_data = await common.httpGet(url, params)
   if (user_data.result !== 'ok') {
     console.log(user_data)
@@ -61,10 +57,11 @@ common.httpGet = async (url_str, params) => {
 
 common.httpPost = async (url_str, _params) => {
   const params = new URLSearchParams(_params)
-  return await fetch(url_str, {
+  const response = await fetch(url_str, {
     method: 'POST',
     body: params
-  }).then(r => r.json())
+  })
+  return await response.json()
 }
 
 export default common
