@@ -81,7 +81,7 @@ export default {
     exiting: false,
     other_users_info: [],
     timeout: null,
-    room_timeout: null,
+    stay_awake_timeout: null,
     user_timeout: null
   }),
   async created() {
@@ -89,22 +89,61 @@ export default {
 
     if (this.$store.state.isSignedIn) {
       // 入室時刻を取得
-      await this.updateUserData()
+      this.user_timeout = setTimeout(() => {
+        this.updateUserData()
+      }, 5000)
 
-      await this.updateRoomInfo()
+      await this.fetchRoomData()
 
-      // todo staying awake
+      await this.stayAwake()
     } else {
       await this.$router.push('/')
     }
   },
-  computed: {
-  },
   methods: {
-    async updateRoomInfo() {
+    async stayAwake() {
       if (this.$store.state.isSignedIn) {
         // 存在する部屋のroom_idでなければならない
-        const vm = this;
+        const vm = this
+        const room_id = vm.$store.state.room_id
+        let url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/StayingAwake'
+        let params = {
+          user_id: vm.$store.state.user.user_id,
+          id_token: vm.$store.state.user.id_token,
+        }
+        const resp = await common.httpPost(url, params)
+
+        if (resp.result === 'ok') {
+          let info = []
+          let amIin = false
+          for (const user of resp['users']) {
+            if (user.user_id !== vm.$store.state.user.user_id) {
+              const study_seconds = new Date().getTime() - new Date(user['user_body'].last_entered).getTime()
+              info.push({
+                display_name: user.display_name.substr(0, 3),
+                time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
+              })
+            } else {
+              amIin = true
+            }
+          }
+          if (!amIin) {
+            console.log('部屋に自分がいないので退室処理')
+            await this.$router.push('/')
+          }
+          this.other_users_info = info
+        }
+        this.room_status = resp.room_status
+        this.stay_awake_timeout = setTimeout(() => {
+          this.stayAwake()
+        }, 10000)
+      } else {
+        await this.$router.push('/')
+      }
+    },
+    async fetchRoomData() {
+      if (this.$store.state.isSignedIn) {
+        const vm = this
         const room_id = vm.$store.state.room_id
         let url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus'
         let params = {room_id}
@@ -112,42 +151,18 @@ export default {
 
         if (resp.result === 'ok') {
           this.room_name = resp.room_status['room_body'].name
-          const users = resp.room_status['room_body']['users']
-          if (!users.includes(vm.$store.state.user.user_id)) {
-            console.log('部屋に自分がいないので退室処理')
-            await this.$router.push('/')
-            return
-          }
-          let info = []
-          for (const user of resp.users) {
-            if (user.user_id !== vm.$store.state.user.user_id) {
-              const study_seconds = new Date().getTime() - new Date(user['user_body'].last_entered).getTime()
-              info.push({
-                display_name: user.display_name.substr(0, 3),
-                time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分'
-              })
-            }
-          }
-          this.other_users_info = info
+          this.room_status = resp.room_status
         }
-        this.room_status = resp.room_status
-        this.room_timeout = setTimeout(() => {
-          this.updateRoomInfo()
-        }, 10000)
       } else {
         await this.$router.push('/')
       }
     },
-    async updateUserData() { // todo これは最初の1回だけでいいのでは？
+    async updateUserData() {
       await common.getUserData(this)
       const date_time = this.$store.state.user.last_entered
       if (date_time) {
         this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
       }
-
-      this.user_timeout = setTimeout(() => {
-        this.updateUserData()
-      }, 15000)
     },
     async exitRoom() {
       this.exiting = true

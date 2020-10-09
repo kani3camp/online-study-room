@@ -38,6 +38,9 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 			RoomId: doc.Ref.ID,
 			Body:   _room,
 		}
+		if room.Body.Users == nil {
+			room.Body.Users = []string{}
+		}
 		rooms = append(rooms, room)
 	}
 	return rooms, nil
