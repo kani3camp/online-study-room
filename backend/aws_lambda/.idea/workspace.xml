@@ -20,13 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/my-first-golang-lambda-function.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_function/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +34,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" path="/usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
@@ -64,7 +58,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="terminal" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -117,6 +111,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
+    <state x="520" y="387" key="#GOROOT" timestamp="1603789970386">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="520" y="387" key="#GOROOT/0.0.1440.900@0.0.1440.900" timestamp="1603789970386" />
     <state x="752" y="393" key="#Go_Modules" timestamp="1602264976791">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
@@ -141,9 +139,10 @@
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state width="1877" height="208" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state x="461" y="205" key="SettingsEditor" timestamp="1602270152521">
-      <screen x="0" y="40" width="1920" height="1040" />
+    <state x="346" y="143" key="SettingsEditor" timestamp="1603789920014">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
+    <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1603789920014" />
     <state x="461" y="205" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1602270152521" />
   </component>
 </project>
