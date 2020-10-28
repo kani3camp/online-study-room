@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"google.golang.org/api/iterator"
 	"log"
-	"net/http"
 )
 
 
@@ -47,22 +46,6 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 	return rooms, nil
 }
 
-
-func Rooms(w http.ResponseWriter, r *http.Request) {
-	//ctx, client := InitializeHttpFunc(&w)
-	//defer client.Close()
-	//
-	//UpdateDatabase(client, ctx)
-	//
-	//var apiResp RoomsResponseStruct
-	//
-	//rooms, _ := RetrieveRooms(client, ctx)
-	//apiResp.Result = OK
-	//apiResp.Rooms = rooms
-	//
-	//bytes, _ := json.Marshal(apiResp)
-	//_, _ = w.Write(bytes)
-}
 func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
 	defer client.Close()
