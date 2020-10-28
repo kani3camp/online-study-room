@@ -19,21 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/rooms.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/main" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/main.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/main.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/my-first-golang-lambda-function.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_function/main" beforeDir="false" afterPath="$PROJECT_DIR$/test_function/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_function/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/test_function/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_function/main.zip" beforeDir="false" afterPath="$PROJECT_DIR$/test_function/main.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/update_database.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/update_database.go" afterDir="false" />
-    </list>
+    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
