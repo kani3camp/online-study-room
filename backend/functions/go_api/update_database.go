@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// todo これもcommon.goでよくない？
 // 全オンラインユーザーの最終アクセス時間を調べ、タイムアウトを判断して処理
 func UpdateDatabase(client *firestore.Client, ctx context.Context)  {
 	fmt.Println("updating database...")

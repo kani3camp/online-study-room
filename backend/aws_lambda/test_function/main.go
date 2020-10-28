@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -9,7 +8,7 @@ import (
 
 type TestFunctionParams struct {
 	Name string `json:"name"`
-	Age string `json:"age"`
+	Age int `json:"age"`
 }
 
 type Response struct {
@@ -17,33 +16,34 @@ type Response struct {
 	RequestBody    string `json:"RequestBody"`
 	PathParameter  string `json:"PathParameter"`
 	QueryParameter string `json:"QueryParameter"`
+	Name string `json:"name"`
+	Age int `json:"age"`
 }
 
 
-func HandleLambdaEvent(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleLambdaEvent(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// httpリクエストの情報を取得
-	method := request.HTTPMethod
-	body := request.Body
-	pathParam := request.PathParameters["pathparam"]
-	queryParam := request.QueryStringParameters["queryparam"]
-	
+	body := request.Body	// POSTの場合
+	queryParam := request.QueryStringParameters["name"]	// GETの場合。"name"は適宜keyに変える
+
 	params := TestFunctionParams{}
 	_ = json.Unmarshal([]byte(body), &params)
-	
+
 	// レスポンスとして返すjson文字列を作る
 	res := Response{
-		RequestMethod:  method,
 		RequestBody:    body,
-		PathParameter:  pathParam,
 		QueryParameter: queryParam,
+		Name: params.Name,
+		Age: params.Age,
 	}
 	jsonBytes, _ := json.Marshal(res)
-	
+
 	return events.APIGatewayProxyResponse{
 		Body: string(jsonBytes),
-		//Headers: map[string]string{
-		//	"Content-Type": "application/json",
-		//},
+		StatusCode: 200,	// これないとInternal Server Errorになる
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
 	}, nil
 }
 
