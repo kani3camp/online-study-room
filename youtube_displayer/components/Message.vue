@@ -24,7 +24,7 @@ export default {
       this.updateNumOnlineUsers()
     },
     async updateNumRooms () {
-      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
+      const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms')
       const resp = await fetch(url.toString(), { method: 'GET' }).then(r => r.json())
       if (resp.result === 'ok') {
         if (resp.rooms) {
@@ -37,7 +37,7 @@ export default {
       }
     },
     async updateNumOnlineUsers () {
-      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/OnlineUsers')
+      const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/online_users')
       const resp = await fetch(url.toString(), { method: 'GET' }).then(r => r.json())
       if (resp.result === 'ok') {
         if (resp.online_users) {

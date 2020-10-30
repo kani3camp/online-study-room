@@ -20,40 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/change_user_info.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/create_new_room.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/enter_room.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/exit_room.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/news.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_users.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/room_status.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/send_contact_form.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/send_live_chat_message.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/staying_awake.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user_status.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rooms.go" beforeDir="false" afterPath="$PROJECT_DIR$/rooms.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_function/main" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_function/main.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_function/main.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/enter_room.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/enter_room.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../web_client/.firebase/hosting.ZGlzdA.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/.firebase/hosting.ZGlzdA.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/contact_form.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/contact_form.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/news.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/news.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/plugins/common.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/plugins/common.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/plugins/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/plugins/firebase.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../youtube_displayer/components/Message.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../youtube_displayer/components/Message.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../youtube_displayer/components/RoomInfo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../youtube_displayer/components/RoomInfo.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../youtube_displayer/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../youtube_displayer/pages/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
