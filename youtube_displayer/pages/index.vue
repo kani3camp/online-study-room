@@ -84,7 +84,7 @@ export default {
 html {
   padding: 0;
   margin: 0;
-  font-size: larger;
+  font-size: xx-large;
   width: 1920px;
   height: 1080px;
   overflow: auto;
