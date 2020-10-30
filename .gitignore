@@ -1,23 +1,7 @@
 
-functions/go_api/.idea/go_api.iml
-functions/go_api/.idea/modules.xml
-functions/go_api/.idea/vcs.xml
-functions/go_api/.idea/workspace.xml
-backend/functions/go_api/.idea/workspace.xml
-backend/functions/go_api/.idea/workspace.xml
-web_client/.firebase/hosting.ZGlzdA.cache
+functions/go_api/.idea/
+backend/functions/go_api/.idea/
+web_client/.firebase/
 web_client/node_modules/
 web_client/package-lock.json
-backend/aws_lambda/.idea/aws_lambda.iml
-backend/aws_lambda/.idea/modules.xml
-backend/aws_lambda/.idea/vcs.xml
-backend/aws_lambda/.idea/workspace.xml
-backend/aws_lambda/.idea/workspace.xml
-backend/aws_lambda/.idea/inspectionProfiles/Project_Default.xml
-backend/aws_lambda/.idea/workspace.xml
-backend/aws_lambda/.idea/workspace.xml
-backend/aws_lambda/.idea/workspace.xml
-backend/aws_lambda/.idea/workspace.xml
-backend/aws_lambda/.idea/workspace.xml
-web_client/.firebase/hosting.ZGlzdA.cache
-backend/aws_lambda/test_function/main.zip
+backend/aws_lambda/.idea/
