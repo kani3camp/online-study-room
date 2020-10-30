@@ -150,7 +150,7 @@
       common.onAuthStateChanged(this)
 
       this.loading = true
-      const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms'
+      const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
       const resp = await common.httpGet(url, {})
       if (resp.result === 'ok') {
         this.rooms = resp.rooms
@@ -199,7 +199,7 @@
           this.entering = true
 
           const selected_room_id = this.rooms[this.selected_index].room_id
-          const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/EnterRoom'
+          const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
           const params = {
             user_id: this.$store.state.user.user_id,
             room_id: selected_room_id,

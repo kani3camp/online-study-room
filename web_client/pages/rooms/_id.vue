@@ -106,7 +106,7 @@ export default {
         // 存在する部屋のroom_idでなければならない
         const vm = this
         const room_id = vm.$store.state.room_id
-        let url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/StayingAwake'
+        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/staying_awake'
         let params = {
           user_id: vm.$store.state.user.user_id,
           id_token: vm.$store.state.user.id_token,
@@ -145,7 +145,7 @@ export default {
       if (this.$store.state.isSignedIn) {
         const vm = this
         const room_id = vm.$store.state.room_id
-        let url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus'
+        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
         let params = {room_id}
         const resp = await common.httpGet(url, params)
 
@@ -168,7 +168,7 @@ export default {
       this.exiting = true
       const vm = this
 
-      const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/ExitRoom'
+      const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/exit_room'
       const params = {
         user_id: vm.$store.state.user.user_id,
         room_id: vm.$store.state.room_id,

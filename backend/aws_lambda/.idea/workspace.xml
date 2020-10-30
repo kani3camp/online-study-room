@@ -20,7 +20,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/change_user_info.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/create_new_room.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/enter_room.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/exit_room.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/news.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/online_users.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/room_status.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/send_contact_form.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/send_live_chat_message.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/staying_awake.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user_status.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rooms.go" beforeDir="false" afterPath="$PROJECT_DIR$/rooms.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_function/main" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_function/main.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_function/main.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../functions/go_api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../functions/go_api/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../functions/go_api/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../functions/go_api/enter_room.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/enter_room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/.firebase/hosting.ZGlzdA.cache" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/.firebase/hosting.ZGlzdA.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/contact_form.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/contact_form.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/news.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/news.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/settings.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/plugins/common.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/plugins/common.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/plugins/firebase.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/plugins/firebase.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,42 +93,35 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\momom\Documents\GitHub\online-study-room\backend\aws_lambda" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build online-study-space/go_module/test_function">
-    <configuration name="go build online-study-space/go_module/main" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager">
+    <configuration name="go build api.mod" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="aws_lambda" />
       <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/main/main.go" />
-      <package value="online-study-space/go_module/main" />
-      <directory value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go build online-study-space/go_module/test_function" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="aws_lambda" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <filePath value="$PROJECT_DIR$/test_function/test_function.go" />
-      <package value="online-study-space/go_module/test_function" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/firebase_auth_new_user_listener.go" />
+      <package value="api.mod" />
       <directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build online-study-space/go_module/test_function" />
-        <item itemvalue="Go Build.go build online-study-space/go_module/main" />
+        <item itemvalue="Go Build.go build api.mod" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.sh" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -121,30 +147,43 @@
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="752" y="393" key="#Go_Modules/0.40.1920.1040@0.40.1920.1040" timestamp="1602264976791" />
-    <state x="731" y="362" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1603734993092">
-      <screen x="0" y="40" width="1920" height="1040" />
-    </state>
-    <state x="731" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1603734993092" />
-    <state width="1877" height="208" key="GridCell.Tab.0.bottom" timestamp="1603736615146">
-      <screen x="0" y="40" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="208" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615146" />
-    <state width="1877" height="208" key="GridCell.Tab.0.center" timestamp="1603736615145">
-      <screen x="0" y="40" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="208" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state width="1877" height="208" key="GridCell.Tab.0.left" timestamp="1603736615145">
-      <screen x="0" y="40" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="208" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state width="1877" height="208" key="GridCell.Tab.0.right" timestamp="1603736615145">
-      <screen x="0" y="40" width="1920" height="1040" />
-    </state>
-    <state width="1877" height="208" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state x="346" y="143" key="SettingsEditor" timestamp="1603789920014">
+    <state x="184" y="112" width="1071" height="726" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1604040700898">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1603789920014" />
+    <state x="184" y="112" width="1071" height="726" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.900@0.0.1440.900" timestamp="1604040700898" />
+    <state x="548" y="279" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1604023061477">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="548" y="279" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1604023061477" />
+    <state x="731" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1603734993092" />
+    <state x="735" y="373" key="EnvironmentVariablesDialog" timestamp="1604041313886">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="735" y="373" key="EnvironmentVariablesDialog/0.0.1440.900@0.0.1440.900" timestamp="1604041313886" />
+    <state width="1398" height="167" key="GridCell.Tab.0.bottom" timestamp="1604043341461">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="167" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1604043341461" />
+    <state width="1877" height="208" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615146" />
+    <state width="1398" height="167" key="GridCell.Tab.0.center" timestamp="1604043341460">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="167" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1604043341460" />
+    <state width="1877" height="208" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
+    <state width="1398" height="167" key="GridCell.Tab.0.left" timestamp="1604043341459">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="167" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1604043341459" />
+    <state width="1877" height="208" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
+    <state width="1398" height="167" key="GridCell.Tab.0.right" timestamp="1604043341460">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="167" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1604043341460" />
+    <state width="1877" height="208" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
+    <state x="346" y="143" key="SettingsEditor" timestamp="1604049998246">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1604049998246" />
     <state x="461" y="205" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1602270152521" />
   </component>
 </project>

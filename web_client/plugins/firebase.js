@@ -2,14 +2,14 @@ import firebase from "firebase/app"
 require('firebase/auth')
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBsMmNzh3qo1X-UpS1T9Q6C07ODlohM-_4",
-  authDomain: "online-study-room-f1f30.firebaseapp.com",
-  databaseURL: "https://online-study-room-f1f30.firebaseio.com",
-  projectId: "online-study-room-f1f30",
-  storageBucket: "online-study-room-f1f30.appspot.com",
-  messagingSenderId: "77400576490",
-  appId: "1:77400576490:web:b10794e40775edf921e293",
-  measurementId: "G-4DN92GENJJ"
+  apiKey: "AIzaSyCIY7RCArApaRpg4nkVUJCze88OmF6-wGM",
+  authDomain: "online-study-space.firebaseapp.com",
+  databaseURL: "https://online-study-space.firebaseio.com",
+  projectId: "online-study-space",
+  storageBucket: "online-study-space.appspot.com",
+  messagingSenderId: "486366182751",
+  appId: "1:486366182751:web:dc94794117a6268a050aea",
+  measurementId: "G-KH6EFLWF7T"
 }
 firebase.initializeApp(firebaseConfig)
 export default firebase

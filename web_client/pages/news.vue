@@ -94,7 +94,7 @@ export default {
   }),
   async created() {
     this.loading = true
-    const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/News'
+    const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/news'
     const params = {
       num_news: 10
     }

@@ -34,7 +34,7 @@ common.onAuthStateChanged = (vm) => {
 
 
 common.getUserData = async (vm) => {
-  const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
+  const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/user_status')
   const params = { user_id: vm.$store.state.user.user_id }
   const user_data = await common.httpGet(url, params)
   if (user_data.result !== 'ok') {
@@ -56,10 +56,9 @@ common.httpGet = async (url_str, params) => {
 }
 
 common.httpPost = async (url_str, _params) => {
-  const params = new URLSearchParams(_params)
   const response = await fetch(url_str, {
     method: 'POST',
-    body: params
+    body: JSON.stringify(_params)
   })
   return await response.json()
 }

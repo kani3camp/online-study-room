@@ -203,7 +203,7 @@
         console.log('saveNewValues()')
         this.saving = true
 
-        const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/ChangeUserInfo'
+        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/change_user_info'
         const params = {
           user_id: this.$store.state.user.user_id,
           id_token: this.$store.state.user.id_token,

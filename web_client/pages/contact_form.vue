@@ -138,7 +138,7 @@ export default {
       if (this.selected_contact_type || this.mail_address || this.message) {
         this.submitting = true
 
-        const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/SendContactForm'
+        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
         const params = {
           mail_address: this.mail_address.toString(),
           user_id: this.$store.state.user.user_id,

@@ -7,10 +7,12 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"fmt"
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"log"
 	"time"
@@ -67,7 +69,6 @@ type UserBodyStruct struct {
 	LastEntered time.Time `firestore:"last-entered" json:"last_entered"`
 	LastExited  time.Time `firestore:"last-exited" json:"last_exited"`
 	LastStudied time.Time `firestore:"last-studied" json:"last_studied"`
-	//Name        string    `firestore:"name" json:"name"` todo firestoreの方でも消す
 	Online           bool      `firestore:"online" json:"online"`
 	Status           string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
@@ -96,25 +97,38 @@ func InitializeEventFunc() (context.Context, *firestore.Client) {
 }
 
 func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
-	sa := option.WithCredentialsJSON(retrieveFirebaseCredentialInBytes())
-	client, err := firestore.NewClient(ctx, ProjectId, sa)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+	var client *firestore.Client
+	var err1, err2 error
+	awsCredential, err1 := retrieveFirebaseCredentialInBytes()
+	if err1 != nil {
+		client, err2 = firestore.NewClient(ctx, ProjectId)
+	} else {
+		sa := option.WithCredentialsJSON(awsCredential)
+		client, err2 = firestore.NewClient(ctx, ProjectId, sa)
+	}
+	if err2 != nil {
+		log.Println(err2)
+		return nil, err2
 	}
 	return client, nil
 }
 
 func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
-	//sa := option.WithCredentialsFile(PathToServiceAccount)
-	sa := option.WithCredentialsJSON(retrieveFirebaseCredentialInBytes())
-	app, err := firebase.NewApp(ctx, nil, sa)
-	if err != nil {
-		log.Println("failed to initialize firebase.App.")
-		log.Println(err)
-		return nil, err
+	var app *firebase.App
+	var err1, err2 error
+	awsCredential, err1 := retrieveFirebaseCredentialInBytes()
+	if err1 != nil {
+		app, err2 = firebase.NewApp(ctx, nil)
+	} else {
+		sa := option.WithCredentialsJSON(awsCredential)
+		app, err2 = firebase.NewApp(ctx, nil, sa)
 	}
-	return app, err
+	if err2 != nil {
+		log.Println("failed to initialize firebase.App.")
+		log.Println(err2)
+		return nil, err2
+	}
+	return app, nil
 }
 
 func InitializeFirebaseAuthClient(ctx context.Context) (*auth.Client, error) {
@@ -127,7 +141,7 @@ func InitializeFirebaseAuthClient(ctx context.Context) (*auth.Client, error) {
 	return authClient, err
 }
 
-func retrieveFirebaseCredentialInBytes() []byte {
+func retrieveFirebaseCredentialInBytes() ([]byte, error) {
 	secretName := "firestore-service-account"
 	region := "ap-northeast-1"
 
@@ -171,18 +185,15 @@ func retrieveFirebaseCredentialInBytes() []byte {
 			// Message from an error.
 			fmt.Println(err.Error())
 		}
-		//return
+		return nil, err
 	}
 
 	// Decrypts secret using the associated KMS CMK.
 	// Depending on whether the secret is a string or binary, one of these fields will be populated.
 	var secretString, decodedBinarySecret string
-	if result == nil {
-		log.Println("Couldn't retrieve the credential json result.")
-		return []byte("")	// todo この書き方よくなさそう
-	} else if result.SecretString != nil {
+	if result.SecretString != nil {
 		secretString = *result.SecretString
-		return []byte(secretString)
+		return []byte(secretString), nil
 	} else {
 		decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
 		_len, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
@@ -191,7 +202,7 @@ func retrieveFirebaseCredentialInBytes() []byte {
 			//return
 		}
 		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
-		return []byte(decodedBinarySecret)
+		return []byte(decodedBinarySecret), nil
 	}
 }
 
@@ -281,6 +292,35 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 	return err
 }
 
+func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
+	var rooms []RoomStruct
+
+	// roomsのコレクションを取得
+	iter := client.Collection(ROOMS).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			err = nil
+			break
+		}
+		if err != nil {
+			log.Printf("Failed to iterate: %v", err)
+			return []RoomStruct{}, err
+		}
+		var _room RoomBodyStruct
+		_ = doc.DataTo(&_room)
+		room := RoomStruct{
+			RoomId: doc.Ref.ID,
+			Body:   _room,
+		}
+		if room.Body.Users == nil {
+			room.Body.Users = []string{}
+		}
+		rooms = append(rooms, room)
+	}
+	return rooms, nil
+}
+
 func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
 	userDocs, err := client.Collection(USERS).Documents(ctx).GetAll()
 	if err != nil {
@@ -300,10 +340,18 @@ func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserS
 			var _user UserBodyStruct
 			_ = doc.DataTo(&_user)
 			if _user.Online {
-				user, _ := authClient.GetUser(ctx, doc.Ref.ID)
+				var displayName string
+				user, err := authClient.GetUser(ctx, doc.Ref.ID)
+				if err != nil {
+					// これはfirebase authに登録されてないテストユーザーの場合、例外として起こりうる。
+					log.Println("failed authClient.GetUser().")
+					displayName = ""
+				} else {
+					displayName = user.DisplayName
+				}
 				userList = append(userList, UserStruct{
 					UserId:      doc.Ref.ID,
-					DisplayName: user.DisplayName,
+					DisplayName: displayName,
 					Body:        _user,
 				})
 			}
@@ -313,6 +361,44 @@ func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserS
 		}
 		return userList, nil
 	}
+}
+
+func RetrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([]NewsStruct, error) {
+	var newsList []NewsStruct
+	var err error
+
+	// roomsのコレクションを取得
+	iter := client.Collection(NEWS).OrderBy("updated", firestore.Desc).Limit(numNews).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			err = nil
+			break
+		}
+		if err != nil {
+			log.Printf("failed to iterate: %v\n", err)
+			return []NewsStruct{}, err
+		}
+		var _news NewsBodyStruct
+		_ = doc.DataTo(&_news)
+		news := NewsStruct{
+			NewsId:   doc.Ref.ID,
+			NewsBody: _news,
+		}
+		newsList = append(newsList, news)
+	}
+	return newsList, err
+}
+
+func RetrieveUserInfo(userId string, client *firestore.Client, ctx context.Context) (UserBodyStruct, error) {
+	var userBodyStruct UserBodyStruct
+	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
+	if err != nil {
+		log.Println(err)
+	} else {
+		_ = userDoc.DataTo(&userBodyStruct)
+	}
+	return userBodyStruct, err
 }
 
 func RecordHistory(details interface{}, client *firestore.Client, ctx context.Context) error {
@@ -401,7 +487,10 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, client *fir
 func UpdateDatabase(client *firestore.Client, ctx context.Context)  {
 	fmt.Println("updating database...")
 
-	users, _ := RetrieveOnlineUsers(client, ctx)
+	users, err := RetrieveOnlineUsers(client, ctx)
+	if err != nil {
+		log.Println("RetrieveOnlineUsers() failed.")
+	}
 	if len(users) > 0 {
 		for _, u := range users {
 			lastAccess := u.Body.LastAccess
@@ -413,5 +502,29 @@ func UpdateDatabase(client *firestore.Client, ctx context.Context)  {
 			}
 		}
 	}
+}
+
+func Response(jsonBytes []byte) (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{
+		Body:       string(jsonBytes),
+		StatusCode: 200, // これないとInternal Server Errorになる
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+			//"Access-Control-Allow-Origin": "*",
+			//"Access-Control-Allow-Methods": "GET,POST,HEAD,OPTIONS",
+			//"Access-Control-Allow-Headers": "Content-Type",
+		},
+	}, nil
+}
+
+func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
+	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
+		"users": firestore.ArrayUnion(userId),
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Println("failed _EnterRoom().")
+		log.Println(err)
+	}
+	return err
 }
 

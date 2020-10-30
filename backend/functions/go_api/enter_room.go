@@ -8,8 +8,6 @@ import (
 	"net/http"
 )
 
-// todo roomの人数制限を設ける
-
 type ApiResponseStruct struct {
 	Result  string `json:"result"`
 	Message string `json:"message"`

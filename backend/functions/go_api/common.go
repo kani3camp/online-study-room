@@ -17,7 +17,7 @@ const CONFIG = "config"
 const API = "api"
 const NEWS = "news"
 
-const ProjectId = "online-study-room-f1f30"
+const ProjectId = "online-study-space"
 
 //var ProjectId = os.Getenv("GOOGLE_CLOUD_PROJECT")	// なんか代入されない
 
