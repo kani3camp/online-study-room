@@ -4,6 +4,7 @@
 export const state = () => ({
   isSignedIn: false,
   room_id: null,
+  drawer: false,
 })
 
 export const mutations = {
@@ -12,6 +13,9 @@ export const mutations = {
   },
   setRoomId(state, room_id) {
     state.room_id = room_id
+  },
+  setDrawer(state, newDrawer) {
+    state.drawer = newDrawer
   },
   signOut(state) {
     state.isSignedIn = false

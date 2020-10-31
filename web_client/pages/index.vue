@@ -1,54 +1,16 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-    >
-      <v-list dense>
-        <v-list-item @click="drawer=false" link>
-          <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ホーム</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goToSettingsPage" link>
-          <v-list-item-action>
-            <v-icon>mdi-account-cog</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>設定</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goToContactFormPage" link>
-          <v-list-item-action>
-            <v-icon>mdi-email</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ご意見・お問い合わせ</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goToNewsPage" link>
-          <v-list-item-action>
-            <v-icon>mdi-bell</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>お知らせ</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <NavigationDrawer></NavigationDrawer>
 
     <v-app-bar
       app
-      color="cyan lighten-3"
       flat
+      color="white"
+      height="70"
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-layout justify-center>
-        <v-toolbar-title><h1>オンライン作業部屋</h1></v-toolbar-title>
-      </v-layout>
+        <v-container pb-0 pt-0 pl-0>
+              <v-flex align-self-center><Logo></Logo></v-flex>
+        </v-container>
 <!--      <v-btn v-show="!($store.state.isSignedIn)" @click="signInWithGoogle" outlined>Googleアカウントでログイン</v-btn>-->
       <img
         v-show="!($store.state.isSignedIn)"
@@ -58,6 +20,7 @@
         height="50" width="200"/>
 <!--      <v-btn v-show="!($store.state.isSignedIn)" outlined>登録</v-btn>-->
       <v-btn v-show="$store.state.isSignedIn" @click="goToSettingsPage" icon><v-icon>mdi-account-cog</v-icon></v-btn>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </v-app-bar>
 
     <v-main>
@@ -133,10 +96,15 @@
 <script>
   import common from "~/plugins/common"
   import firebase from '../plugins/firebase'
+  import Logo from "@/components/Logo"
+  import NavigationDrawer from "@/components/NavigationDrawer";
 
   export default {
+    components: {
+      Logo,
+      NavigationDrawer
+    },
     data: () => ({
-      drawer: null,
       rooms: null,
       if_show_dialog: false,
       if_show_dialog_2: false,
@@ -146,6 +114,16 @@
       entering: false,
       loading: false,
     }),
+    computed: {
+      drawer: {
+        get() {
+          return this.$store.state.drawer
+        },
+        set(value) {
+          this.$store.commit('setDrawer', value)
+        }
+      }
+    },
     async created() {
       common.onAuthStateChanged(this)
 
@@ -162,12 +140,6 @@
     methods: {
       goToSettingsPage() {
         this.$router.push('/settings')
-      },
-      goToContactFormPage() {
-        this.$router.push('/contact_form')
-      },
-      goToNewsPage() {
-        this.$router.push('/news')
       },
       async signInWithGoogle() {
         const vm = this

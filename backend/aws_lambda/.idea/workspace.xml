@@ -20,7 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../youtube_displayer/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../youtube_displayer/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../web_client/assets/logo.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../web_client/components/Logo.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../web_client/components/NavigationDrawer.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/store/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/store/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
