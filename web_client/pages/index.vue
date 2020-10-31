@@ -2,26 +2,7 @@
   <v-app>
     <NavigationDrawer></NavigationDrawer>
 
-    <v-app-bar
-      app
-      flat
-      color="white"
-      height="70"
-    >
-        <v-container pb-0 pt-0 pl-0>
-              <v-flex align-self-center><Logo></Logo></v-flex>
-        </v-container>
-<!--      <v-btn v-show="!($store.state.isSignedIn)" @click="signInWithGoogle" outlined>Googleアカウントでログイン</v-btn>-->
-      <img
-        v-show="!($store.state.isSignedIn)"
-        @click="signInWithGoogle"
-        src="~assets/google_signin_buttons/web/2x/btn_google_signin_light_normal_web@2x.png"
-        alt="sign in with google"
-        height="50" width="200"/>
-<!--      <v-btn v-show="!($store.state.isSignedIn)" outlined>登録</v-btn>-->
-      <v-btn v-show="$store.state.isSignedIn" @click="goToSettingsPage" icon><v-icon>mdi-account-cog</v-icon></v-btn>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-    </v-app-bar>
+    <ToolBar></ToolBar>
 
     <v-main>
       <v-container v-show="loading"
@@ -97,12 +78,14 @@
   import common from "~/plugins/common"
   import firebase from '../plugins/firebase'
   import Logo from "@/components/Logo"
-  import NavigationDrawer from "@/components/NavigationDrawer";
+  import NavigationDrawer from "@/components/NavigationDrawer"
+  import ToolBar from "@/components/ToolBar"
 
   export default {
     components: {
       Logo,
-      NavigationDrawer
+      NavigationDrawer,
+      ToolBar
     },
     data: () => ({
       rooms: null,
