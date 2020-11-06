@@ -1,10 +1,11 @@
 <template>
   <v-footer
     app
+    absolute
   >
     <v-container>
       <v-row>
-        <v-col cols="auto">
+        <v-col cols="12">
           <h4>SERVICE</h4>
           <ul>
             <li><nuxt-link to="/">サイトトップ</nuxt-link></li>
@@ -15,14 +16,14 @@
           </ul>
         </v-col>
 
-        <v-col cols="auto">
+        <v-col cols="12">
           <h4>APP</h4>
           <ul>
             <li>Android</li>
           </ul>
         </v-col>
 
-        <v-col cols="auto">
+        <v-col cols="12">
           <h4>FOLLOW</h4>
           <ul>
             <li>
@@ -34,7 +35,7 @@
           </ul>
         </v-col>
 
-        <v-col cols="auto">
+        <v-col cols="12">
           <h4>ABOUT US</h4>
           <ul>
             <li><a href="https://twitter.com/sorarideblog" target="_blank" rel="noopener noreferrer">開発・運営者について</a></li>
