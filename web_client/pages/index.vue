@@ -66,11 +66,10 @@
         <v-card class="mx-auto" outlined :loading="entering">
           <v-card-title>{{ selected_room_name }}の部屋 に入室しますか？</v-card-title>
 
-          <v-card-actions>
-            <v-row justify="end">
-              <v-btn :disabled="entering" @click="enterRoom" text color="primary">入室する</v-btn>
-              <v-btn :disabled="entering" @click="if_show_dialog=false" text>キャンセル</v-btn>
-            </v-row>
+          <v-card-actions box-sizing>
+            <v-spacer></v-spacer>
+            <v-btn :disabled="entering" @click="enterRoom" text color="primary">入室する</v-btn>
+            <v-btn :disabled="entering" @click="if_show_dialog=false" pr-0 text>キャンセル</v-btn>
           </v-card-actions>
 
         </v-card>
@@ -82,9 +81,8 @@
           <v-card-title>{{ dialog_message }}</v-card-title>
 
           <v-card-actions>
-            <v-row justify="end">
-              <v-btn @click="if_show_dialog_2=false" text>閉じる</v-btn>
-            </v-row>
+            <v-spacer></v-spacer>
+            <v-btn @click="if_show_dialog_2=false" text pr-0>閉じる</v-btn>
           </v-card-actions>
 
         </v-card>
@@ -193,8 +191,10 @@
 </script>
 
 <style>
-  .big-char {
-    font-size: 3rem;
-    color: #7F828B;
-  }
+
+
+.big-char {
+  font-size: 3rem;
+  color: #7F828B;
+}
 </style>

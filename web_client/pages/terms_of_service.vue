@@ -195,8 +195,15 @@
 </template>
 
 <script>
+import NavigationDrawer from "@/components/NavigationDrawer"
+import ToolBar from "@/components/ToolBar"
+
 export default {
   name: "terms_of_service",
+  components: {
+    NavigationDrawer,
+    ToolBar,
+  },
   data: () => ({
     drawer: null
   }),

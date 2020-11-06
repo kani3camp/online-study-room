@@ -54,9 +54,8 @@
       <v-card>
         <v-card-title>{{ dialog_message }}</v-card-title>
         <v-card-actions>
-          <v-row justify="end">
-            <v-btn @click="if_show_dialog=false" text>閉じる</v-btn>
-          </v-row>
+          <v-spacer></v-spacer>
+          <v-btn @click="if_show_dialog=false" text>閉じる</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

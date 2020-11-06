@@ -33,9 +33,8 @@
           <v-card-title>{{ dialog_message }}</v-card-title>
 
           <v-card-actions>
-            <v-row justify="end">
-              <v-btn @click="if_show_dialog_2=false; goToTopPage" text>閉じる</v-btn>
-            </v-row>
+            <v-spacer></v-spacer>
+            <v-btn @click="if_show_dialog_2=false; goToTopPage" pr-0 text>閉じる</v-btn>
           </v-card-actions>
 
         </v-card>
