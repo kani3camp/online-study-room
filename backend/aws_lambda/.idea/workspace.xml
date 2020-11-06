@@ -20,17 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../web_client/pages/sign_in.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/components/NavigationDrawer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/components/NavigationDrawer.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/components/ToolBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/components/ToolBar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/about_service.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/about_service.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/all_rooms.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/all_rooms.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/contact_form.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/contact_form.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/news.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/news.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/privacy_policy.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/privacy_policy.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/terms_of_service.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/terms_of_service.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/settings.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +36,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/go" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
@@ -116,10 +108,11 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="520" y="387" key="#GOROOT" timestamp="1603789970386">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="693" y="487" key="#GOROOT" timestamp="1604681331005">
+      <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="520" y="387" key="#GOROOT/0.0.1440.900@0.0.1440.900" timestamp="1603789970386" />
+    <state x="693" y="487" key="#GOROOT/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1604681331005" />
     <state x="752" y="393" key="#Go_Modules" timestamp="1602264976791">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>

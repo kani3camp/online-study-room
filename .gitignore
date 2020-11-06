@@ -4,3 +4,4 @@ web_client/package-lock.json
 backend/aws_lambda/.idea/
 functions/go_api/.idea/
 web_client/.firebase/
+backend/aws_lambda/.idea/workspace.xml

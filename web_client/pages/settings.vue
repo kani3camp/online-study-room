@@ -24,36 +24,36 @@
 
     <v-main>
       <v-layout justify-center>
-      <v-list two-line subheader min-width="600px" max-width="800px">
-        <v-subheader inset>設定</v-subheader>
+      <v-list two-line subheader>
+        <v-subheader >設定</v-subheader>
         <v-list-item>
-          <v-list-item-avatar>
-            <v-icon></v-icon>
-          </v-list-item-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title>表示名</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-content>
-            <v-list-item-title>
-              <v-text-field v-model="display_name"></v-text-field>
-            </v-list-item-title>
-          </v-list-item-content>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>表示名</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>
+                <v-text-field v-model="display_name"></v-text-field>
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
         <v-list-item>
-          <v-list-item-avatar>
-            <v-icon></v-icon>
-          </v-list-item-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title>ひとこと</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-content>
-            <v-list-item-title>
-              <v-text-field v-model="status_message"></v-text-field>
-            </v-list-item-title>
-          </v-list-item-content>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>ひとこと</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>
+                <v-text-field v-model="status_message"></v-text-field>
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
 <!--        <v-list-item>-->
@@ -69,66 +69,68 @@
 <!--          </v-list-item-content>-->
 <!--        </v-list-item>-->
 
-        <v-divider inset></v-divider>
+        <v-divider></v-divider>
 
-        <v-subheader inset>情報</v-subheader>
+        <v-subheader>情報</v-subheader>
 
         <v-list-item>
-          <v-list-item-avatar>
-            <v-icon></v-icon>
-          </v-list-item-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title>ログイン中のアカウント</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-content>
-            <v-list-item-title>{{ provider_id }}</v-list-item-title>
-          </v-list-item-content>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>ログイン中のアカウント</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>{{ provider_id }}</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
         <v-list-item>
-          <v-list-item-avatar>
-            <v-icon></v-icon>
-          </v-list-item-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title>メールアドレス</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-content>
-            <v-list-item-title>{{ mail_address }}</v-list-item-title>
-          </v-list-item-content>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>メールアドレス</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>{{ mail_address }}</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
         <v-list-item>
-          <v-list-item-avatar>
-            <v-icon></v-icon>
-          </v-list-item-avatar>
-
-          <v-list-item-content>
-            <v-list-item-title>合計学習時間</v-list-item-title>
-          </v-list-item-content>
-          <v-list-item-content>
-            <v-list-item-title>{{ sum_study_time }}</v-list-item-title>
-          </v-list-item-content>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>合計学習時間</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
+          <v-flex>
+            <v-list-item-content>
+              <v-list-item-title>{{ sum_study_time }}</v-list-item-title>
+            </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
         <v-list-item>
-          <v-list-item-avatar>
-            <v-icon></v-icon>
-          </v-list-item-avatar>
-
+          <v-flex>
           <v-list-item-content>
             <v-list-item-title>登録日</v-list-item-title>
           </v-list-item-content>
-          <v-list-item-content>
-            {{ registration_date }}
+          </v-flex>
+          <v-flex>
+            <v-list-item-content>
+            {{ registration_date.getFullYear() }}年　{{ registration_date.getMonth() + 1 }}月 {{ registration_date.getDate() }}日
           </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
         <v-list-item>
-          <v-list-item-content>
-            <v-btn color="primary" @click="saveNewValues" :disabled="!is_some_value_changed || is_some_value_blank || saving">保存</v-btn>
-          </v-list-item-content>
+          <v-flex>
+            <v-list-item-content>
+              <v-btn color="primary" @click="saveNewValues" :disabled="!is_some_value_changed || is_some_value_blank || saving">保存</v-btn>
+            </v-list-item-content>
+          </v-flex>
         </v-list-item>
 
       </v-list>
@@ -226,5 +228,7 @@
 </script>
 
 <style scoped>
-
+.v-list-item__title {
+  padding-left: 1rem;
+}
 </style>
