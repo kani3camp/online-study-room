@@ -140,9 +140,6 @@
       this.loading = false
     },
     methods: {
-      goToSettingsPage() {
-        this.$router.push('/settings')
-      },
       confirmEntering(index) {
         this.selected_index = index
         this.selected_room_name = this.rooms[this.selected_index]['room_body'].name

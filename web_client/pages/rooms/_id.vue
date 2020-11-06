@@ -32,7 +32,7 @@
           </v-layout>
         </v-list-item>
 
-        <v-divider inset></v-divider>
+        <v-divider></v-divider>
 
         <v-subheader>同じ部屋の他のユーザー</v-subheader>
 

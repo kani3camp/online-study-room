@@ -160,7 +160,9 @@
       provider_id: null,
       saving: false,
     }),
-    created() {
+    async created() {
+      await common.onAuthStateChanged(this)
+
       this.display_name = this.$store.state.user.display_name
       this.status_message = this.$store.state.user.status_message
       this.mail_address = this.$store.state.user.mail_address
