@@ -1,6 +1,10 @@
 import firebase from "~/plugins/firebase"
 
 const common = {
+  key: {
+    youtubeLink: 'https://www.youtube.com/',
+    twitterLink: 'https://twitter.com/home',
+  }
 }
 
 common.c = (m) => {
