@@ -203,7 +203,7 @@
           this.entering = false
         } else {
           this.if_show_dialog = false
-          this.dialog_message = 'ログインしてください。'
+          this.dialog_message = 'サインインしてください。'
           this.if_show_dialog_2 = true
         }
       }

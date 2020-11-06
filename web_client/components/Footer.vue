@@ -38,7 +38,7 @@
           <h4>ABOUT US</h4>
           <ul>
             <li><a href="https://twitter.com/sorarideblog" target="_blank" rel="noopener noreferrer">開発・運営者について</a></li>
-            <li>><nuxt-link to="/contact_form">お問い合わせ</nuxt-link></li>
+            <li><nuxt-link to="/contact_form">お問い合わせ</nuxt-link></li>
           </ul>
         </v-col>
       </v-row>

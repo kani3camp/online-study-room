@@ -11,34 +11,41 @@
         </v-flex>
       </v-container>
 
-      <v-form class="mx-auto">
-      <v-container>
-        <v-select
-          v-model="selected_contact_type"
-          :items="contact_types"
-          item-value="mode"
-          item-text="ss"
-          label="問い合わせの種類"
-          outlined
-        ></v-select>
-        <v-text-field
-          v-model="mail_address"
-          label="あなたのメールアドレス"
-          outlined
-        ></v-text-field>
-        <v-textarea label="本文" v-model="message" outlined></v-textarea>
-        <div>
-          <v-btn
-            @click="submit"
-            color="primary"
-            block elevation="3"
-            :disabled="submitting || !selected_contact_type || !message"
-          >
-            送信
-          </v-btn>
-        </div>
+
+      <v-container v-show="! is_signed_in">
+        サインインしてください。
       </v-container>
-    </v-form>
+
+      <v-container v-show="is_signed_in">
+        <v-form class="mx-auto">
+          <v-select
+            v-model="selected_contact_type"
+            :items="contact_types"
+            item-value="mode"
+            item-text="ss"
+            label="問い合わせの種類"
+            outlined
+          ></v-select>
+          <v-text-field
+            v-model="mail_address"
+            label="あなたのメールアドレス"
+            outlined
+          ></v-text-field>
+          <v-textarea label="本文" v-model="message" outlined></v-textarea>
+          <div>
+            <v-btn
+              @click="submit"
+              color="primary"
+              block elevation="3"
+              :disabled="submitting || !selected_contact_type || !message"
+            >
+              送信
+            </v-btn>
+          </div>
+      </v-form>
+      </v-container>
+
+
     </v-main>
 
     <Footer></Footer>
@@ -66,20 +73,25 @@ const emailRegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9
 
 export default {
   name: "contact_form",
-  data: function () {
-    return {
-      drawer: null,
-      mail_address: this.$store.state.user.mail_address,
-      message: null,
-      submitting: false,
-      contact_types: [
-        {mode: 'feedback', ss: '意見'},
-        {mode: 'contact', ss: '問い合わせ'},
-      ],
-      selected_contact_type: null,
-      if_show_dialog: false,
-      dialog_message: null,
-    };
+  data: () => ({
+    drawer: null,
+    mail_address: this.$store.state.user.mail_address,
+    message: null,
+    submitting: false,
+    contact_types: [
+      {mode: 'feedback', ss: '意見'},
+      {mode: 'contact', ss: '問い合わせ'},
+    ],
+    selected_contact_type: null,
+    if_show_dialog: false,
+    dialog_message: null,
+  }),
+  computed: {
+    is_signed_in: {
+      get() {
+        return this.$store.state.isSignedIn
+      }
+    }
   },
   mounted() {
     common.onAuthStateChanged(this)
