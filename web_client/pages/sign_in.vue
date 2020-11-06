@@ -11,7 +11,7 @@
         </v-flex>
       </v-container>
 
-      <v-container >
+      <v-container v-show="! ($store.state.isSignedIn)">
         <p>　登録・サインインともに下のボタンから行えます。</p>
         <v-row justify="center" id="google-sign-in-button">
           <img @click="signInWithGoogle" v-bind:src="imageSource"
@@ -20,6 +20,11 @@
                v-on:mouseout="changeImageToNormal"
                alt="google sign in button">
         </v-row>
+      </v-container>
+
+      <v-container>
+        <p>すでにサインイン済みです。</p>
+        <p>アカウント設定ページからサインアウトできます。</p>
       </v-container>
 
 

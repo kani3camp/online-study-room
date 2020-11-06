@@ -8,7 +8,7 @@
       <v-layout justify-center>
         <v-toolbar-title>設定</v-toolbar-title>
       </v-layout>
-      <v-btn v-show="($store.state.isSignedIn)" @click="signOut" outlined>ログアウト</v-btn>
+      <v-btn v-show="($store.state.isSignedIn)" @click="signOut" outlined>サインアウト</v-btn>
 
       <v-dialog v-model="if_show_dialog_2" width=500>
         <v-card>

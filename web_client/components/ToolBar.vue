@@ -17,12 +17,12 @@
         <div class="tool-content"><nuxt-link to="/about_service">はじめての方</nuxt-link></div>
         <div class="tool-content"><nuxt-link to="/">YouTube</nuxt-link></div> <!-- todo -->
         <div class="tool-content"><nuxt-link to="/news">お知らせ</nuxt-link></div>
-        <div v-show="! ($store.state.isSignedIn)" class="tool-content">
-          <v-btn v-show="!($store.state.isSignedIn)" @click="goToSignInPage" outlined>サインイン</v-btn>
-        </div>
-        <div>
-          <v-btn v-show="$store.state.isSignedIn" @click="goToSettingsPage" icon><v-icon>mdi-account-cog</v-icon></v-btn>
-        </div>
+      </div>
+      <div v-show="! ($store.state.isSignedIn)" class="tool-content">
+        <v-btn v-show="!($store.state.isSignedIn)" @click="goToSignInPage" outlined>サインイン</v-btn>
+      </div>
+      <div v-show="($store.state.isSignedIn)">
+        <v-btn @click="goToSettingsPage" icon><v-icon>mdi-account-cog</v-icon></v-btn>
       </div>
       <div v-show="($vuetify.breakpoint.mobile)">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
