@@ -12,7 +12,7 @@
     <v-spacer></v-spacer>
 
     <v-layout fill-height pb-0 pt-0 pl-0 wrap id="tool-right">
-      <div class="tool-menu">
+      <div class="tool-menu" v-show="!($vuetify.breakpoint.mobile)">
         <div class="tool-content"><nuxt-link to="/all_rooms">ルーム一覧</nuxt-link></div>
         <div class="tool-content"><nuxt-link to="/about_service">はじめての方</nuxt-link></div>
         <div class="tool-content"><nuxt-link to="/">YouTube</nuxt-link></div> <!-- todo -->
@@ -24,7 +24,7 @@
           <v-btn v-show="$store.state.isSignedIn" @click="goToSettingsPage" icon><v-icon>mdi-account-cog</v-icon></v-btn>
         </div>
       </div>
-      <div>
+      <div v-show="($vuetify.breakpoint.mobile)">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </div>
     </v-layout>

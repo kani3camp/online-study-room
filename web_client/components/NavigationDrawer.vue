@@ -3,6 +3,7 @@
     v-model="drawer"
     app
     right
+    disable-resize-watcher
   >
     <v-list dense>
       <v-list-item @click="goToTopPage" link>
