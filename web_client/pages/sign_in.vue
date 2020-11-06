@@ -7,7 +7,7 @@
     <v-main>
       <v-container>
         <v-flex>
-          <h2>ルーム一覧</h2>
+          <h2>サインイン</h2>
         </v-flex>
       </v-container>
 
@@ -18,15 +18,8 @@
 </template>
 
 <script>
-import NavigationDrawer from "@/components/NavigationDrawer";
-import ToolBar from "@/components/ToolBar";
-
 export default {
-  name: "all_rooms",
-  components: {
-    NavigationDrawer,
-    ToolBar
-  }
+name: "sign_in"
 }
 </script>
 

@@ -1,57 +1,17 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-    >
-      <v-list dense>
-        <v-list-item @click="goToHomePage" link>
-          <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ホーム</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goToSettingsPage" link>
-          <v-list-item-action>
-            <v-icon>mdi-account-cog</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>設定</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="drawer=false" link>
-          <v-list-item-action>
-            <v-icon>mdi-email</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>ご意見・お問い合わせ</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item @click="goToNewsPage" link>
-          <v-list-item-action>
-            <v-icon>mdi-bell</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>お知らせ</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <NavigationDrawer></NavigationDrawer>
 
-    <v-app-bar
-      app
-      flat
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-layout justify-center>
-        <v-toolbar-title>意見・お問い合わせ</v-toolbar-title>
-      </v-layout>
-    </v-app-bar>
+    <ToolBar></ToolBar>
 
     <v-main>
-    <v-form class="mx-auto">
+      <v-container>
+        <v-flex>
+          <h2>ご意見・お問い合わせ</h2>
+        </v-flex>
+      </v-container>
+
+      <v-form class="mx-auto">
       <v-container>
         <v-select
           v-model="selected_contact_type"

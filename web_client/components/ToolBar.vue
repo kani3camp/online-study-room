@@ -6,17 +6,17 @@
     min-height="60"
   >
     <v-layout fill-height pb-0 pt-0 pl-0>
-      <v-flex align-self-center><Logo></Logo></v-flex>
+      <nuxt-link to="/"><v-flex @click="goToTopPage" align-self-center><Logo></Logo></v-flex></nuxt-link>
     </v-layout>
 
     <v-spacer></v-spacer>
 
     <v-layout fill-height pb-0 pt-0 pl-0 wrap id="tool-right">
       <div class="tool-menu">
-        <div class="tool-content">ルーム一覧</div>
-        <div class="tool-content">はじめての方</div>
-        <div class="tool-content">YouTube</div>
-        <div class="tool-content">お知らせ</div>
+        <div class="tool-content"><nuxt-link to="/all_rooms">ルーム一覧</nuxt-link></div>
+        <div class="tool-content"><nuxt-link to="/about_service">はじめての方</nuxt-link></div>
+        <div class="tool-content"><nuxt-link to="/">YouTube</nuxt-link></div> <!-- todo -->
+        <div class="tool-content"><nuxt-link to="/news">お知らせ</nuxt-link></div>
 
         <!--          <img-->
         <!--          v-show="!($store.state.isSignedIn)"-->
@@ -25,7 +25,7 @@
         <!--          alt="sign in with google"-->
         <!--          height="50" width="200"/>-->
         <div class="tool-content">
-          <v-btn v-show="!($store.state.isSignedIn)" outlined>サインイン</v-btn>
+          <v-btn v-show="!($store.state.isSignedIn)" @click="goToSignInPage" outlined>サインイン</v-btn>
         </div>
         <div>
           <v-btn v-show="$store.state.isSignedIn" @click="goToSettingsPage" icon><v-icon>mdi-account-cog</v-icon></v-btn>
@@ -57,8 +57,17 @@ export default {
     }
   },
   methods: {
+    goToTopPage() {
+      this.$router.push('/')
+    },
+    goToYoutubeLive() {
+      // todo
+    },
     goToSettingsPage() {
       this.$router.push('/settings')
+    },
+    goToSignInPage() {
+      this.$router.push('/sign_in')
     },
   }
 }

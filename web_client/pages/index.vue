@@ -5,41 +5,63 @@
     <ToolBar></ToolBar>
 
     <v-main>
-      <v-container v-show="loading"
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          align="center"
-          justify="center"
+      <v-container>
+        <v-flex>
+          <h2 style="display: inline-block">ルーム</h2>
+          <span>に入室して作業開始！</span>
+        </v-flex>
+
+        <v-container v-show="loading"
+                     class="fill-height"
+                     fluid
         >
-          <v-col class="text-center">
-            <div class="big-char">Loading...</div>
-          </v-col>
-        </v-row>
+          <v-row
+            align="center"
+            justify="center"
+          >
+            <v-col class="text-center">
+              <div class="big-char">Loading...</div>
+            </v-col>
+          </v-row>
+        </v-container>
+
+        <v-container v-show="! loading">
+          <v-row>
+            <v-col
+              cols="12" sm="4" md="3" lg="3" xl="3"
+              v-for="(room, index) in rooms"
+              :key="room.room_id"
+              @click="confirmEntering(index)"
+              dense
+            >
+              <v-hover v-slot:default="{ hover }">
+                <v-card class="ma-2 pa-3" :elevation="hover ? 10 : 2">
+                  <v-layout justify-center>
+                    <v-card-title>
+                      {{ room.room_body.name }}
+                    </v-card-title>
+                  </v-layout>
+                </v-card>
+              </v-hover>
+            </v-col>
+          </v-row>
+        </v-container>
+
       </v-container>
 
-      <v-container v-show="! loading">
-        <v-row>
-          <v-col
-            cols="12" sm="4" md="3" lg="3" xl="3"
-            v-for="(room, index) in rooms"
-            :key="room.room_id"
-            @click="confirmEntering(index)"
-            dense
-          >
-            <v-hover v-slot:default="{ hover }">
-              <v-card class="ma-2 pa-3" :elevation="hover ? 10 : 2">
-                <v-layout justify-center>
-                <v-card-title>
-                  {{ room.room_body.name }}
-                </v-card-title>
-                </v-layout>
-              </v-card>
-            </v-hover>
-          </v-col>
-        </v-row>
+      <v-container>
+        <v-flex>
+          <h2 style="display: inline-block">YouTubeライブ</h2>
+        </v-flex>
+
+<!--        todo-->
+
       </v-container>
+
+
+
+
+
 
       <v-dialog v-model="if_show_dialog" width=500>
         <v-card class="mx-auto" outlined :loading="entering">

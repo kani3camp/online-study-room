@@ -5,7 +5,7 @@
     right
   >
     <v-list dense>
-      <v-list-item @click="drawer = false" link>
+      <v-list-item @click="goToTopPage" link>
         <v-list-item-action>
           <v-icon>mdi-home</v-icon>
         </v-list-item-action>
@@ -86,6 +86,10 @@ export default {
   methods: {
     CloseDrawer() {
       this.drawer = false;
+    },
+    goToTopPage() {
+      this.$router.push('/')
+      this.CloseDrawer()
     },
     goToAllRoomsPage() {
       this.$router.push('/all_rooms')
