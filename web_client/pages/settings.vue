@@ -188,11 +188,11 @@
         const vm = this
         await firebase.auth().signOut().then(function() {
           console.log('Sign-out successful.')
-          vm.sign_out_result = 'ログアウトしました。'
+          vm.sign_out_result = 'サインアウトしました。'
           vm.if_show_dialog_2 = true
         }).catch(function(error) {
           console.log(error)
-          vm.sign_out_result = 'ログアウトに失敗しました。'
+          vm.sign_out_result = 'サインアウトに失敗しました。'
           vm.if_show_dialog_2 = true
         })
       },

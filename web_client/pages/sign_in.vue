@@ -12,7 +12,7 @@
       </v-container>
 
       <v-container v-show="! ($store.state.isSignedIn)">
-        <p>　登録・サインインともに下のボタンから行えます。</p>
+        <p>登録・サインインともに下のボタンから行えます。</p>
         <v-row justify="center" id="google-sign-in-button">
           <img @click="signInWithGoogle" v-bind:src="imageSource"
                v-on:mouseover="changeImageToHovered"
@@ -22,7 +22,7 @@
         </v-row>
       </v-container>
 
-      <v-container>
+      <v-container v-show="($store.state.isSignedIn)">
         <p>すでにサインイン済みです。</p>
         <p>アカウント設定ページからサインアウトできます。</p>
       </v-container>
@@ -34,7 +34,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="if_show_dialog_2=false; goToTopPage" pr-0 text>閉じる</v-btn>
+            <v-btn @click="goToTopPage" pr-0 text>閉じる</v-btn>
           </v-card-actions>
 
         </v-card>
