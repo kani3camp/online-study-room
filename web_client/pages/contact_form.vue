@@ -12,11 +12,11 @@
       </v-container>
 
 
-      <v-container v-show="! is_signed_in">
+      <v-container v-show="! ($store.state.isSignedIn)">
         サインインしてください。
       </v-container>
 
-      <v-container v-show="is_signed_in">
+      <v-container v-show="$store.state.isSignedIn">
         <v-form class="mx-auto">
           <v-select
             v-model="selected_contact_type"
@@ -68,30 +68,34 @@
 // Regular expression from W3C HTML5.2 input specification:
 // https://www.w3.org/TR/html/sec-forms.html#email-state-typeemail
 import common from "~/plugins/common"
+import NavigationDrawer from "@/components/NavigationDrawer"
+import ToolBar from "@/components/ToolBar"
 
-const emailRegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+// const emailRegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
 export default {
   name: "contact_form",
-  data: () => ({
-    drawer: null,
-    mail_address: this.$store.state.user.mail_address,
+  components: {
+    NavigationDrawer,
+    ToolBar,
+  },
+  data: () => ({  // アロー関数でdataを定義している場合は中でthisがundefinedになるので注意
+    dialog_message: '',
     message: null,
     submitting: false,
+    selected_contact_type: null,
+    if_show_dialog: false,
     contact_types: [
       {mode: 'feedback', ss: '意見'},
       {mode: 'contact', ss: '問い合わせ'},
     ],
-    selected_contact_type: null,
-    if_show_dialog: false,
-    dialog_message: null,
   }),
   computed: {
-    is_signed_in: {
+    mail_address: {
       get() {
-        return this.$store.state.isSignedIn
+        return this.$store.state.user.mail_address
       }
-    }
+    },
   },
   mounted() {
     common.onAuthStateChanged(this)

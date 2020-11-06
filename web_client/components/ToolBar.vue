@@ -17,14 +17,7 @@
         <div class="tool-content"><nuxt-link to="/about_service">はじめての方</nuxt-link></div>
         <div class="tool-content"><nuxt-link to="/">YouTube</nuxt-link></div> <!-- todo -->
         <div class="tool-content"><nuxt-link to="/news">お知らせ</nuxt-link></div>
-
-        <!--          <img-->
-        <!--          v-show="!($store.state.isSignedIn)"-->
-        <!--          @click="signInWithGoogle"-->
-        <!--          src="~assets/google_signin_buttons/web/2x/btn_google_signin_light_normal_web@2x.png"-->
-        <!--          alt="sign in with google"-->
-        <!--          height="50" width="200"/>-->
-        <div class="tool-content">
+        <div v-show="! ($store.state.isSignedIn)" class="tool-content">
           <v-btn v-show="!($store.state.isSignedIn)" @click="goToSignInPage" outlined>サインイン</v-btn>
         </div>
         <div>

@@ -62,7 +62,6 @@
 
 
 
-
       <v-dialog v-model="if_show_dialog" width=500>
         <v-card class="mx-auto" outlined :loading="entering">
           <v-card-title>{{ selected_room_name }}の部屋 に入室しますか？</v-card-title>
@@ -145,24 +144,6 @@
     methods: {
       goToSettingsPage() {
         this.$router.push('/settings')
-      },
-      async signInWithGoogle() {
-        const vm = this
-        const provider = new firebase.auth.GoogleAuthProvider()
-        await firebase.auth().signInWithPopup(provider).then(function(result) {
-          let token = result.credential['accessToken']
-          let user = result.user
-          console.log(user)
-          vm.dialog_message = 'ログインに成功しました。'
-        }).catch(function(error) {
-          let errorCode = error.code
-          let errorMessage = error.message
-          let email = error.email
-          // The firebase.auth.AuthCredential type that was used.
-          let credential = error.credential
-          vm.dialog_message = 'ログインに失敗しました。'
-        })
-        vm.if_show_dialog_2 = true
       },
       confirmEntering(index) {
         this.selected_index = index

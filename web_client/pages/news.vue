@@ -45,9 +45,16 @@
 
 <script>
 import common from "@/plugins/common";
+import NavigationDrawer from "@/components/NavigationDrawer"
+import ToolBar from "@/components/ToolBar"
+
 
 export default {
   name: "news",
+  components: {
+    NavigationDrawer,
+    ToolBar,
+  },
   data: () => ({
     drawer: null,
     newsList: [],

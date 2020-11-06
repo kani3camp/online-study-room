@@ -18,8 +18,16 @@
 </template>
 
 <script>
+import NavigationDrawer from "@/components/NavigationDrawer"
+import ToolBar from "@/components/ToolBar"
+
+
 export default {
-  name: "about_service"
+  name: "about_service",
+  components: {
+    NavigationDrawer,
+    ToolBar,
+  }
 }
 </script>
 
