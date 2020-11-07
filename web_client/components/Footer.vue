@@ -2,6 +2,7 @@
   <v-footer
     app
     absolute
+    id="footer"
   >
     <v-container>
       <v-row>
@@ -66,9 +67,29 @@ import common from "@/plugins/common";
 </script>
 
 <style scoped>
+#footer {
+  background-color: #D3E6F6;
+}
+
 .child-center > * {
   text-align: center;
   justify-content: center;
   list-style-type: none;
+}
+
+.child-center h4 {
+  color: #006CB8;
+  font-family: sans-serif;
+}
+
+.child-center ul li, :visited {
+  color: #647A7F;
+}
+.child-center ul li :hover {
+  color: #A8BABE;
+}
+
+.child-center ul li a {
+  text-decoration: none;
 }
 </style>

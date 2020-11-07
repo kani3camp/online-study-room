@@ -2,7 +2,7 @@
   <v-app-bar
     app
     flat
-    color="gray"
+    color="white"
     min-height="60"
   >
     <v-layout fill-height pb-0 pt-0 pl-0>
@@ -80,6 +80,13 @@ export default {
 .tool-content {
   margin: 0 0.5rem;
   align-self: center;
+}
+.tool-content a, :visited {
+  color: #000;
+  text-decoration: none;
+}
+.tool-content :hover {
+  color: #006CB8;
 }
 
 </style>

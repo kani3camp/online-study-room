@@ -188,7 +188,9 @@
 </script>
 
 <style>
-
+main {
+  background-color: #99B5B1;
+}
 
 .big-char {
   font-size: 3rem;
