@@ -70,12 +70,14 @@
     "semi": ["error", "never"],    // セミコロンをつけるかつけないか
     "no-extra-semi": "error",    // 余分なセミコロンを禁止する
     "no-unused-vars": "warn",
+    "max-len": ["warn", { "code": 110 }],
     "prettier-vue/prettier": [
       "error",
       {
         "singleQuote": true,
         "trailingComma": "es5",
-        "semi": false
+        "semi": false,
+        "printWidth": 110
       }
     ]
   }

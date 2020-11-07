@@ -166,8 +166,7 @@ export default {
     common.onAuthStateChanged(this)
 
     this.loading = true
-    const url =
-      'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
+    const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
     const resp = await common.httpGet(url, {})
     if (resp.result === 'ok') {
       this.rooms = resp.rooms
@@ -179,9 +178,7 @@ export default {
   methods: {
     confirmEntering(index) {
       this.selected_index = index
-      this.selected_room_name = this.rooms[this.selected_index][
-        'room_body'
-      ].name
+      this.selected_room_name = this.rooms[this.selected_index]['room_body'].name
       this.if_show_dialog = true
     },
     async enterRoom() {
@@ -191,8 +188,7 @@ export default {
         this.entering = true
 
         const selected_room_id = this.rooms[this.selected_index].room_id
-        const url =
-          'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
+        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
         const params = {
           user_id: this.$store.state.user.user_id,
           room_id: selected_room_id,

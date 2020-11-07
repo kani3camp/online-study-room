@@ -80,8 +80,6 @@ import common from '~/plugins/common'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
 
-// const emailRegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-
 export default {
   name: 'ContactForm',
   components: {
@@ -124,8 +122,7 @@ export default {
       if (this.selected_contact_type || this.mail_address || this.message) {
         this.submitting = true
 
-        const url =
-          'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
+        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
         const params = {
           mail_address: this.mail_address.toString(),
           user_id: this.$store.state.user.user_id,
@@ -138,8 +135,7 @@ export default {
         if (resp.result === 'ok') {
           this.message = null
           this.selected_contact_type = null
-          this.dialog_message =
-            '送信が完了しました。お問い合わせ頂きありがとうございます。'
+          this.dialog_message = '送信が完了しました。お問い合わせ頂きありがとうございます。'
           this.if_show_dialog = true
         } else {
           this.dialog_message = '送信に失敗しました。'
