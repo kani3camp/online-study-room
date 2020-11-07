@@ -86,7 +86,7 @@ export default {
   },
   methods: {
     goToTopPage() {
-      this.$router.push('/') // todo
+      this.$router.push('/')
     },
     changeImageToHovered() {
       console.log('changeImageToHovered()')
