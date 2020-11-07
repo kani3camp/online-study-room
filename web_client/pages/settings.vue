@@ -142,9 +142,7 @@
             </v-flex>
             <v-flex>
               <v-list-item-content>
-                {{ registration_date.getFullYear() }}年　{{
-                  registration_date.getMonth() + 1
-                }}月 {{ registration_date.getDate() }}日
+                {{ registration_date_str }}
               </v-list-item-content>
             </v-flex>
           </v-list-item>
@@ -181,13 +179,8 @@ export default {
   data: () => ({
     display_name: null,
     status_message: null,
-    mail_address: null,
-    sum_study_time: null,
-    registration_date: null,
-    // if_show_dialog_1: false,
     if_show_dialog_2: false,
     sign_out_result: null,
-    provider_id: null,
     saving: false,
   }),
   computed: {
@@ -200,16 +193,36 @@ export default {
     is_some_value_blank: function () {
       return !this.display_name || !this.status_message
     },
+    registration_date_str: function () {
+      const registration_date = this.$store.state.user.registration_date
+      if (registration_date) {
+        return (
+          registration_date.getFullYear() +
+          '年' +
+          (registration_date.getMonth() + 1) +
+          '月' +
+          registration_date.getDate() +
+          '日'
+        )
+      } else {
+        return null
+      }
+    },
+    mail_address: function () {
+      return this.$store.state.user.mail_address
+    },
+    provider_id: function () {
+      return this.$store.state.user.provider_id
+    },
+    sum_study_time: function () {
+      return this.$store.state.user.sum_study_time
+    },
   },
   async created() {
     await common.onAuthStateChanged(this)
 
     this.display_name = this.$store.state.user.display_name
     this.status_message = this.$store.state.user.status_message
-    this.mail_address = this.$store.state.user.mail_address
-    this.sum_study_time = this.$store.state.user.sum_study_time
-    this.registration_date = this.$store.state.user.registration_date
-    this.provider_id = this.$store.state.user.provider_id
   },
   methods: {
     goToHomePage() {
