@@ -8,7 +8,7 @@ export const state = () => ({
 })
 
 export const mutations = {
-  setSignInState(state, isSignedIn){
+  setSignInState(state, isSignedIn) {
     state.isSignedIn = isSignedIn
   },
   setRoomId(state, room_id) {
@@ -28,17 +28,7 @@ export const mutations = {
     state.user.id_token = null
     state.user.provider_id = null
     state.user.last_entered = null
-  }
+  },
 }
 
-export const actions = {
-  // async signIn({ commit }){
-  //   // ログイン処理
-  //   const isSignedIn = true // Todo
-  //   commit('setSignInState', isSignedIn)
-  // },
-  // signOut({ commit }){
-  //   commit('setSignInState', false)
-  // }
-}
-
+export const actions = {}

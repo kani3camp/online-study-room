@@ -1,4 +1,3 @@
-
 export const state = () => ({
   user_id: null,
   display_name: null,
@@ -10,7 +9,6 @@ export const state = () => ({
   provider_id: null,
   last_entered: null,
 })
-
 
 export const mutations = {
   setUserId(state, user_id) {
@@ -39,9 +37,7 @@ export const mutations = {
   },
   setLastEntered(state, last_entered) {
     state.last_entered = last_entered
-  }
+  },
 }
 
-export const actions = {
-
-}
+export const actions = {}

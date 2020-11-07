@@ -185,13 +185,18 @@ export default {
   }),
   computed: {
     is_some_value_changed: function () {
-      const bool1 = this.display_name !== this.$store.state.user.display_name
-      const bool2 =
-        this.status_message !== this.$store.state.user.status_message
+      const bool1 = this.display_name !== this.vuex_display_name
+      const bool2 = this.status_message !== this.vuex_status_message
       return bool1 || bool2
     },
     is_some_value_blank: function () {
       return !this.display_name || !this.status_message
+    },
+    vuex_display_name: function () {
+      return this.$store.state.user.display_name
+    },
+    vuex_status_message: function () {
+      return this.$store.state.user.status_message
     },
     registration_date_str: function () {
       const registration_date = this.$store.state.user.registration_date
@@ -216,6 +221,18 @@ export default {
     },
     sum_study_time: function () {
       return this.$store.state.user.sum_study_time
+    },
+  },
+  watch: {
+    vuex_display_name: function (newValue, oldValue) {
+      if (oldValue === null && newValue !== null) {
+        this.display_name = newValue
+      }
+    },
+    vuex_status_message: function (newValue, oldValue) {
+      if (oldValue === null && newValue !== null) {
+        this.status_message = newValue
+      }
     },
   },
   async created() {
@@ -269,8 +286,8 @@ export default {
         this.$store.commit('user/setStatusMessage', this.status_message)
       } else {
         console.log(resp)
-        this.display_name = this.$store.state.user.display_name
-        this.status_message = this.$store.state.user.status_message
+        this.display_name = this.vuex_display_name
+        this.status_message = this.vuex_status_message
       }
       this.saving = false
     },
