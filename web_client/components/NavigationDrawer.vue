@@ -6,7 +6,10 @@
     disable-resize-watcher
   >
     <v-list dense>
-      <v-list-item @click="goToTopPage" link>
+      <v-list-item
+        link
+        @click="goToTopPage"
+      >
         <v-list-item-action>
           <v-icon>mdi-home</v-icon>
         </v-list-item-action>
@@ -15,7 +18,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToAllRoomsPage" link>
+      <v-list-item
+        link
+        @click="goToAllRoomsPage"
+      >
         <v-list-item-action>
           <v-icon>mdi-door-open</v-icon>
         </v-list-item-action>
@@ -24,7 +30,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToAboutServicePage" link>
+      <v-list-item
+        link
+        @click="goToAboutServicePage"
+      >
         <v-list-item-action>
           <v-icon>mdi-account-question</v-icon>
         </v-list-item-action>
@@ -33,7 +42,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToYoutubeLive" link>
+      <v-list-item
+        link
+        @click="goToYoutubeLive"
+      >
         <v-list-item-action>
           <v-icon>mdi-youtube</v-icon>
         </v-list-item-action>
@@ -42,7 +54,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToNewsPage" link>
+      <v-list-item
+        link
+        @click="goToNewsPage"
+      >
         <v-list-item-action>
           <v-icon>mdi-bulletin-board</v-icon>
         </v-list-item-action>
@@ -51,7 +66,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToTermsOfServicePage" link>
+      <v-list-item
+        link
+        @click="goToTermsOfServicePage"
+      >
         <v-list-item-action>
           <v-icon>mdi-file-document-outline</v-icon>
         </v-list-item-action>
@@ -60,7 +78,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToPrivacyPolicyPage" link>
+      <v-list-item
+        link
+        @click="goToPrivacyPolicyPage"
+      >
         <v-list-item-action>
           <v-icon>mdi-account-lock</v-icon>
         </v-list-item-action>
@@ -69,7 +90,10 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item @click="goToContactFormPage" link>
+      <v-list-item
+        link
+        @click="goToContactFormPage"
+      >
         <v-list-item-action>
           <v-icon>mdi-email</v-icon>
         </v-list-item-action>
@@ -83,10 +107,20 @@
 
 <script>
 export default {
-  name: "NavigationDrawer",
+  name: 'NavigationDrawer',
+  computed: {
+    drawer: {
+      get() {
+        return this.$store.state.drawer
+      },
+      set(value) {
+        this.$store.commit('setDrawer', value)
+      },
+    },
+  },
   methods: {
     CloseDrawer() {
-      this.drawer = false;
+      this.drawer = false
     },
     goToTopPage() {
       this.$router.push('/')
@@ -125,19 +159,7 @@ export default {
       this.CloseDrawer()
     },
   },
-  computed: {
-    drawer: {
-      get() {
-        return this.$store.state.drawer
-      },
-      set(value) {
-        this.$store.commit('setDrawer', value)
-      }
-    }
-  }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

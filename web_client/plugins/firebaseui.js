@@ -1,3 +1,2 @@
-import firebaseui from "firebaseui"
-
+import firebaseui from 'firebaseui'
 export default firebaseui

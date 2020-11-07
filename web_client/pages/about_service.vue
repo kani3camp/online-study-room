@@ -1,8 +1,8 @@
 <template>
   <v-app>
-    <NavigationDrawer></NavigationDrawer>
+    <NavigationDrawer />
 
-    <ToolBar></ToolBar>
+    <ToolBar />
 
     <v-main>
       <v-container>
@@ -10,27 +10,23 @@
           <h2>はじめての方へ</h2>
         </v-flex>
       </v-container>
-
     </v-main>
 
-    <Footer></Footer>
+    <Footer />
   </v-app>
 </template>
 
 <script>
-import NavigationDrawer from "@/components/NavigationDrawer"
-import ToolBar from "@/components/ToolBar"
-
+import NavigationDrawer from '@/components/NavigationDrawer'
+import ToolBar from '@/components/ToolBar'
 
 export default {
-  name: "about_service",
+  name: 'AboutService',
   components: {
     NavigationDrawer,
     ToolBar,
-  }
+  },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

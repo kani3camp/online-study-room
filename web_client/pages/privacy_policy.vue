@@ -1,8 +1,8 @@
 <template>
   <v-app>
-    <NavigationDrawer></NavigationDrawer>
+    <NavigationDrawer />
 
-    <ToolBar></ToolBar>
+    <ToolBar />
 
     <v-main>
       <v-container>
@@ -10,19 +10,23 @@
           <h2>プライバシーポリシー</h2>
         </v-flex>
       </v-container>
-
     </v-main>
 
-    <Footer></Footer>
+    <Footer />
   </v-app>
 </template>
 
 <script>
+import NavigationDrawer from '@/components/NavigationDrawer'
+import ToolBar from '@/components/ToolBar'
+
 export default {
-  name: "privacy_policy"
+  name: 'PrivacyPolicy',
+  components: {
+    NavigationDrawer,
+    ToolBar,
+  },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

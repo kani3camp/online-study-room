@@ -1,8 +1,8 @@
 <template>
   <v-app>
-    <NavigationDrawer></NavigationDrawer>
+    <NavigationDrawer />
 
-    <ToolBar></ToolBar>
+    <ToolBar />
 
     <v-main>
       <v-container>
@@ -25,75 +25,86 @@
             item-text="ss"
             label="問い合わせの種類"
             outlined
-          ></v-select>
+          />
           <v-text-field
             v-model="mail_address"
             label="あなたのメールアドレス"
             outlined
-          ></v-text-field>
-          <v-textarea label="本文" v-model="message" outlined></v-textarea>
+          />
+          <v-textarea
+            v-model="message"
+            label="本文"
+            outlined
+          />
           <div>
             <v-btn
-              @click="submit"
               color="primary"
-              block elevation="3"
+              block
+              elevation="3"
               :disabled="submitting || !selected_contact_type || !message"
+              @click="submit"
             >
               送信
             </v-btn>
           </div>
-      </v-form>
+        </v-form>
       </v-container>
-
-
     </v-main>
 
-    <Footer></Footer>
+    <Footer />
 
-    <v-dialog v-model="if_show_dialog" width=500>
+    <v-dialog
+      v-model="if_show_dialog"
+      width="500"
+    >
       <v-card>
         <v-card-title>{{ dialog_message }}</v-card-title>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="if_show_dialog=false" text>閉じる</v-btn>
+          <v-spacer />
+          <v-btn
+            text
+            @click="if_show_dialog=false"
+          >
+            閉じる
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
   </v-app>
 </template>
 
 <script>
 // Regular expression from W3C HTML5.2 input specification:
 // https://www.w3.org/TR/html/sec-forms.html#email-state-typeemail
-import common from "~/plugins/common"
-import NavigationDrawer from "@/components/NavigationDrawer"
-import ToolBar from "@/components/ToolBar"
+import common from '~/plugins/common'
+import NavigationDrawer from '@/components/NavigationDrawer'
+import ToolBar from '@/components/ToolBar'
 
 // const emailRegExp = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
 export default {
-  name: "contact_form",
+  name: 'ContactForm',
   components: {
     NavigationDrawer,
     ToolBar,
   },
-  data: () => ({  // アロー関数でdataを定義している場合は中でthisがundefinedになるので注意
+  data: () => ({
+    // アロー関数でdataを定義している場合は中でthisがundefinedになるので注意
     dialog_message: '',
     message: null,
     submitting: false,
     selected_contact_type: null,
     if_show_dialog: false,
     contact_types: [
-      {mode: 'feedback', ss: '意見'},
-      {mode: 'contact', ss: '問い合わせ'},
+      { mode: 'feedback', ss: '意見' },
+      { mode: 'contact', ss: '問い合わせ' },
     ],
   }),
   computed: {
     mail_address: {
       get() {
         return this.$store.state.user.mail_address
-      }
+      },
     },
   },
   mounted() {
@@ -113,7 +124,8 @@ export default {
       if (this.selected_contact_type || this.mail_address || this.message) {
         this.submitting = true
 
-        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
+        const url =
+          'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
         const params = {
           mail_address: this.mail_address.toString(),
           user_id: this.$store.state.user.user_id,
@@ -126,7 +138,8 @@ export default {
         if (resp.result === 'ok') {
           this.message = null
           this.selected_contact_type = null
-          this.dialog_message = '送信が完了しました。お問い合わせ頂きありがとうございます。'
+          this.dialog_message =
+            '送信が完了しました。お問い合わせ頂きありがとうございます。'
           this.if_show_dialog = true
         } else {
           this.dialog_message = '送信に失敗しました。'
@@ -139,8 +152,6 @@ export default {
     },
   },
 }
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

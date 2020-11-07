@@ -1,13 +1,15 @@
 <template>
   <v-app>
-    <NavigationDrawer></NavigationDrawer>
+    <NavigationDrawer />
 
-    <ToolBar></ToolBar>
+    <ToolBar />
 
     <v-main>
       <v-container>
         <v-flex>
-          <v-row justify="center"><h2>オンライン作業部屋</h2><h2>サービス利用規約</h2></v-row>
+          <v-row justify="center">
+            <h2>オンライン作業部屋</h2><h2>サービス利用規約</h2>
+          </v-row>
 
           <p>　この利用規約（以下，「本規約」といいます。）は、オンライン作業部屋運営（以下、「当運営」といいます。）が提供するサービス（以下、「本サービス」といいます。）の利用条件を定めるものです。本サービスを利用するユーザー（以下、「ユーザー」といいます。）は、本規約に同意したものとみなし、本規約の内容を当運営およびユーザー双方の契約内容とします。</p>
           <h3>第１条（適用）</h3>
@@ -180,32 +182,31 @@
             <li>本サービスに関して紛争が生じた場合には，当運営の指定する裁判所を専属的合意管轄とします。</li>
           </ol>
 
-          <p></p>
+          <p />
           <h4>施行日：2020年10月31日</h4>
 
-          <p></p>
+          <p />
           <h4>以上</h4>
         </v-flex>
       </v-container>
-
     </v-main>
 
-    <Footer></Footer>
+    <Footer />
   </v-app>
 </template>
 
 <script>
-import NavigationDrawer from "@/components/NavigationDrawer"
-import ToolBar from "@/components/ToolBar"
+import NavigationDrawer from '@/components/NavigationDrawer'
+import ToolBar from '@/components/ToolBar'
 
 export default {
-  name: "terms_of_service",
+  name: 'TermsOfService',
   components: {
     NavigationDrawer,
     ToolBar,
   },
   data: () => ({
-    drawer: null
+    drawer: null,
   }),
   methods: {
     goToHomePage() {
@@ -219,11 +220,9 @@ export default {
     },
     goToNewsPage() {
       this.$router.push('/news')
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

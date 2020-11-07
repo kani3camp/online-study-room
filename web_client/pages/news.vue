@@ -1,8 +1,8 @@
 <template>
   <v-app>
-    <NavigationDrawer></NavigationDrawer>
+    <NavigationDrawer />
 
-    <ToolBar></ToolBar>
+    <ToolBar />
 
     <v-main>
       <v-container>
@@ -11,46 +11,52 @@
         </v-flex>
       </v-container>
 
-      <v-container v-show="loading"
-                   class="fill-height"
-                   fluid
+      <v-container
+        v-show="loading"
+        class="fill-height"
+        fluid
       >
         <v-row
           align="center"
           justify="center"
         >
           <v-col class="text-center">
-            <div class="big-char">Loading...</div>
+            <div class="big-char">
+              Loading...
+            </div>
           </v-col>
         </v-row>
       </v-container>
 
       <v-container v-show="! loading">
         <v-row dense>
-          <v-col v-for="(news, index) in newsList" :key="news.news_id" cols="12" dense>
+          <v-col
+            v-for="news in newsList"
+            :key="news['news_id']"
+            cols="12"
+            dense
+          >
             <v-card>
-              <v-card-title v-text="news.news_body.title"></v-card-title>
-              <v-card-subtitle v-text="formatDateString(news.news_body.updated)"></v-card-subtitle>
-              <v-card-text v-text="news.news_body.text_body"></v-card-text>
+              <v-card-title v-text="news['news_body'].title" />
+              <v-card-subtitle v-text="formatDateString(news['news_body'].updated)" />
+              <v-card-text v-text="news['news_body']['text_body']" />
             </v-card>
           </v-col>
         </v-row>
       </v-container>
-
     </v-main>
 
-    <Footer></Footer>
+    <Footer />
   </v-app>
 </template>
 
 <script>
-import common from "@/plugins/common";
-import NavigationDrawer from "@/components/NavigationDrawer"
-import ToolBar from "@/components/ToolBar"
-
+import common from '@/plugins/common'
+import NavigationDrawer from '@/components/NavigationDrawer'
+import ToolBar from '@/components/ToolBar'
 
 export default {
-  name: "news",
+  name: 'News',
   components: {
     NavigationDrawer,
     ToolBar,
@@ -62,9 +68,10 @@ export default {
   }),
   async created() {
     this.loading = true
-    const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/news'
+    const url =
+      'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/news'
     const params = {
-      num_news: 10
+      num_news: 10,
     }
     const resp = await common.httpGet(url, params)
     if (resp.result === 'ok') {
@@ -73,7 +80,6 @@ export default {
       console.log(resp.message)
     }
     this.loading = false
-
   },
   methods: {
     goToHomePage() {
@@ -93,11 +99,9 @@ export default {
       const h = date.getHours()
       const mi = date.getMinutes()
       return `${y}/${mo}/${d} ${h}:${mi}`
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
