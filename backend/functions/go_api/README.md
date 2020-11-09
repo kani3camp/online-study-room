@@ -3,7 +3,7 @@ deploy.shを実行して。内容はトリガーの種類ごとに書き換え�
 
 # ハマったこと
 GoLandの不具合なのかわからないけど、プロジェクト内外に関わらず（GOPATH以下はやったことないが）、
-`go get`しても読み込んでくれないし、go mod init firebase.google.com/go でモジュールインストールすると、
+`go get`しても読み込んでくれないし、`go mod init firebase.google.com/go` でモジュールインストールすると、
 firebase.google.com/goそのもののモジュールはself importエラーとなってしまう
 (自動追加でインストールされるcloud.google.com/goなどはちゃんと読み込めるのに)。
 

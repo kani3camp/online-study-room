@@ -1,6 +1,10 @@
-import firebase from "~/plugins/firebase"
+import firebase from '~/plugins/firebase'
 
 const common = {
+  key: {
+    youtubeLink: 'https://www.youtube.com/',
+    twitterLink: 'https://twitter.com/home',
+  },
 }
 
 common.c = (m) => {
@@ -8,26 +12,27 @@ common.c = (m) => {
 }
 
 common.onAuthStateChanged = (vm) => {
-  // const vm = this
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
-      // user.displayNameは使わない。firestoreのnameを使う
       vm.$store.commit('user/setMailAddress', user.email)
       vm.$store.commit('user/setUserId', user.uid)
       vm.$store.commit('user/setProviderId', user.providerData[0].providerId)
-
-      // var emailVerified = user.emailVerified
+      vm.$store.commit('user/setDisplayName', user.displayName)
 
       console.log('User is signed in.')
       vm.$store.commit('setSignInState', true)
 
       await common.getUserData(vm)
 
-      firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
-        vm.$store.commit('user/setIdToken', idToken)
-      }).catch(function(error) {
-        console.error(error)
-      })
+      firebase
+        .auth()
+        .currentUser.getIdToken(/* forceRefresh */ true)
+        .then(function (idToken) {
+          vm.$store.commit('user/setIdToken', idToken)
+        })
+        .catch(function (error) {
+          console.error(error)
+        })
     } else {
       console.log('User is signed out.')
       vm.$store.commit('signOut')
@@ -35,18 +40,14 @@ common.onAuthStateChanged = (vm) => {
   })
 }
 
-
 common.getUserData = async (vm) => {
-  const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/UserStatus')
+  const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/user_status')
   const params = { user_id: vm.$store.state.user.user_id }
-  url.search = new URLSearchParams(params).toString()
-  const response = (await fetch(url.toString(), {method: 'GET'}))
-  const user_data = await response.json()
+  const user_data = await common.httpGet(url, params)
   if (user_data.result !== 'ok') {
     console.log(user_data)
   } else {
     const user_body = user_data['user_status']['user_body']
-    vm.$store.commit("user/setUserName", user_body.name)
     vm.$store.commit('user/setStatusMessage', user_body.status)
     // this.$store.commit('user/setSumStudyTime', use) // Todo
     vm.$store.commit('user/setRegistrationDate', new Date(user_body.registration_date))
@@ -54,5 +55,19 @@ common.getUserData = async (vm) => {
   }
 }
 
+common.httpGet = async (url_str, params) => {
+  const url = new URL(url_str)
+  url.search = new URLSearchParams(params).toString()
+  const response = await fetch(url.toString(), { method: 'GET' })
+  return await response.json()
+}
+
+common.httpPost = async (url_str, _params) => {
+  const response = await fetch(url_str, {
+    method: 'POST',
+    body: JSON.stringify(_params),
+  })
+  return await response.json()
+}
 
 export default common

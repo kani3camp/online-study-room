@@ -73,7 +73,7 @@ export default {
     },
     async retrieveRoomIdList () {
       const vm = this
-      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms')
+      const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms')
       const resp = await fetch(url.toString(), { method: 'GET' }).then(response => response.json())
       if (resp.result === 'ok') {
         const list = []
@@ -87,7 +87,7 @@ export default {
     },
     async fetchRoomInfo () {
       const roomId = this.$store.state.roomId
-      const url = new URL('https://us-central1-online-study-room-f1f30.cloudfunctions.net/RoomStatus')
+      const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status')
       url.search = new URLSearchParams({ room_id: roomId }).toString()
       const resp = await fetch(url.toString(), { method: 'GET' }).then(response =>
         response.json()

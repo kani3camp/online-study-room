@@ -13,17 +13,17 @@ import (
 // なぜか、構造体のキーを小文字から始めるとそのデータが返せないので大文字にするように。
 
 type NewsResponseStruct struct {
-	Result string `json:"result"`
-	Message string `json:"message"`
+	Result   string       `json:"result"`
+	Message  string       `json:"message"`
 	NewsList []NewsStruct `json:"news_list"`
 }
 
-func retrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([]NewsStruct, error) {
+func RetrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([]NewsStruct, error) {
 	var newsList []NewsStruct
 	var err error
-
+	
 	// roomsのコレクションを取得
-	iter := client.Collection(NEWS).OrderBy("updated", firestore.Asc).Limit(numNews).Documents(ctx)
+	iter := client.Collection(NEWS).OrderBy("updated", firestore.Desc).Limit(numNews).Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -31,13 +31,14 @@ func retrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([
 			break
 		}
 		if err != nil {
-			log.Printf("Failed to iterate: %v\n", err)
+			log.Printf("failed to iterate: %v\n", err)
+			return []NewsStruct{}, err
 		}
 		var _news NewsBodyStruct
 		_ = doc.DataTo(&_news)
-		news := NewsStruct {
-			NewsId: doc.Ref.ID,
-			NewsBody:   _news,
+		news := NewsStruct{
+			NewsId:   doc.Ref.ID,
+			NewsBody: _news,
 		}
 		newsList = append(newsList, news)
 	}
@@ -47,9 +48,9 @@ func retrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([
 func News(w http.ResponseWriter, r *http.Request) {
 	ctx, client := InitializeHttpFunc(&w)
 	defer client.Close()
-
+	
 	var apiResp NewsResponseStruct
-
+	
 	_numNews := r.FormValue("num_news")
 	if _numNews == "" {
 		apiResp.Result = ERROR
@@ -63,18 +64,12 @@ func News(w http.ResponseWriter, r *http.Request) {
 			apiResp.Result = ERROR
 			apiResp.Message = InvalidValue
 		} else {
-			newsList, err := retrieveNews(numNews, client, ctx)
-			if err != nil {
-				log.Println(err)
-				apiResp.Result = ERROR
-				apiResp.Message = err.Error()
-			} else {
-				apiResp.Result = OK
-				apiResp.NewsList = newsList
-			}
+			newsList, _ := RetrieveNews(numNews, client, ctx)
+			apiResp.Result = OK
+			apiResp.NewsList = newsList
 		}
 	}
-
+	
 	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type ExitRoomResponseStruct struct {
-	Result string `json:"result"`
+	Result  string `json:"result"`
 	Message string `json:"message"`
 }
 
@@ -20,19 +20,15 @@ func ExitRoom(w http.ResponseWriter, r *http.Request) {
 	if roomId == "" || userId == "" || idToken == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
+	} else if isUserVerified, _ := IsUserVerified(userId, idToken, client, ctx); !isUserVerified {
+		apiResp.Result = ERROR
+		apiResp.Message = UserAuthFailed
+	} else if isInRoom, _ := IsInRoom(roomId, userId, client, ctx); !isInRoom {
+		apiResp.Result = ERROR
+		apiResp.Message = "you are not in the room."
 	} else {
-		if IsUserVerified(userId, idToken, ctx) {
-			statement, err := LeaveRoom(roomId, userId, client, ctx)
-			if err != nil {
-				apiResp.Result = ERROR
-			} else {
-				apiResp.Result = OK
-			}
-			apiResp.Message = statement
-		} else {
-			apiResp.Result = ERROR
-			apiResp.Message = UserAuthFailed
-		}
+		_ = LeaveRoom(roomId, userId, client, ctx)
+		apiResp.Result = OK
 	}
 	
 	bytes, _ := json.Marshal(apiResp)

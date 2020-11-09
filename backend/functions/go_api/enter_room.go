@@ -8,84 +8,66 @@ import (
 	"net/http"
 )
 
-
-// todo roomの人数制限を設ける
-
 type ApiResponseStruct struct {
-	Result string `json:"result"`
+	Result  string `json:"result"`
 	Message string `json:"message"`
 }
 
-func enterRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) (*firestore.WriteResult, error) {
-	return client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
+func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
+	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
 		"users": firestore.ArrayUnion(userId),
 	}, firestore.MergeAll)
+	if err != nil {
+		log.Println("failed _EnterRoom().")
+		log.Println(err)
+	}
+	return err
 }
 
-func EnterRoom(w http.ResponseWriter, r *http.Request)  {
+func EnterRoom(w http.ResponseWriter, r *http.Request) {
 	ctx, client := InitializeHttpFunc(&w)
 	defer client.Close()
 	
-	var apiResponse ApiResponseStruct
-	roomId, userId, idToken := r.FormValue(room_id), r.FormValue(user_id), r.FormValue(id_token)
+	var apiResp ApiResponseStruct
+	roomId, userId, idToken := r.PostFormValue(room_id), r.PostFormValue(user_id), r.PostFormValue(id_token)
 	
 	if roomId == "" || userId == "" || idToken == "" {
-		apiResponse.Result = ERROR
-		apiResponse.Message = InvalidParams
+		apiResp.Result = ERROR
+		apiResp.Message = InvalidParams
 	} else {
 		// auth
-		if IsUserVerified(userId, idToken, ctx) {
-			if IsExistRoom(roomId, client, ctx) {
-				if IsInUsers(userId, client, ctx) {
-					if IsOnline(userId, client, ctx) {
-						currentRoomId, err := InWhichRoom(userId, client, ctx)
-						if err != nil {
-							log.Println(err)
-							apiResponse.Result = ERROR
-							apiResponse.Message = "Failed InWhichRoom()"
-						} else {
-							if currentRoomId == roomId {
-								apiResponse.Result = OK
-								apiResponse.Message = "You are already in the " + currentRoomId
-							} else {
-								_, _ = LeaveRoom(currentRoomId, userId, client, ctx)
-								_, err := enterRoom(roomId, userId, client, ctx)
-								if err != nil {
-									log.Println(err)
-									apiResponse.Result = ERROR
-									apiResponse.Message = "Failed enterRoom()"
-								} else {
-									apiResponse.Result = OK
-									apiResponse.Message = "Successfully entered " + roomId + "."
-								}
-							}
-						}
-					} else {
-						// 入室処理
-						_, err := enterRoom(roomId, userId, client, ctx)
-						if err != nil {
-							log.Println(err)
-							apiResponse.Result = ERROR
-							apiResponse.Message = "Failed enterRoom()"
-						} else {
-							apiResponse.Result = OK
-							apiResponse.Message = "Successfully entered " + roomId + "."
-						}
-					}
-				} else {
-					apiResponse.Result = ERROR
-					apiResponse.Message = InvalidUser
-				}
+		if isUserVerified, _ := IsUserVerified(userId, idToken, client, ctx); !isUserVerified {
+			apiResp.Result = ERROR
+			apiResp.Message = UserAuthFailed
+		} else if isExistRoom, _ := IsExistRoom(roomId, client, ctx); !isExistRoom {
+			apiResp.Result = ERROR
+			apiResp.Message = RoomDoesNotExist
+		} else if isInUsers, _ := IsInUsers(userId, client, ctx); !isInUsers {
+			apiResp.Result = ERROR
+			apiResp.Message = InvalidUser
+		} else if isOnline, _ := IsOnline(userId, client, ctx); isOnline {
+			// 一旦退室させてから入室
+			currentRoomId, _ := InWhichRoom(userId, client, ctx)
+			if currentRoomId == roomId {
+				apiResp.Result = OK
+				apiResp.Message = "you are already in the " + currentRoomId
 			} else {
-				apiResponse.Result = ERROR
-				apiResponse.Message = RoomDoesNotExist
+				_ = LeaveRoom(currentRoomId, userId, client, ctx)
+				client.Close()
+				
+				client, _ = InitializeFirestoreClient(ctx)
+				_ = _EnterRoom(roomId, userId, client, ctx)
+				apiResp.Result = OK
+				apiResp.Message = "successfully entered " + roomId + "."
 			}
 		} else {
-			apiResponse.Result = ERROR
-			apiResponse.Message = UserAuthFailed
+			// 入室処理
+			_ = _EnterRoom(roomId, userId, client, ctx)
+			apiResp.Result = OK
+			apiResp.Message = "successfully entered " + roomId + "."
 		}
 	}
-	log.Println(apiResponse)
-	bytes, _ := json.Marshal(apiResponse)
+	log.Println(apiResp)
+	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)
 }

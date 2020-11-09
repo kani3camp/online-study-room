@@ -1,67 +1,119 @@
+
 import 'package:flutter/material.dart';
 
+// Import the firebase_core plugin
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_app/pages/in_room.dart';
+
+import 'home_page.dart';
+import 'login_page.dart';
+
 void main() {
-  runApp(MyApp());
+  runApp(App());
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class App extends StatefulWidget {
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  bool _initialized = false;
+  bool _error = false;
+
+  void initializeFlutterFire() async {
+    try {
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch(e) {
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initializeFlutterFire();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if(_error) {
+      return MaterialApp(
+        title: 'エラー発生',
+        home: Scaffold(
+          body: AlertDialog(
+            content: Text('エラーが発生しました'),
+          ),
+        ),
+      );
+    }
+
+    if (!_initialized) {
+      return MaterialApp(
+        title: 'ローディング',
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              children: [
+                Text('ローディング'),
+                CircularProgressIndicator()
+              ]
+            )
+          ),
+        ),
+      );
+    }
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'オンライン作業部屋',
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Splash(),
+      routes: <String, WidgetBuilder>{
+        LoginPage.routeName: (_) => LoginPage(),
+        MyHomePage.routeName: (_) => MyHomePage(),
+        InRoom.routeName: (_) => InRoom(),
+      }
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
 
-  final String title;
-
+class Splash extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _SplashState createState() => new _SplashState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+class _SplashState extends State<Splash> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 1))
+        .then((_) => handleTimeout());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Splash'),
+            CircularProgressIndicator()
+          ]
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  void handleTimeout() {
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 }

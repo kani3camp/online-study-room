@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-
 type FirestoreEvent struct {
 	OldValue   FirestoreValue `json:"oldValue"`
 	Value      FirestoreValue `json:"value"`
@@ -20,16 +19,16 @@ type FirestoreEvent struct {
 }
 
 type FirestoreValue struct {
-	CreateTime time.Time `json:"createTime"`
+	CreateTime time.Time           `json:"createTime"`
 	Fields     EventRoomBodyStruct `json:"fields"`
-	Name       string      `json:"name"`
-	UpdateTime time.Time   `json:"updateTime"`
+	Name       string              `json:"name"`
+	UpdateTime time.Time           `json:"updateTime"`
 }
 
 type EventRoomBodyStruct struct {
 	Created TimestampValue `firestore:"created"`
 	Name    StringValue    `firestore:"name"`
-	Users   ArrayValue  `firestore:"users"`
+	Users   ArrayValue     `firestore:"users"`
 }
 
 type TimestampValue struct {
@@ -45,10 +44,8 @@ type ArrayValue struct {
 	ArrayValue Values `json:"arrayValue"`
 }
 type Values struct {
-	Values  []StringValue  `json:"values"`
+	Values []StringValue `json:"values"`
 }
-
-
 
 // ユーザーの入退室がトリガー
 func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
@@ -56,13 +53,12 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	defer client.Close()
 	
 	_, err := metadata.FromContext(ctx)
-	if err != nil {return fmt.Errorf("metadata.FromContext: %v", err)}
+	if err != nil {
+		return fmt.Errorf("metadata.FromContext: %v", err)
+	}
 	
 	previousUsers := e.OldValue.Fields.Users.ArrayValue.Values
 	newUsers := e.Value.Fields.Users.ArrayValue.Values
-	
-	log.Println(previousUsers)
-	log.Println(newUsers)
 	
 	var enteredUser, leftUser []string
 	
@@ -93,8 +89,16 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		}
 	}
 	
-	if len(enteredUser) > 1 {log.Fatalln("More than 1 people entered : ",  enteredUser)}
-	if len(leftUser) > 1 {log.Fatalln("More than 1 people left : ",  leftUser)}
+	if len(enteredUser) > 1 {
+		log.Fatalln("more than 1 people entered : ", enteredUser)
+	}
+	if len(leftUser) > 1 {
+		log.Fatalln("more than 1 people left : ", leftUser)
+	}
+	if len(enteredUser) > 1 || len(leftUser) > 1 {
+		log.Println("previousUsers : ", previousUsers)
+		log.Println("newUsers : ", newUsers)
+	}
 	
 	usersCollectionRef := client.Collection(USERS)
 	fullPath := strings.Split(e.Value.Name, "/documents/")[1]
@@ -102,64 +106,54 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	doc := strings.Join(pathParts[1:], "/")
 	
 	if len(enteredUser) > 0 {
-		log.Printf("Entered! entered_user is %s while left_user.length is %d\n", enteredUser[0], len(leftUser))
+		log.Printf("Entered! entered_user is %s\n", enteredUser[0])
 		userId := enteredUser[0]
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
-			"online": true,
-			"in":     doc,
-			"last-access": firestore.ServerTimestamp,
+			"online":      true,
+			"in":          doc,
+			"last-access": time.Now(),
 		}, firestore.MergeAll)
 		if err != nil {
-			log.Fatalln("Failed to update user info of " + userId)
+			log.Println("failed to update user info of " + userId + ".")
 		}
-		RecordLastAccess(userId, client, ctx)
-		RecordEnteredTime(userId, client, ctx)
-		Record(map[string]interface{}{
+		_ = RecordLastAccess(userId, client, ctx)
+		_ = RecordEnteredTime(userId, client, ctx)
+		_ = RecordHistory(map[string]interface{}{
 			"activity": "entering",
 			"room":     doc,
 			"user-id":  userId,
-			"time":     firestore.ServerTimestamp,
+			"time":     time.Now(),
 		}, client, ctx)
-		userBody, err1 := GetUserInfo(userId, client, ctx)
-		roomBody, err2 := GetRoomInfo(doc, client, ctx)
-		if err1 != nil {
-			log.Fatalln(err1)
-		} else if err2 != nil {
-			log.Fatalln(err2)
-		} else {
-			defer SendLiveChatMessage(userBody.Name + "さんが" + roomBody.Name + "の部屋に入室しました。", client, ctx)
-		}
+		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
+		authClient, _ := InitializeFirebaseAuthClient(ctx)
+		user, _ := authClient.GetUser(ctx, userId)
+		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"の部屋に入室しました。", client, ctx)
 	} else if len(leftUser) > 0 {
-		log.Printf("Left! left_user is %s while entered_user.length is %d\n", leftUser[0], len(enteredUser))
+		log.Printf("Left! left_user is %s\n", leftUser[0])
 		userId := leftUser[0]
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
 			"online":       false,
 			"in":           "",
-			"last-studied": firestore.ServerTimestamp,
-			"last-access": firestore.ServerTimestamp,
+			"last-studied": time.Now(),
+			"last-access":  time.Now(),
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Fatalln("Failed to update user info of " + userId)
 		}
-		RecordLastAccess(userId, client, ctx)
-		RecordExitedTime(userId, client, ctx)
-		Record(map[string]interface{}{
+		_ = RecordLastAccess(userId, client, ctx)
+		_ = RecordExitedTime(userId, client, ctx)
+		_ = RecordHistory(map[string]interface{}{
 			"activity": "leaving",
 			"room":     doc,
 			"user-id":  userId,
-			"time":     firestore.ServerTimestamp,
+			"time":     time.Now(),
 		}, client, ctx)
-		userBody, err1 := GetUserInfo(userId, client, ctx)
-		roomBody, err2 := GetRoomInfo(doc, client, ctx)
-		if err1 != nil {
-			log.Fatalln(err1)
-		} else if err2 != nil {
-			log.Fatalln(err2)
-		} else {
-			defer SendLiveChatMessage(userBody.Name + "さんが" + roomBody.Name + "の部屋を退室しました。", client, ctx)
-		}
+		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
+		authClient, _ := InitializeFirebaseAuthClient(ctx)
+		user, _ := authClient.GetUser(ctx, userId)
+		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"の部屋を退室しました。", client, ctx)
 	} else {
-		log.Println("No changes?")
+		log.Println("no changes?")
 	}
 	return nil
 }

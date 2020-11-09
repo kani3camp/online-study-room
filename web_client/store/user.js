@@ -1,7 +1,6 @@
-
 export const state = () => ({
   user_id: null,
-  user_name: null,
+  display_name: null,
   mail_address: null,
   sum_study_time: null,
   registration_date: null,
@@ -11,13 +10,12 @@ export const state = () => ({
   last_entered: null,
 })
 
-
 export const mutations = {
   setUserId(state, user_id) {
     state.user_id = user_id
   },
-  setUserName(state, user_name) {
-    state.user_name = user_name
+  setDisplayName(state, display_name) {
+    state.display_name = display_name
   },
   setMailAddress(state, mail_address) {
     state.mail_address = mail_address
@@ -39,9 +37,7 @@ export const mutations = {
   },
   setLastEntered(state, last_entered) {
     state.last_entered = last_entered
-  }
+  },
 }
 
-export const actions = {
-
-}
+export const actions = {}

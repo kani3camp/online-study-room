@@ -9,38 +9,54 @@ import (
 )
 
 type RoomStatusResponseStruct struct {
-	Result string `json:"result"`
-	Message string `json:"message"`
-	RoomStatus RoomStruct `json:"room_status"`
-	UserNames []string `json:"user_names"`
+	Result     string       `json:"result"`
+	Message    string       `json:"message"`
+	RoomStatus RoomStruct   `json:"room_status"`
+	Users      []UserStruct `json:"users"`
 }
 
-func GetRoomUserNames(roomId string, client *firestore.Client, ctx context.Context) ([]string, error) {
+func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
 	var err error
-	var userNames []string
-	roomInfo, err := GetRoomInfo(roomId, client, ctx)
+	var users []UserStruct
+	
+	authClient, _ := InitializeFirebaseAuthClient(ctx)
+	
+	roomInfo, err := RetrieveRoomInfo(roomId, client, ctx)
 	if err != nil {
 	} else {
-		for _, id := range roomInfo.Users {
-			userInfo, err := GetUserInfo(id, client, ctx)
+		for _, userId := range roomInfo.Users {
+			userBody, err := RetrieveUserInfo(userId, client, ctx)
 			if err != nil {
 			} else {
-				userNames = append(userNames, userInfo.Name)
+				user, _ := authClient.GetUser(ctx, userId)
+				users = append(users, UserStruct{
+					UserId:      userId,
+					DisplayName: user.DisplayName,
+					Body:        userBody,
+				})
 			}
 		}
 	}
-	return userNames, err
+	if users == nil {
+		users = []UserStruct{}
+	}
+	return users, err
 }
 
-func GetRoomInfo(roomId string, client *firestore.Client, ctx context.Context) (RoomBodyStruct, error) {
-	room, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
+func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Context) (RoomBodyStruct, error) {
 	var roomBodyStruct RoomBodyStruct
+	
+	room, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
 	if err != nil {
 		log.Println(err)
+		return RoomBodyStruct{}, err
 	} else {
 		_ = room.DataTo(&roomBodyStruct)
+		if roomBodyStruct.Users == nil {
+			roomBodyStruct.Users = []string{}	// jsonにした時、中身がない場合にnullではなく[]にする
+		}
+		return roomBodyStruct, nil
 	}
-	return roomBodyStruct, err
 }
 
 func RoomStatus(w http.ResponseWriter, r *http.Request) {
@@ -53,30 +69,19 @@ func RoomStatus(w http.ResponseWriter, r *http.Request) {
 	if roomId == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
-	} else if IsExistRoom(roomId, client, ctx) {
-		roomInfo, err := GetRoomInfo(roomId, client, ctx)
-		if err != nil {
-			apiResp.Result = ERROR
-			apiResp.Message = err.Error()
-		} else {
-			apiResp.RoomStatus = RoomStruct{
-				RoomId: roomId,
-				Body:   roomInfo,
-			}
-			
-			userNames, err := GetRoomUserNames(roomId, client, ctx)
-			if err != nil {
-				apiResp.Result = ERROR
-				apiResp.Message = err.Error()
-			} else {
-				apiResp.UserNames = userNames
-				apiResp.Result = OK
-			}
-		}
-	} else {
-		log.Println(RoomDoesNotExist)
+	} else if isExistRoom, _ := IsExistRoom(roomId, client, ctx); !isExistRoom {
 		apiResp.Result = ERROR
 		apiResp.Message = RoomDoesNotExist
+	} else {
+		roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
+		apiResp.RoomStatus = RoomStruct{
+			RoomId: roomId,
+			Body:   roomInfo,
+		}
+		
+		users, _ := RetrieveRoomUsers(roomId, client, ctx)
+		apiResp.Users = users
+		apiResp.Result = OK
 	}
 	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)

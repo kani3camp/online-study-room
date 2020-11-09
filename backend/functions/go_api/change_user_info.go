@@ -1,45 +1,48 @@
 package go_api
 
 import (
-	"cloud.google.com/go/firestore"
 	"encoding/json"
-	"log"
+	"firebase.google.com/go/auth"
 	"net/http"
 )
 
 type ChangeUserInfoResponseStruct struct {
-	Result string `json:"result"`
+	Result  string `json:"result"`
 	Message string `json:"message"`
 }
 
-func ChangeUserInfo(w http.ResponseWriter, r *http.Request)  {
+func ChangeUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx, client := InitializeHttpFunc(&w)
 	defer client.Close()
 	
-	var apiResponse ChangeUserInfoResponseStruct
+	var apiResp ChangeUserInfoResponseStruct
 	userId, idToken := r.FormValue(user_id), r.FormValue(id_token)
 	displayName, statusMessage := r.FormValue("display_name"), r.FormValue("status_message")
 	
 	if userId == "" || idToken == "" || displayName == "" || statusMessage == "" {
-		apiResponse.Result = ERROR
-		apiResponse.Message = InvalidParams
+		apiResp.Result = ERROR
+		apiResp.Message = InvalidParams
+	} else if _isUserVerified, _ := IsUserVerified(userId, idToken, client, ctx); !_isUserVerified {
+		apiResp.Result = ERROR
+		apiResp.Message = UserAuthFailed
 	} else {
-		if IsUserVerified(userId, idToken, ctx) {
-			_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
-				"last-access": firestore.ServerTimestamp,
-				"name": displayName,
-				"status": statusMessage,
-			}, firestore.MergeAll)
-			if err != nil {
-				log.Fatalln("Failed to update user info of " + userId)
-			}
-			apiResponse.Result = OK
+		authClient, _ := InitializeFirebaseAuthClient(ctx)
+		params := (&auth.UserToUpdate{}).DisplayName(displayName)
+		_, err := authClient.UpdateUser(ctx, userId, params)
+		if err != nil {
+			apiResp.Result = ERROR
+			apiResp.Message = "failed to update display name of " + userId + "."
 		} else {
-			apiResponse.Result = ERROR
-			apiResponse.Message = UserAuthFailed
+			err := UpdateStatusMessage(userId, statusMessage, client, ctx)
+			if err != nil {
+				apiResp.Result = ERROR
+				apiResp.Message = "failed to update user info of " + userId + "."
+			} else {
+				apiResp.Result = OK
+			}
 		}
 	}
 	
-	bytes, _ := json.Marshal(apiResponse)
+	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)
 }
