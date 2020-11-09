@@ -50,14 +50,14 @@ type AccessTokenResponseStruct struct {
 }
 
 type ApiConfigStruct struct {
-	AccessToken string `firestore:"access-token"`
-	LiveChatId string `firestore:"live-chat-id"`
-	LiveChatMessageUrl string `firestore:"live-chat-message-url"`
-	RefreshToken string `firestore:"refresh-token"`
-	ExpireDate time.Time `firestore:"expire-date"`
-	ClientId string `firestore:"client-id"`
-	ClientSecret string `firestore:"client-secret"`
-	OAuthRefreshTokenUrl string `firestore:"o-auth-refresh-token-url"`
+	AccessToken string `firestore:"access-token"`	// 自動
+	LiveChatId string `firestore:"live-chat-id"`	// 自動
+	LiveChatMessageUrl string `firestore:"live-chat-message-url"`	// 要設定
+	RefreshToken string `firestore:"refresh-token"`	// 要設定
+	ExpireDate time.Time `firestore:"expire-date"`	// 自動
+	ClientId string `firestore:"client-id"`	// 要設定
+	ClientSecret string `firestore:"client-secret"`	// 要設定
+	OAuthRefreshTokenUrl string `firestore:"o-auth-refresh-token-url"`	// 要設定
 }
 
 type ChatMessageRequestStruct struct {
