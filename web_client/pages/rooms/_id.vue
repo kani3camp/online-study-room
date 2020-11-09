@@ -164,6 +164,8 @@ export default {
             await this.$router.push('/')
           }
           this.other_users_info = info
+        } else {
+          // todo
         }
         this.room_status = resp.room_status
         this.stay_awake_timeout = setTimeout(() => {
