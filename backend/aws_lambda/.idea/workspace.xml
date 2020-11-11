@@ -19,16 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/enter_room.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/enter_room.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/news.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/news.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/room_status.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/room_status.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/rooms.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/rooms.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/send_live_chat_message.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/send_live_chat_message.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/update_database.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/update_database.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../functions/go_api/user_status.go" beforeDir="false" afterPath="$PROJECT_DIR$/../functions/go_api/user_status.go" afterDir="false" />
-    </list>
+    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
