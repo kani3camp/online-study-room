@@ -67,6 +67,8 @@ type UserBodyStruct struct {
 	Online           bool      `firestore:"online" json:"online"`
 	Status           string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
+	TotalStudyTime int64 `firestore:"total-study-time" json:"total_study_time"`
+	TotalBreakTime int64 `firestore:"total-break-time" json:"total_break_time"`
 }
 
 type NewsStruct struct {

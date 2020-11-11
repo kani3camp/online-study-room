@@ -21,6 +21,8 @@ func CreateNewUser(userId string, client *firestore.Client, ctx context.Context)
 		"last-access":       time.Now(),
 		"online":            false,
 		"status":            "",
+		"total-study-time": 0,
+		"total-break-time": 0,
 	})
 	if err != nil {
 		log.Println("failed to create new user")
