@@ -16,10 +16,11 @@ func CreateNewRoom(w http.ResponseWriter, r *http.Request) {
 	defer client.Close()
 	
 	var apiResp ChangeUserInfoResponseStruct
-	roomId, roomName, roomType := r.PostFormValue(room_id), r.PostFormValue("room_name"), r.PostFormValue("room_type")
+	roomId, roomName := r.PostFormValue(room_id), r.PostFormValue("room_name")
+	roomType, themeColorHex := r.PostFormValue("room_type"), r.PostFormValue("theme_color_hex")
 	password := r.PostFormValue("password")
 	
-	if roomId == "" || roomName == "" || roomType == "" || password == "" {
+	if roomId == "" || roomName == "" || roomType == "" || password == "" || themeColorHex == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
 	} else
@@ -39,7 +40,7 @@ func CreateNewRoom(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if continueFlag {
-			_ = _CreateNewRoom(roomId, roomName, roomType, client, ctx)
+			_ = _CreateNewRoom(roomId, roomName, roomType, themeColorHex, client, ctx)
 			apiResp.Result = OK
 			apiResp.Message = "Successfully created room named " + roomId
 		}

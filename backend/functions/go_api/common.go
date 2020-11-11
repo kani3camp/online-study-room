@@ -48,6 +48,8 @@ type RoomBodyStruct struct {
 	Created time.Time `firestore:"created" json:"created"`
 	Name    string    `firestore:"name" json:"name"`
 	Users   []string  `firestore:"users" json:"users"`
+	Type string `firestore:"type" json:"type"`
+	ThemeColorHex string `firestore:"theme-color-hex" json:"theme_color_hex"`
 }
 
 type UserStruct struct {
@@ -428,12 +430,13 @@ func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (
 	return "", err
 }
 
-func _CreateNewRoom(roomId string, roomName string, roomType string, client *firestore.Client, ctx context.Context) error {
+func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorHex string, client *firestore.Client, ctx context.Context) error {
 	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
 		"name":    roomName,
 		"type":    roomType,
 		"users":   []string{},
 		"created": time.Now(),
+		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
 	if err != nil {
 		log.Println(err)
