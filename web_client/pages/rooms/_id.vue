@@ -112,7 +112,6 @@ export default {
     if_show_dialog: false,
     exiting: false,
     other_users_info: [],
-    timeout: null,
     stay_awake_timeout: null,
     user_timeout: null,
   }),
@@ -131,6 +130,10 @@ export default {
     } else {
       await this.$router.push('/')
     }
+  },
+  destroyed() {
+    clearTimeout(this.stay_awake_timeout)
+    clearTimeout(this.user_timeout)
   },
   methods: {
     async stayAwake() {
