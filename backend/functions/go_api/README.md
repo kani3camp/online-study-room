@@ -1,6 +1,9 @@
 # デプロイの仕方
 deploy.shを実行して。内容はトリガーの種類ごとに書き換えて。
 
+## gcloudコマンドによるプロジェクト切り替え
+`gcloud config set project プロジェクトID`
+
 # ハマったこと
 GoLandの不具合なのかわからないけど、プロジェクト内外に関わらず（GOPATH以下はやったことないが）、
 `go get`しても読み込んでくれないし、`go mod init firebase.google.com/go` でモジュールインストールすると、

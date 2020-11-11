@@ -49,6 +49,7 @@ type Values struct {
 
 // ユーザーの入退室がトリガー
 func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
+	now := time.Now()
 	_, client := InitializeEventFunc()
 	defer client.Close()
 	
@@ -111,7 +112,6 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
 			"online":      true,
 			"in":          doc,
-			"last-access": time.Now(),
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Println("failed to update user info of " + userId + ".")
@@ -119,10 +119,10 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		_ = RecordLastAccess(userId, client, ctx)
 		_ = RecordEnteredTime(userId, client, ctx)
 		_ = RecordHistory(map[string]interface{}{
-			"activity": "entering",
+			"activity": EnterActivity,
 			"room":     doc,
 			"user-id":  userId,
-			"time":     time.Now(),
+			"date":     now,
 		}, client, ctx)
 		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
@@ -134,8 +134,7 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
 			"online":       false,
 			"in":           "",
-			"last-studied": time.Now(),
-			"last-access":  time.Now(),
+			"last-studied": now,
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Fatalln("Failed to update user info of " + userId)
@@ -143,11 +142,13 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		_ = RecordLastAccess(userId, client, ctx)
 		_ = RecordExitedTime(userId, client, ctx)
 		_ = RecordHistory(map[string]interface{}{
-			"activity": "leaving",
+			"activity": LeaveActivity,
 			"room":     doc,
 			"user-id":  userId,
-			"time":     time.Now(),
+			"date":     now,
 		}, client, ctx)
+		defer UpdateTotalTime(userId, doc, now, client, ctx)
+		
 		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
 		user, _ := authClient.GetUser(ctx, userId)
