@@ -1,6 +1,6 @@
 <template>
   <div id="message">
-    現在、全 {{ numRooms }}カテゴリで {{ numOnlineUsers }}人が作業中
+    現在、全 {{ numRooms }}ルームで {{ numOnlineUsers }}人が作業中
   </div>
 </template>
 

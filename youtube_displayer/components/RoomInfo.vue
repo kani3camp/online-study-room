@@ -5,7 +5,7 @@
         <div id="room-name">
           <h2>{{ room_name }}</h2>
         </div>
-        <h2 id="room-category">カテゴリ</h2>
+        <h2 id="room-category">ルーム</h2>
         <div>
           <div id="studying-users-title">
             <p>作業中のユーザー</p>
