@@ -18,23 +18,22 @@
         <v-card :loading="exiting">
           <v-card-title>部屋を出ますか？</v-card-title>
           <v-card-actions>
-            <v-row justify="end">
-              <v-btn
-                :disabled="exiting"
-                text
-                color="primary"
-                @click="exitRoom"
-              >
-                退室する
-              </v-btn>
-              <v-btn
-                :disabled="exiting"
-                text
-                @click="if_show_dialog=false"
-              >
-                キャンセル
-              </v-btn>
-            </v-row>
+            <v-spacer />
+            <v-btn
+              :disabled="exiting"
+              text
+              color="primary"
+              @click="exitRoom"
+            >
+              退室する
+            </v-btn>
+            <v-btn
+              :disabled="exiting"
+              text
+              @click="if_show_dialog=false"
+            >
+              キャンセル
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
