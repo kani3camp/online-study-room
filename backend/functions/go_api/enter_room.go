@@ -1,8 +1,6 @@
 package go_api
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,17 +9,6 @@ import (
 type ApiResponseStruct struct {
 	Result  string `json:"result"`
 	Message string `json:"message"`
-}
-
-func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
-	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
-		"users": firestore.ArrayUnion(userId),
-	}, firestore.MergeAll)
-	if err != nil {
-		log.Println("failed _EnterRoom().")
-		log.Println(err)
-	}
-	return err
 }
 
 func EnterRoom(w http.ResponseWriter, r *http.Request) {

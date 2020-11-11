@@ -5,6 +5,8 @@ import (
 	"context"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
+	"fmt"
+	"google.golang.org/api/iterator"
 	"log"
 	"net/http"
 	"time"
@@ -60,7 +62,6 @@ type UserBodyStruct struct {
 	LastEntered time.Time `firestore:"last-entered" json:"last_entered"`
 	LastExited  time.Time `firestore:"last-exited" json:"last_exited"`
 	LastStudied time.Time `firestore:"last-studied" json:"last_studied"`
-	//Name        string    `firestore:"name" json:"name"` todo firestoreの方でも消す
 	Online           bool      `firestore:"online" json:"online"`
 	Status           string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
@@ -205,16 +206,45 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 	return err
 }
 
+func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
+	var rooms []RoomStruct
+
+	// roomsのコレクションを取得
+	iter := client.Collection(ROOMS).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			err = nil
+			break
+		}
+		if err != nil {
+			log.Printf("Failed to iterate: %v", err)
+			return []RoomStruct{}, err
+		}
+		var _room RoomBodyStruct
+		_ = doc.DataTo(&_room)
+		room := RoomStruct{
+			RoomId: doc.Ref.ID,
+			Body:   _room,
+		}
+		if room.Body.Users == nil {
+			room.Body.Users = []string{}
+		}
+		rooms = append(rooms, room)
+	}
+	return rooms, nil
+}
+
 func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
 	userDocs, err := client.Collection(USERS).Documents(ctx).GetAll()
 	if err != nil {
 		log.Println(err)
 		return []UserStruct{}, err
 	}
-	
+
 	app, _ := InitializeFirebaseApp(ctx)
 	authClient, _ := app.Auth(ctx)
-	
+
 	if len(userDocs) == 0 {
 		log.Println("there is no user.")
 		return []UserStruct{}, nil
@@ -224,10 +254,18 @@ func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserS
 			var _user UserBodyStruct
 			_ = doc.DataTo(&_user)
 			if _user.Online {
-				user, _ := authClient.GetUser(ctx, doc.Ref.ID)
+				var displayName string
+				user, err := authClient.GetUser(ctx, doc.Ref.ID)
+				if err != nil {
+					// これはfirebase authに登録されてないテストユーザーの場合、例外として起こりうる。
+					log.Println("failed authClient.GetUser().")
+					displayName = ""
+				} else {
+					displayName = user.DisplayName
+				}
 				userList = append(userList, UserStruct{
 					UserId:      doc.Ref.ID,
-					DisplayName: user.DisplayName,
+					DisplayName: displayName,
 					Body:        _user,
 				})
 			}
@@ -237,6 +275,88 @@ func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserS
 		}
 		return userList, nil
 	}
+}
+
+func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
+	var err error
+	var users []UserStruct
+
+	authClient, _ := InitializeFirebaseAuthClient(ctx)
+
+	roomInfo, err := RetrieveRoomInfo(roomId, client, ctx)
+	if err != nil {
+	} else {
+		for _, userId := range roomInfo.Users {
+			userBody, err := RetrieveUserInfo(userId, client, ctx)
+			if err != nil {
+			} else {
+				user, _ := authClient.GetUser(ctx, userId)
+				users = append(users, UserStruct{
+					UserId:      userId,
+					DisplayName: user.DisplayName,
+					Body:        userBody,
+				})
+			}
+		}
+	}
+	if users == nil {
+		users = []UserStruct{}
+	}
+	return users, err
+}
+
+func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Context) (RoomBodyStruct, error) {
+	var roomBodyStruct RoomBodyStruct
+
+	room, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
+	if err != nil {
+		log.Println(err)
+		return RoomBodyStruct{}, err
+	} else {
+		_ = room.DataTo(&roomBodyStruct)
+		if roomBodyStruct.Users == nil {
+			roomBodyStruct.Users = []string{}	// jsonにした時、中身がない場合にnullではなく[]にする
+		}
+		return roomBodyStruct, nil
+	}
+}
+
+func RetrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([]NewsStruct, error) {
+	var newsList []NewsStruct
+	var err error
+
+	// roomsのコレクションを取得
+	iter := client.Collection(NEWS).OrderBy("updated", firestore.Desc).Limit(numNews).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			err = nil
+			break
+		}
+		if err != nil {
+			log.Printf("failed to iterate: %v\n", err)
+			return []NewsStruct{}, err
+		}
+		var _news NewsBodyStruct
+		_ = doc.DataTo(&_news)
+		news := NewsStruct{
+			NewsId:   doc.Ref.ID,
+			NewsBody: _news,
+		}
+		newsList = append(newsList, news)
+	}
+	return newsList, err
+}
+
+func RetrieveUserInfo(userId string, client *firestore.Client, ctx context.Context) (UserBodyStruct, error) {
+	var userBodyStruct UserBodyStruct
+	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
+	if err != nil {
+		log.Println(err)
+	} else {
+		_ = userDoc.DataTo(&userBodyStruct)
+	}
+	return userBodyStruct, err
 }
 
 func RecordHistory(details interface{}, client *firestore.Client, ctx context.Context) error {
@@ -320,3 +440,37 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, client *fir
 	}
 	return err
 }
+
+// 全オンラインユーザーの最終アクセス時間を調べ、タイムアウトを判断して処理
+func UpdateDatabase(client *firestore.Client, ctx context.Context)  {
+	fmt.Println("updating database...")
+
+	users, err := RetrieveOnlineUsers(client, ctx)
+	if err != nil {
+		log.Println("RetrieveOnlineUsers() failed.")
+	}
+	if len(users) > 0 {
+		for _, u := range users {
+			lastAccess := u.Body.LastAccess
+			timeElapsed := time.Now().Sub(lastAccess)
+			if timeElapsed.Seconds() > TimeLimit {
+				log.Printf("%s is put over time.\n", u.UserId)
+				currentRoom := u.Body.In
+				_ = LeaveRoom(currentRoom, u.UserId, client, ctx)
+			}
+		}
+	}
+}
+
+
+func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
+	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
+		"users": firestore.ArrayUnion(userId),
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Println("failed _EnterRoom().")
+		log.Println(err)
+	}
+	return err
+}
+

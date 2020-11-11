@@ -1,11 +1,7 @@
 package go_api
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
 	"encoding/json"
-	"google.golang.org/api/iterator"
-	"log"
 	"net/http"
 )
 
@@ -15,35 +11,6 @@ type RoomsResponseStruct struct {
 	Result  string       `json:"result"`
 	Message string       `json:"message"`
 	Rooms   []RoomStruct `json:"rooms"`
-}
-
-func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
-	var rooms []RoomStruct
-	
-	// roomsのコレクションを取得
-	iter := client.Collection(ROOMS).Documents(ctx)
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			err = nil
-			break
-		}
-		if err != nil {
-			log.Printf("Failed to iterate: %v", err)
-			return []RoomStruct{}, err
-		}
-		var _room RoomBodyStruct
-		_ = doc.DataTo(&_room)
-		room := RoomStruct{
-			RoomId: doc.Ref.ID,
-			Body:   _room,
-		}
-		if room.Body.Users == nil {
-			room.Body.Users = []string{}
-		}
-		rooms = append(rooms, room)
-	}
-	return rooms, nil
 }
 
 func Rooms(w http.ResponseWriter, r *http.Request) {

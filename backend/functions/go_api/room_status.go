@@ -1,10 +1,7 @@
 package go_api
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -13,50 +10,6 @@ type RoomStatusResponseStruct struct {
 	Message    string       `json:"message"`
 	RoomStatus RoomStruct   `json:"room_status"`
 	Users      []UserStruct `json:"users"`
-}
-
-func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
-	var err error
-	var users []UserStruct
-	
-	authClient, _ := InitializeFirebaseAuthClient(ctx)
-	
-	roomInfo, err := RetrieveRoomInfo(roomId, client, ctx)
-	if err != nil {
-	} else {
-		for _, userId := range roomInfo.Users {
-			userBody, err := RetrieveUserInfo(userId, client, ctx)
-			if err != nil {
-			} else {
-				user, _ := authClient.GetUser(ctx, userId)
-				users = append(users, UserStruct{
-					UserId:      userId,
-					DisplayName: user.DisplayName,
-					Body:        userBody,
-				})
-			}
-		}
-	}
-	if users == nil {
-		users = []UserStruct{}
-	}
-	return users, err
-}
-
-func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Context) (RoomBodyStruct, error) {
-	var roomBodyStruct RoomBodyStruct
-	
-	room, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
-	if err != nil {
-		log.Println(err)
-		return RoomBodyStruct{}, err
-	} else {
-		_ = room.DataTo(&roomBodyStruct)
-		if roomBodyStruct.Users == nil {
-			roomBodyStruct.Users = []string{}	// jsonにした時、中身がない場合にnullではなく[]にする
-		}
-		return roomBodyStruct, nil
-	}
 }
 
 func RoomStatus(w http.ResponseWriter, r *http.Request) {

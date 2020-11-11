@@ -1,8 +1,6 @@
 package go_api
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -12,17 +10,6 @@ type UserStatusResponseStruct struct {
 	Result     string     `json:"result"`
 	Message    string     `json:"message"`
 	UserStatus UserStruct `json:"user_status"`
-}
-
-func RetrieveUserInfo(userId string, client *firestore.Client, ctx context.Context) (UserBodyStruct, error) {
-	var userBodyStruct UserBodyStruct
-	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
-	if err != nil {
-		log.Println(err)
-	} else {
-		_ = userDoc.DataTo(&userBodyStruct)
-	}
-	return userBodyStruct, err
 }
 
 func UserStatus(w http.ResponseWriter, r *http.Request) {
@@ -40,12 +27,21 @@ func UserStatus(w http.ResponseWriter, r *http.Request) {
 		apiResp.Message = InvalidUser
 	} else {
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
-		user, _ := authClient.GetUser(ctx, userId)
-		
+		var displayName string
+		user, err := authClient.GetUser(ctx, userId)
+		if err != nil {
+			// テストユーザーだとauthに登録されてないかもなので起こりうる
+			log.Println("faield authClient.GetUser(ctx, userId).")
+			displayName = ""
+		} else {
+			displayName = user.DisplayName
+		}
+
+		log.Println("p4")
 		userInfo, _ := RetrieveUserInfo(userId, client, ctx)
 		apiResp.UserStatus = UserStruct{
 			UserId:      userId,
-			DisplayName: user.DisplayName,
+			DisplayName: displayName,
 			Body:        userInfo,
 		}
 		apiResp.Result = OK
