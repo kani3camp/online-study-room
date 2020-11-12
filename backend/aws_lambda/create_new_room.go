@@ -12,6 +12,7 @@ type CreateNewRoomParams struct {
 	RoomName string `json:"room_name"`
 	RoomType string `json:"room_type"`
 	Password string `json:"password"`
+	ThemeColorHex string `json:"theme_color_hex"`
 }
 
 type CreateNewRoomResponseStruct struct {
@@ -28,10 +29,10 @@ func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	params := CreateNewRoomParams{}
 	_ = json.Unmarshal([]byte(body), &params)
 
-	roomId, roomName, roomType := params.RoomId, params.RoomName, params.RoomType
+	roomId, roomName, roomType, themeColorHex := params.RoomId, params.RoomName, params.RoomType, params.ThemeColorHex
 	password := params.Password
-
-	if roomId == "" || roomName == "" || roomType == "" || password == "" {
+	
+	if roomId == "" || roomName == "" || roomType == "" || password == "" || themeColorHex == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
 	} else
@@ -51,7 +52,7 @@ func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 			}
 		}
 		if continueFlag {
-			_ = _CreateNewRoom(roomId, roomName, roomType, client, ctx)
+			_ = _CreateNewRoom(roomId, roomName, roomType, themeColorHex, client, ctx)
 			apiResp.Result = OK
 			apiResp.Message = "Successfully created room named " + roomId
 		}
