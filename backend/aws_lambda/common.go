@@ -26,7 +26,7 @@ const API = "api"
 const NEWS = "news"
 
 const ProjectId = "online-study-space"
-const PathToServiceAccount = "path/to/serviceAccount.json"
+const PathToServiceAccount = "path/to/serviceAccount.json"	// todo
 
 //var ProjectId = os.Getenv("GOOGLE_CLOUD_PROJECT")	// なんか代入されない
 
@@ -46,6 +46,9 @@ const UserAuthFailed = "user authentication failed."
 const UserDoesNotExist = "user does not exist."
 const Failed = "failed"
 
+const EnterActivity = "entering"
+const LeaveActivity = "leaving"
+
 type RoomStruct struct {
 	RoomId string         `json:"room_id"`
 	Body   RoomBodyStruct `json:"room_body"`
@@ -55,6 +58,8 @@ type RoomBodyStruct struct {
 	Created time.Time `firestore:"created" json:"created"`
 	Name    string    `firestore:"name" json:"name"`
 	Users   []string  `firestore:"users" json:"users"`
+	Type string `firestore:"type" json:"type"`
+	ThemeColorHex string `firestore:"theme-color-hex" json:"theme_color_hex"`
 }
 
 type UserStruct struct {
@@ -72,6 +77,8 @@ type UserBodyStruct struct {
 	Online           bool      `firestore:"online" json:"online"`
 	Status           string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
+	TotalStudyTime int64 `firestore:"total-study-time" json:"total_study_time"`
+	TotalBreakTime int64 `firestore:"total-break-time" json:"total_break_time"`
 }
 
 type NewsStruct struct {
@@ -84,6 +91,13 @@ type NewsBodyStruct struct {
 	Updated  time.Time `firestore:"updated" json:"updated"`
 	Title    string    `firestore:"title" json:"title"`
 	TextBody string    `firestore:"text-body" json:"text_body"`
+}
+
+type EnteringAndLeavingHistoryStruct struct {
+	Activity string `firestore:"activity"`
+	Room string `firestore:"room"`
+	Date time.Time `firestore:"date"`
+	UserId string `firestore:"user-id"`
 }
 
 func InitializeHttpFunc() (context.Context, *firestore.Client) {
@@ -514,12 +528,13 @@ func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (
 	return "", err
 }
 
-func _CreateNewRoom(roomId string, roomName string, roomType string, client *firestore.Client, ctx context.Context) error {
+func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorHex string, client *firestore.Client, ctx context.Context) error {
 	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
 		"name":    roomName,
 		"type":    roomType,
 		"users":   []string{},
 		"created": time.Now(),
+		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
 	if err != nil {
 		log.Println(err)
@@ -572,3 +587,65 @@ func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx cont
 	return err
 }
 
+
+// todo 定期実行
+//func CheckHistoryConsistency(client *firestore.Client, ctx context.Context) error {
+//	// 全ユーザーの入退室の整合性がとれているか（入室と退室が必ずペアで記録できているか）
+//	iter := client.Collection(HISTORY).Where("user-id", "==", userId).OrderBy("date", firestore.Asc).Documents(ctx)
+//	var historyData EnteringAndLeavingHistoryStruct
+//	for {
+//		doc, err := iter.Next()
+//		if err == iterator.Done {
+//			return nil
+//		}
+//		if err != nil {
+//			return err
+//		}
+//		_ = doc.DataTo(&historyData)
+//		if historyData.Activity == EnterActivity {
+//			enteredDate := historyData.Date
+//		} else if historyData.Activity == LeaveActivity {
+//			leftDate := historyData.Date
+//		}
+//
+//	}
+//}
+
+func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *firestore.Client, ctx context.Context) {
+	var historyData EnteringAndLeavingHistoryStruct
+	
+	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room", "==", roomId).Where("activity", "==", EnterActivity).OrderBy("date", firestore.Desc).Limit(1).Documents(ctx).GetAll()
+	if err != nil {
+		log.Fatalln("could not fetch entering history: " + err.Error())
+	}
+	_ = docs[0].DataTo(&historyData)
+	enteredDate := historyData.Date
+	duration := leftDate.Sub(enteredDate)
+	log.Printf("duration: %v", duration)
+	
+	roomBody, _ := RetrieveRoomInfo(roomId, client, ctx)
+	roomType := roomBody.Type
+	
+	userBody, _ := RetrieveUserInfo(userId, client, ctx)
+	totalStudyTime := time.Duration(userBody.TotalStudyTime) * time.Second
+	totalBreakTime := time.Duration(userBody.TotalBreakTime) * time.Second
+	
+	if roomType == "study" {
+		totalStudyTime = totalStudyTime + duration
+		log.Printf("new totalStudyTime: %v", totalStudyTime)
+		_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+			"total-study-time": int(totalStudyTime.Seconds()),
+		}, firestore.MergeAll)
+		if err != nil {
+			log.Fatalln("Failed to update user info of " + userId)
+		}
+	} else if roomType == "break" {
+		totalBreakTime = totalBreakTime + duration
+		_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+			"total-break-time": int(totalBreakTime.Seconds()),
+		}, firestore.MergeAll)
+		if err != nil {
+			log.Fatalln("Failed to update user info of " + userId)
+		}
+	}
+}
