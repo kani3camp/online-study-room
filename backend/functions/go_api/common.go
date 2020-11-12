@@ -516,25 +516,27 @@ func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx cont
 func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *firestore.Client, ctx context.Context) {
 	var historyData EnteringAndLeavingHistoryStruct
 	
-	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room", "==", roomId).OrderBy("date", firestore.Asc).Limit(1).Documents(ctx).GetAll()
+	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room", "==", roomId).Where("activity", "==", EnterActivity).OrderBy("date", firestore.Desc).Limit(1).Documents(ctx).GetAll()
 	if err != nil {
 		log.Fatalln("could not fetch entering history: " + err.Error())
 	}
 	_ = docs[0].DataTo(&historyData)
 	enteredDate := historyData.Date
 	duration := leftDate.Sub(enteredDate)
+	log.Printf("duration: %v", duration)
 	
 	roomBody, _ := RetrieveRoomInfo(roomId, client, ctx)
 	roomType := roomBody.Type
 	
 	userBody, _ := RetrieveUserInfo(userId, client, ctx)
-	totalStudyTime := time.Duration(userBody.TotalStudyTime)
-	totalBreakTime := time.Duration(userBody.TotalBreakTime)
+	totalStudyTime := time.Duration(userBody.TotalStudyTime) * time.Second
+	totalBreakTime := time.Duration(userBody.TotalBreakTime) * time.Second
 	
 	if roomType == "study" {
 		totalStudyTime = totalStudyTime + duration
+		log.Printf("new totalStudyTime: %v", totalStudyTime)
 		_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
-			"total-study-time": totalStudyTime,
+			"total-study-time": int(totalStudyTime.Seconds()),
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Fatalln("Failed to update user info of " + userId)
@@ -542,7 +544,7 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 	} else if roomType == "break" {
 		totalBreakTime = totalBreakTime + duration
 		_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
-			"total-break-time": totalBreakTime,
+			"total-break-time": int(totalBreakTime.Seconds()),
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Fatalln("Failed to update user info of " + userId)
