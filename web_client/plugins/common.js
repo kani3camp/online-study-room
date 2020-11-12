@@ -49,7 +49,7 @@ common.getUserData = async (vm) => {
   } else {
     const user_body = user_data['user_status']['user_body']
     vm.$store.commit('user/setStatusMessage', user_body.status)
-    // this.$store.commit('user/setSumStudyTime', use) // Todo
+    vm.$store.commit('user/setTotalStudyTime', user_body.total_study_time)
     vm.$store.commit('user/setRegistrationDate', new Date(user_body.registration_date))
     vm.$store.commit('user/setLastEntered', new Date(user_body.last_entered))
   }

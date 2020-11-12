@@ -2,7 +2,7 @@ export const state = () => ({
   user_id: null,
   display_name: null,
   mail_address: null,
-  sum_study_time: null,
+  total_study_time: null,
   registration_date: null,
   status_message: null,
   id_token: null,
@@ -20,8 +20,8 @@ export const mutations = {
   setMailAddress(state, mail_address) {
     state.mail_address = mail_address
   },
-  setSumStudyTime(state, sum_study_time) {
-    state.sum_study_time = sum_study_time
+  setTotalStudyTime(state, total_study_time) {
+    state.total_study_time = total_study_time
   },
   setRegistrationDate(state, registration_date) {
     state.registration_date = registration_date
