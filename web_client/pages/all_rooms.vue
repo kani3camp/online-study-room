@@ -46,11 +46,12 @@
                 class="ma-2 pa-3"
                 :elevation="hover ? 10 : 2"
               >
-                <v-layout justify-center>
-                  <v-card-title>
-                    {{ room['room_body'].name }}
-                  </v-card-title>
-                </v-layout>
+                <v-card-title>
+                  {{ room['room_body'].name }}
+                </v-card-title>
+                <v-card-subtitle>
+                  {{ room['room_body']['users'].length }}人
+                </v-card-subtitle>
               </v-card>
             </v-hover>
           </v-col>
