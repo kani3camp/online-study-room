@@ -5,3 +5,4 @@ web_client/package-lock.json
 backend/aws_lambda/.idea/
 functions/go_api/.idea/
 web_client/.firebase/
+.DS_Store
