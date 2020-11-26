@@ -79,6 +79,8 @@
         "semi": false,
         "printWidth": 110
       }
-    ]
+    ],
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/multiline-html-element-content-newline": "off"
   }
 }
