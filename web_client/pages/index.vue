@@ -7,10 +7,28 @@
     <v-main>
       <v-container>
         <v-flex>
-          <h2 style="display: inline-block">
-            ルーム
-          </h2>
-          <span>に入室して作業開始！</span>
+          <v-row>
+            <v-flex>
+              <v-col>
+                <h2 style="display: inline-block">
+                  ルーム
+                </h2>
+                に入室して作業開始！
+              </v-col>
+            </v-flex>
+            <v-spacer/>
+            <v-flex>
+              <v-col class="d-flex flex-row-reverse">
+                <v-btn
+                  outlined
+                  @click="loadRooms"
+                >
+                  <v-icon>mdi-reload</v-icon>
+                </v-btn>
+              </v-col>
+            </v-flex>
+          </v-row>
+
         </v-flex>
 
         <v-container
@@ -48,11 +66,12 @@
                   class="ma-2 pa-3"
                   :elevation="hover ? 10 : 2"
                 >
-                  <v-layout justify-center>
-                    <v-card-title>
-                      {{ room['room_body'].name }}
-                    </v-card-title>
-                  </v-layout>
+                  <v-card-title>
+                    {{ room['room_body'].name }}
+                  </v-card-title>
+                  <v-card-subtitle>
+                    {{ room['room_body']['users'].length }}人
+                  </v-card-subtitle>
                 </v-card>
               </v-hover>
             </v-col>
@@ -165,15 +184,7 @@ export default {
   async created() {
     common.onAuthStateChanged(this)
 
-    this.loading = true
-    const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
-    const resp = await common.httpGet(url, {})
-    if (resp.result === 'ok') {
-      this.rooms = resp.rooms
-    } else {
-      console.log(resp.message)
-    }
-    this.loading = false
+    await this.loadRooms()
   },
   methods: {
     confirmEntering(index) {
@@ -219,6 +230,17 @@ export default {
         this.if_show_dialog_2 = true
       }
     },
+    async loadRooms() {
+      this.loading = true
+      const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
+      const resp = await common.httpGet(url, {})
+      if (resp.result === 'ok') {
+        this.rooms = resp.rooms
+      } else {
+        console.log(resp.message)
+      }
+      this.loading = false
+    }
   },
 }
 </script>

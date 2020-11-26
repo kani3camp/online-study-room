@@ -129,7 +129,7 @@
             </v-flex>
             <v-flex>
               <v-list-item-content>
-                <v-list-item-title>{{ sum_study_time }}</v-list-item-title>
+                <v-list-item-title>{{ total_study_time }}</v-list-item-title>
               </v-list-item-content>
             </v-flex>
           </v-list-item>
@@ -219,8 +219,14 @@ export default {
     provider_id: function () {
       return this.$store.state.user.provider_id
     },
-    sum_study_time: function () {
-      return this.$store.state.user.sum_study_time
+    total_study_time: function () {
+      const total_seconds = this.$store.state.user.total_study_time
+      if (total_seconds) {
+        const hours = Math.floor(total_seconds / 3600)
+        const minutes = Math.floor(total_seconds / 60)
+        return hours + '時間' + minutes + '分'
+      }
+      return null
     },
   },
   watch: {

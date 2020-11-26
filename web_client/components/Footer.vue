@@ -147,7 +147,11 @@ export default {
   font-family: sans-serif;
 }
 
-.child-center ul li,
+.child-center ul li a {
+  color: #647a7f;
+}
+
+.child-center ul li a,
 :visited {
   color: #647a7f;
 }

@@ -19,7 +19,16 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="" />
+    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gcp_deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_new_room.go" beforeDir="false" afterPath="$PROJECT_DIR$/create_new_room.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.zip" beforeDir="false" afterPath="$PROJECT_DIR$/main.zip" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,14 +60,15 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../functions/go_api/staying_awake.go" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Go" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../functions/go_api/staying_awake.go" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -122,10 +132,18 @@
     </state>
     <state x="548" y="279" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1440.900@0.0.1440.900" timestamp="1604023061477" />
     <state x="731" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1603734993092" />
+    <state x="92" y="132" width="1736" height="856" maximized="true" key="DiffContextDialog" timestamp="1605180308835">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="92" y="132" width="1736" height="856" maximized="true" key="DiffContextDialog/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1605180308835" />
     <state x="735" y="373" key="EnvironmentVariablesDialog" timestamp="1604041313886">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="735" y="373" key="EnvironmentVariablesDialog/0.0.1440.900@0.0.1440.900" timestamp="1604041313886" />
+    <state x="740" y="315" key="FileChooserDialogImpl" timestamp="1605180168037">
+      <screen x="0" y="40" width="1920" height="1040" />
+    </state>
+    <state x="740" y="315" key="FileChooserDialogImpl/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1605180168037" />
     <state width="1398" height="167" key="GridCell.Tab.0.bottom" timestamp="1604043341461">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -146,10 +164,11 @@
     </state>
     <state width="1398" height="167" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1604043341460" />
     <state width="1877" height="208" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state x="346" y="143" key="SettingsEditor" timestamp="1604049998246">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="461" y="205" key="SettingsEditor" timestamp="1605180100123">
+      <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1604049998246" />
     <state x="461" y="205" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1602270152521" />
+    <state x="461" y="205" key="SettingsEditor/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1605180100123" />
   </component>
 </project>
