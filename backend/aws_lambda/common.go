@@ -445,6 +445,9 @@ func RetrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([
 		}
 		newsList = append(newsList, news)
 	}
+	if newsList == nil {
+		newsList = []NewsStruct{}
+	}
 	return newsList, err
 }
 
