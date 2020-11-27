@@ -113,41 +113,50 @@ export default {
     other_users_info: [],
     stay_awake_timeout: null,
     user_timeout: null,
+    socket: null,
+    is_socket_open: false,
   }),
   async created() {
-    common.onAuthStateChanged(this)
+    const vm = this
+    common.onAuthStateChanged(vm)
 
-    if (this.$store.state.isSignedIn) {
+    if (vm.$store.state.isSignedIn) {
       // 入室時刻を取得
-      this.user_timeout = setTimeout(() => {
-        this.updateUserData()
+      vm.user_timeout = setTimeout(() => {
+        vm.updateUserData()
       }, 5000)
 
-      await this.fetchRoomData()
-
-      await this.stayAwake()
+      await vm.fetchRoomData()
+      await vm.startStudying()
+      await vm.stayStudying()
     } else {
-      await this.$router.push('/')
+      await vm.$router.push('/')
     }
   },
   destroyed() {
     clearTimeout(this.stay_awake_timeout)
     clearTimeout(this.user_timeout)
+    this.socket.close()
   },
   methods: {
-    async stayAwake() {
-      if (this.$store.state.isSignedIn) {
-        // 存在する部屋のroom_idでなければならない
-        const vm = this
-        const room_id = vm.$store.state.room_id
-        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/staying_awake'
-        let params = {
-          user_id: vm.$store.state.user.user_id,
-          id_token: vm.$store.state.user.id_token,
-        }
-        const resp = await common.httpPost(url, params)
-
-        if (resp.result === 'ok') {
+    async startStudying() {
+      const vm = this
+      vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
+      vm.socket.onopen = () => {
+        vm.is_socket_open = true
+        vm.socket.send(
+          JSON.stringify({
+            action: 'connect',
+            user_id: vm.$store.state.user.user_id,
+            id_token: vm.$store.state.user.id_token,
+            room_id: vm.$store.state.room_id,
+            device_type: '',
+          })
+        )
+      }
+      vm.socket.onmessage = async (event) => {
+        const resp = JSON.parse(event.data)
+        if (resp['is_ok']) {
           let info = []
           let amIin = false
           for (const user of resp['users']) {
@@ -167,11 +176,26 @@ export default {
           }
           this.other_users_info = info
         } else {
-          // todo
+          console.log(resp.message)
+          await vm.$router.push('/')
         }
-        this.room_status = resp.room_status
-        this.stay_awake_timeout = setTimeout(() => {
-          this.stayAwake()
+      }
+    },
+    async stayStudying() {
+      if (this.$store.state.isSignedIn) {
+        const vm = this
+        if (vm.is_socket_open) {
+          const params = {
+            user_id: vm.$store.state.user.user_id,
+            id_token: vm.$store.state.user.id_token,
+            room_id: vm.$store.state.room_id,
+            device_type: '',
+          }
+          vm.socket.send(JSON.stringify(params))
+        }
+
+        vm.stay_awake_timeout = setTimeout(() => {
+          vm.stayStudying()
         }, 10000)
       } else {
         await this.$router.push('/')
@@ -201,8 +225,9 @@ export default {
       }
     },
     async exitRoom() {
-      this.exiting = true
       const vm = this
+
+      vm.exiting = true
 
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/exit_room'
       const params = {
@@ -213,14 +238,14 @@ export default {
       const resp = await common.httpPost(url, params)
 
       if (resp.result === 'ok') {
-        this.$store.commit('setRoomId', null)
-        await this.$router.push('/')
+        vm.$store.commit('setRoomId', null)
+        await vm.$router.push('/')
       } else {
         console.log('Failed to exit room.')
         console.log(resp)
       }
-      this.exiting = false
-      this.if_show_dialog = false
+      vm.exiting = false
+      vm.if_show_dialog = false
     },
   },
 }

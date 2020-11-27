@@ -23,12 +23,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/firebase_auth_new_user_listener.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/update_user_doc.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/start_studying.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/complete_studying.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/start_studying.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.zip" beforeDir="false" afterPath="$PROJECT_DIR$/main.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stay_studying.go" beforeDir="false" afterPath="$PROJECT_DIR$/stay_studying.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../web_client/pages/sign_in.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/sign_in.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +73,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoLibrariesConfigurableProvider" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Go" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../functions/go_api/staying_awake.go" />
   </component>
   <component name="RecentsManager">
@@ -171,11 +173,11 @@
     </state>
     <state width="1398" height="167" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1604043341460" />
     <state width="1877" height="208" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state x="461" y="205" key="SettingsEditor" timestamp="1606498490293">
+    <state x="461" y="205" key="SettingsEditor" timestamp="1606501056699">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1606354872385" />
     <state x="461" y="205" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1602270152521" />
-    <state x="461" y="205" key="SettingsEditor/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606498490293" />
+    <state x="461" y="205" key="SettingsEditor/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606501056699" />
   </component>
 </project>
