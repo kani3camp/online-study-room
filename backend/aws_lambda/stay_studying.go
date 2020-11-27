@@ -1,10 +1,15 @@
 package main
 
-import "github.com/aws/aws-lambda-go/events"
+import (
+	"context"
+	"github.com/aws/aws-lambda-go/events"
+	"net/http"
+)
 
-func StayStudying(request events.APIGatewayWebsocketProxyRequest) events.APIGatewayProxyResponse {
+func StayStudying(_ context.Context, request events.APIGatewayWebsocketProxyRequest) events.APIGatewayProxyResponse {
 	//connectionID := request.RequestContext.ConnectionID
-
-	return
+	
+	
+	return events.APIGatewayProxyResponse{StatusCode: http.StatusOK}
 }
 

@@ -23,8 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/firebase_auth_new_user_listener.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/update_user_doc.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/start_studying.go" beforeDir="false" afterPath="$PROJECT_DIR$/start_studying.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/complete_studying.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/start_studying.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stay_studying.go" beforeDir="false" afterPath="$PROJECT_DIR$/stay_studying.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +64,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../functions" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -71,6 +75,9 @@
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../functions/go_api/staying_awake.go" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\momom\Documents\GitHub\online-study-room\backend\aws_lambda" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\momom\Documents\GitHub\online-study-room\backend\aws_lambda" />
     </key>
@@ -140,10 +147,10 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="735" y="373" key="EnvironmentVariablesDialog/0.0.1440.900@0.0.1440.900" timestamp="1604041313886" />
-    <state x="740" y="315" key="FileChooserDialogImpl" timestamp="1606499659035">
+    <state x="740" y="315" key="FileChooserDialogImpl" timestamp="1606499932955">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="740" y="315" key="FileChooserDialogImpl/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606499659035" />
+    <state x="740" y="315" key="FileChooserDialogImpl/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606499932955" />
     <state width="1398" height="167" key="GridCell.Tab.0.bottom" timestamp="1604043341461">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
