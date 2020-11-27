@@ -23,10 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/complete_studying.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/start_studying.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stay_studying.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/start_studying.go" beforeDir="false" afterPath="$PROJECT_DIR$/start_studying.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +38,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/go" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
@@ -56,17 +54,20 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="configurable.Global.GOPATH.is.expanded" value="true" />
+    <property name="configurable.Module.GOPATH.is.expanded" value="false" />
+    <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../functions/go_api/staying_awake.go" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../functions" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="go.sdk" />
+    <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoLibrariesConfigurableProvider" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../functions/go_api/staying_awake.go" />
   </component>
   <component name="RecentsManager">
@@ -113,11 +114,11 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="693" y="487" key="#GOROOT" timestamp="1605102454873">
+    <state x="693" y="487" key="#GOROOT" timestamp="1606498472647">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="520" y="387" key="#GOROOT/0.0.1440.900@0.0.1440.900" timestamp="1604773345317" />
-    <state x="693" y="487" key="#GOROOT/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1605102454873" />
+    <state x="693" y="487" key="#GOROOT/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606498472647" />
     <state x="752" y="393" key="#Go_Modules" timestamp="1602264976791">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
@@ -139,10 +140,10 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="735" y="373" key="EnvironmentVariablesDialog/0.0.1440.900@0.0.1440.900" timestamp="1604041313886" />
-    <state x="740" y="315" key="FileChooserDialogImpl" timestamp="1605180168037">
+    <state x="740" y="315" key="FileChooserDialogImpl" timestamp="1606499659035">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="740" y="315" key="FileChooserDialogImpl/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1605180168037" />
+    <state x="740" y="315" key="FileChooserDialogImpl/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606499659035" />
     <state width="1398" height="167" key="GridCell.Tab.0.bottom" timestamp="1604043341461">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
@@ -163,11 +164,11 @@
     </state>
     <state width="1398" height="167" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1604043341460" />
     <state width="1877" height="208" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1603736615145" />
-    <state x="346" y="143" key="SettingsEditor" timestamp="1606354872385">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="461" y="205" key="SettingsEditor" timestamp="1606498490293">
+      <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="346" y="143" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1606354872385" />
     <state x="461" y="205" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1602270152521" />
-    <state x="461" y="205" key="SettingsEditor/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1605180100123" />
+    <state x="461" y="205" key="SettingsEditor/1920.40.1920.1040/0.40.1920.1040@0.40.1920.1040" timestamp="1606498490293" />
   </component>
 </project>
