@@ -1,50 +1,43 @@
 {
   "project_info": {
-    "project_number": "77400576490",
-    "firebase_url": "https://online-study-room-f1f30.firebaseio.com",
-    "project_id": "online-study-room-f1f30",
-    "storage_bucket": "online-study-room-f1f30.appspot.com"
+    "project_number": "486366182751",
+    "firebase_url": "https://online-study-space.firebaseio.com",
+    "project_id": "online-study-space",
+    "storage_bucket": "online-study-space.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:77400576490:android:e6d3b754bf48b1d221e293",
+        "mobilesdk_app_id": "1:486366182751:android:a66217ba2695674c050aea",
         "android_client_info": {
-          "package_name": "com.example.flutter_app"
+          "package_name": "com.soraride.online_study_space"
         }
       },
       "oauth_client": [
         {
-          "client_id": "77400576490-kngi5ooamho87nca8rtopihvbvv6p0aj.apps.googleusercontent.com",
+          "client_id": "486366182751-05ir3vlouotuci8okn51kgkodigf5nne.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.flutter_app",
+            "package_name": "com.soraride.online_study_space",
             "certificate_hash": "a5249967515868633b8c2e3291ad884cdbdff571"
           }
         },
         {
-          "client_id": "77400576490-u3rfpu4tqft4l39iccl16i88aiu6r83o.apps.googleusercontent.com",
+          "client_id": "486366182751-ikurvnvv2ogab35f94dp905d4k72707k.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC1uwAr68oqeNy6P4SzQcNJfWkqVipOcUo"
+          "current_key": "AIzaSyDs-YhIIL2X8ur7eLs1ImDNuGCDfX1rgJw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "77400576490-plrk9qqv8fe61j465pj8nkggnnp5qcif.apps.googleusercontent.com",
+              "client_id": "486366182751-21g628a5c779iepmiqj4b8ivfur99nod.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "77400576490-dhehv6qlg14l29femfd6u65paft3hlia.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.flutterApp"
-              }
             }
           ]
         }
