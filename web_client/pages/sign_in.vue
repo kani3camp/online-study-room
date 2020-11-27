@@ -14,11 +14,17 @@
       <v-container v-show="! ($store.state.isSignedIn)">
         <p>登録・サインインともに下のボタンから行えます。</p>
         <p>
-          <a href="/terms_of_service" target="_blank">
+          <a
+            href="/terms_of_service"
+            target="_blank"
+          >
             利用規約
           </a>
           および
-          <a href="/privacy_policy" target="_blank">
+          <a
+            href="/privacy_policy"
+            target="_blank"
+          >
             プライバシーポリシー
           </a>
           に同意したうえで、当サービスをご利用ください。
