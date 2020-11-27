@@ -7,3 +7,4 @@ backend/aws_lambda/.idea/
 functions/go_api/.idea/
 web_client/.firebase/
 .DS_Store
+web_client/.firebase/hosting.ZGlzdA.cache

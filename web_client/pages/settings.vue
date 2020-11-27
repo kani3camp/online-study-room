@@ -223,7 +223,8 @@ export default {
       const total_seconds = this.$store.state.user.total_study_time
       if (total_seconds) {
         const hours = Math.floor(total_seconds / 3600)
-        const minutes = Math.floor(total_seconds / 60)
+        const total_minutes = Math.floor(total_seconds / 60)
+        const minutes = total_minutes % 60
         return hours + '時間' + minutes + '分'
       }
       return null
