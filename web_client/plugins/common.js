@@ -2,8 +2,8 @@ import firebase from '~/plugins/firebase'
 
 const common = {
   key: {
-    youtubeLink: 'https://www.youtube.com/',
-    twitterLink: 'https://twitter.com/home',
+    youtubeLink: 'https://www.youtube.com/channel/UCXuD2XmPTdpVy7zmwbFVZWg',
+    twitterLink: 'https://twitter.com/osr_soraride',
   },
 }
 
