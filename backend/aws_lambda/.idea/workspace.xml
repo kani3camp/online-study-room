@@ -22,16 +22,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/start_studying.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.zip" beforeDir="false" afterPath="$PROJECT_DIR$/main.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stay_studying.go" beforeDir="false" afterPath="$PROJECT_DIR$/stay_studying.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/rooms/_id.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../web_client/pages/sign_in.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../../web_client/pages/sign_in.vue" afterDir="false" />
-    </list>
+    <list default="true" id="920219e6-38a1-4c9d-b669-bd2a06f0599f" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
