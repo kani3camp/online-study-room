@@ -80,11 +80,11 @@ class _InRoomState extends State<InRoom> {
   Future<void> exitRoom(BuildContext context, Room roomInfo) async {
     _prefs = await generateSharedPrefs();
 
-    final _body = {
+    final _body = json.encode({
       'room_id': roomInfo.roomId,
       'user_id': await _prefs.getUserId(),
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
-    };
+    });
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.ExitRoom);
 
     final response = await http.post(

@@ -34,12 +34,11 @@ class _RoomPageState extends State<RoomPage> {
   Future<void> enterRoom(BuildContext context, Room roomInfo) async {
     _prefs = await generateSharedPrefs();
 
-    final _body = {
+    final _body = json.encode({
       'room_id': roomInfo.roomId,
       'user_id': await _prefs.getUserId(),
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
-    };
-    print(_body);
+    });
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.EnterRoom);
 
     final response = await http.post(
@@ -101,7 +100,7 @@ class _RoomPageState extends State<RoomPage> {
     return Scaffold(
       appBar: AppBar(
         title: Center(
-            child: Text('カテゴリ一覧')
+            child: Text('ルーム一覧')
         ),
       ),
       body: RefreshIndicator(
