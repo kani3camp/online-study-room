@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/controllers/api_links.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:flutter_app/login_page.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -61,7 +62,7 @@ class SettingPageState extends State<SettingPage> {
     Map<String, String> queryParams = {
       'user_id': await _prefs.getUserId()
     };
-    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/UserStatus', queryParams);
+    Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.UserStatus, queryParams);
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       UserStatusResponse userStatusResp = UserStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
@@ -198,14 +199,15 @@ class SettingPageState extends State<SettingPage> {
     );
   }
 
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is removed from the
-    // widget tree.
-    _displayNameController.dispose();
-    _quickWordController.dispose();
-    super.dispose();
-  }
+  // 画面遷移するだけでもdisposeされるため、結局毎回リロードしなければならなくなるためなくて良い
+  // @override
+  // void dispose() {
+  //   // Clean up the controller when the widget is removed from the
+  //   // widget tree.
+  //   // _displayNameController.dispose();
+  //   // _quickWordController.dispose();
+  //   super.dispose();
+  // }
 }
 
 class UserStatusResponse {

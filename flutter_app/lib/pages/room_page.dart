@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/controllers/api_links.dart';
 import 'package:flutter_app/controllers/loading_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -38,7 +39,8 @@ class _RoomPageState extends State<RoomPage> {
       'user_id': await _prefs.getUserId(),
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
     };
-    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/EnterRoom');
+    print(_body);
+    Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.EnterRoom);
 
     final response = await http.post(
         uri,
@@ -140,8 +142,8 @@ class _RoomPageState extends State<RoomPage> {
 
 Future<List<Room>> fetchRooms() async {
   print('fetchRooms()');
-  const url = 'https://us-central1-online-study-room-f1f30.cloudfunctions.net/Rooms';
-  final response = await http.get(url);
+  Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.Rooms);
+  final response = await http.get(uri);
   if (response.statusCode == 200) {
     RoomsResponse roomsResponse = RoomsResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
     if (roomsResponse.result == 'ok') {

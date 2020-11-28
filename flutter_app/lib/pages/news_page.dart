@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/controllers/api_links.dart';
 import 'package:http/http.dart' as http;
 
 class NewsPage extends StatefulWidget {
@@ -74,7 +75,7 @@ Future<List> fetchNewsList() async {
   Map<String, String> queryParams = {
     'num_news': '10'
   };
-  Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/News', queryParams);
+  Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.News, queryParams);
   final response = await http.get(uri);
   if (response.statusCode == 200) {
     NewsResponse roomsResponse = NewsResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));

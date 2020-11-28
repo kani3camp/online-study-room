@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/controllers/api_links.dart';
 import 'package:flutter_app/controllers/loading_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:flutter_app/pages/room_page.dart';
@@ -64,7 +65,7 @@ class _InRoomState extends State<InRoom> {
     Map<String, String> queryParams = {
       'user_id': await _prefs.getUserId()
     };
-    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/UserStatus', queryParams);
+    Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.UserStatus, queryParams);
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       UserStatusResponse userStatusResp = UserStatusResponse.fromJson(
@@ -84,7 +85,7 @@ class _InRoomState extends State<InRoom> {
       'user_id': await _prefs.getUserId(),
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
     };
-    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/ExitRoom');
+    Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.ExitRoom);
 
     final response = await http.post(
         uri,
