@@ -68,10 +68,24 @@ class _AppState extends State<App> {
       );
     }
 
+    Map<int, Color> colorCodes = {
+      50: Color.fromRGBO(54, 71, 159, .1),
+      100: Color.fromRGBO(54, 71, 159, .2),
+      200: Color.fromRGBO(54, 71, 159, .3),
+      300: Color.fromRGBO(54, 71, 159, .4),
+      400: Color.fromRGBO(54, 71, 159, .5),
+      500: Color.fromRGBO(54, 71, 159, .6),
+      600: Color.fromRGBO(54, 71, 159, .7),
+      700: Color.fromRGBO(54, 71, 159, .8),
+      800: Color.fromRGBO(54, 71, 159, .9),
+      900: Color.fromRGBO(54, 71, 159, 1),
+    };
+    final MaterialColor customColor = MaterialColor(0xFF36479F, colorCodes);
+
     return MaterialApp(
       title: 'オンライン作業部屋',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: customColor,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Splash(),
@@ -79,7 +93,7 @@ class _AppState extends State<App> {
         LoginPage.routeName: (_) => LoginPage(),
         MyHomePage.routeName: (_) => MyHomePage(),
         InRoom.routeName: (_) => InRoom(),
-      }
+      },
     );
   }
 }

@@ -10,5 +10,6 @@ class ApiLinks {
   static const OnlineUsers = '/online_users';
   static const UserStatus = '/user_status';
   static const SendContactForm = '/send_contact_form';
+  static const ChangeUserInfo = '/change_user_info';
   static const News = '/news';
 }

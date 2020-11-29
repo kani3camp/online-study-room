@@ -96,13 +96,13 @@ class SettingPageState extends State<SettingPage> {
     setState(() {
       _isButtonDisabled = true;
     });
-    final _body = {
+    final _body = json.encode({
       'display_name': _displayNameController.text,
       'status_message': _quickWordController.text,
       'user_id': await _prefs.getUserId(),
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
-    };
-    Uri uri = Uri.https('us-central1-online-study-room-f1f30.cloudfunctions.net', '/ChangeUserInfo');
+    });
+    Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.ChangeUserInfo);
 
     final response = await http.post(
         uri,
