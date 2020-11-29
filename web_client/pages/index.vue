@@ -16,7 +16,7 @@
                 に入室して作業開始！
               </v-col>
             </v-flex>
-            <v-spacer/>
+            <v-spacer />
             <v-flex>
               <v-col class="d-flex flex-row-reverse">
                 <v-btn
@@ -86,7 +86,14 @@
           </h2>
         </v-flex>
         <v-flex>
-          <iframe width="424" height="240" src="https://www.youtube.com/embed/mXHlgRsoXz8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe
+            width="424"
+            height="240"
+            src="https://www.youtube.com/embed/mXHlgRsoXz8"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          />
         </v-flex>
       </v-container>
 
@@ -202,9 +209,9 @@ export default {
         const selected_room_id = this.rooms[this.selected_index].room_id
         const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
         const params = {
-          user_id: this.$store.state.user.user_id,
+          user_id: firebase.auth().currentUser.uid,
+          id_token: await firebase.auth().currentUser.getIdToken(false),
           room_id: selected_room_id,
-          id_token: this.$store.state.user.id_token,
         }
         const res = await common.httpPost(url, params).catch((e) => {
           console.log(e)
@@ -241,7 +248,7 @@ export default {
         console.log(resp.message)
       }
       this.loading = false
-    }
+    },
   },
 }
 </script>

@@ -19,14 +19,9 @@ export const mutations = {
   },
   signOut(state) {
     state.isSignedIn = false
-    state.user.user_id = null
-    state.user.display_name = null
-    state.user.mail_address = null
     state.user.total_study_time = null
     state.user.registration_date = null
     state.user.status_message = null
-    state.user.id_token = null
-    state.user.provider_id = null
     state.user.last_entered = null
   },
 }

@@ -170,9 +170,9 @@ export default {
         const selected_room_id = this.rooms[this.selected_index].room_id
         const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
         const params = {
-          user_id: this.$store.state.user.user_id,
+          user_id: firebase.auth().currentUser.uid,
           room_id: selected_room_id,
-          id_token: this.$store.state.user.id_token,
+          id_token: await firebase.auth().currentUser.getIdToken(false),
         }
         const res = await common.httpPost(url, params).catch((e) => {
           console.log(e)

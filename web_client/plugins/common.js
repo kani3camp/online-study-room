@@ -14,25 +14,12 @@ common.c = (m) => {
 common.onAuthStateChanged = (vm) => {
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
-      vm.$store.commit('user/setMailAddress', user.email)
-      vm.$store.commit('user/setUserId', user.uid)
-      vm.$store.commit('user/setProviderId', user.providerData[0].providerId)
-      vm.$store.commit('user/setDisplayName', user.displayName)
-
       console.log('User is signed in.')
       vm.$store.commit('setSignInState', true)
 
       await common.getUserData(vm)
 
-      firebase
-        .auth()
-        .currentUser.getIdToken(/* forceRefresh */ true)
-        .then(function (idToken) {
-          vm.$store.commit('user/setIdToken', idToken)
-        })
-        .catch(function (error) {
-          console.error(error)
-        })
+      await firebase.auth().currentUser.getIdToken(true) // refresh idToken
     } else {
       console.log('User is signed out.')
       vm.$store.commit('signOut')
@@ -42,7 +29,9 @@ common.onAuthStateChanged = (vm) => {
 
 common.getUserData = async (vm) => {
   const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/user_status')
-  const params = { user_id: vm.$store.state.user.user_id }
+  const params = {
+    user_id: firebase.auth().currentUser.uid,
+  }
   const user_data = await common.httpGet(url, params)
   if (user_data.result !== 'ok') {
     console.log(user_data)

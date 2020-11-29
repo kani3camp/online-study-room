@@ -186,8 +186,8 @@ export default {
         const vm = this
         if (vm.is_socket_open) {
           const params = {
-            user_id: vm.$store.state.user.user_id,
-            id_token: vm.$store.state.user.id_token,
+            user_id: firebase.auth().currentUser.uid,
+            id_token: await firebase.auth().currentUser.getIdToken(false),
             room_id: vm.$store.state.room_id,
             device_type: '',
           }
@@ -231,9 +231,9 @@ export default {
 
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/exit_room'
       const params = {
-        user_id: vm.$store.state.user.user_id,
+        user_id: firebase.auth().currentUser.uid,
         room_id: vm.$store.state.room_id,
-        id_token: vm.$store.state.user.id_token,
+        id_token: await firebase.auth().currentUser.getIdToken(false),
       }
       const resp = await common.httpPost(url, params)
 
