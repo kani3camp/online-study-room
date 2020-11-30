@@ -259,7 +259,11 @@ export default {
 
 <style>
 main {
-  background-color: #99b5b1;
+  /*background-color: #dffaf6;*/
+}
+
+h2 {
+  color: #36479f;
 }
 
 #youtube-live-video {
