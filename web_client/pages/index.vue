@@ -92,7 +92,6 @@
               width="424"
               height="240"
               src="https://www.youtube.com/embed/mXHlgRsoXz8"
-              frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
             />
@@ -264,6 +263,10 @@ main {
 
 h2 {
   color: #36479f;
+}
+
+iframe {
+  border-width: 0;
 }
 
 #youtube-live-video {
