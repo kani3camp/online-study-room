@@ -209,14 +209,20 @@ class _InRoomState extends State<InRoom> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(_roomName + 'の部屋'),
+          backgroundColor: Colors.white,
+          title: Text(
+            _roomName + 'の部屋',
+            style: TextStyle(
+                color: Theme.of(context).primaryColor
+            ),
+          ),
           leading: FlatButton(
             onPressed: () => _isButtonDisabled
                 ? null
                 : showExitRoomDialog(context, _roomInfo),
             child: Icon(
               Icons.close,
-              color: _isButtonDisabled ? Colors.black : Colors.white,
+              color: _isButtonDisabled ? Theme.of(context).backgroundColor : Theme.of(context).primaryColor,
             ),
           ),
         ),

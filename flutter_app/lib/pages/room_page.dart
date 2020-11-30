@@ -148,12 +148,12 @@ class _RoomPageState extends State<RoomPage> {
                     ),
                     Divider(),
                     Flexible(
-                      child: ListView.separated(
+                      child: ListView.builder(
                         shrinkWrap: true,
                         padding: const EdgeInsets.all(8),
                         itemCount: rooms.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Container(
+                          return Card(
                             child: ListTile(
                               title: Text(
                                 rooms[index].roomBody.name,
@@ -171,7 +171,7 @@ class _RoomPageState extends State<RoomPage> {
                             ),
                           );
                         },
-                        separatorBuilder: (BuildContext context, int index) => const Divider(),
+                        // separatorBuilder: (BuildContext context, int index) => const Divider(),
                       ),
                     ),
                   ],

@@ -136,8 +136,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(_pageList[_selectedIndex].title),
+        title: Text(
+          _pageList[_selectedIndex].title,
+          style: TextStyle(
+            color: Theme.of(context).primaryColor
+          ),
+        ),
       ),
       body: _pageList[_selectedIndex].page,
       drawer: _drawer,

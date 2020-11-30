@@ -44,12 +44,18 @@ class _InNewsState extends State<InNews> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('お知らせ 詳細',),
+          backgroundColor: Colors.white,
+          title: Text(
+            'お知らせ 詳細',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor
+            ),
+          ),
           leading: FlatButton(
             onPressed: () => Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName)),
             child: Icon(
               Icons.close,
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         ),
