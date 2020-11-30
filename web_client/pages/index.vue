@@ -86,14 +86,17 @@
           </h2>
         </v-flex>
         <v-flex>
-          <iframe
-            width="424"
-            height="240"
-            src="https://www.youtube.com/embed/mXHlgRsoXz8"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          />
+          <v-row justify="center">
+            <iframe
+              id="youtube-live-video"
+              width="424"
+              height="240"
+              src="https://www.youtube.com/embed/mXHlgRsoXz8"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            />
+          </v-row>
         </v-flex>
       </v-container>
 
@@ -257,6 +260,10 @@ export default {
 <style>
 main {
   background-color: #99b5b1;
+}
+
+#youtube-live-video {
+  max-width: 90%;
 }
 
 .big-char {
