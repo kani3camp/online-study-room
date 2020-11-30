@@ -4,6 +4,7 @@
     app
     right
     disable-resize-watcher
+    overlay-color="#36479f"
   >
     <v-list dense>
       <v-list-item

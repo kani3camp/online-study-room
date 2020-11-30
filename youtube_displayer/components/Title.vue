@@ -17,9 +17,10 @@ export default {
 <style scoped>
 #title {
   padding-top: 0.5rem;
-  background-color: #e2fcfc;
+  /*background-color: #e2fcfc;*/
   width: 1536px;
   font-size: 1.3rem;
+  color: #36479f;
 }
 
 </style>

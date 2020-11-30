@@ -5,7 +5,9 @@
         <div id="room-name">
           <h2>{{ room_name }}</h2>
         </div>
-        <h2 id="room-category">ルーム</h2>
+        <h2 id="room-category">
+          ルーム
+        </h2>
         <div>
           <div id="studying-users-title">
             <p>作業中のユーザー</p>
@@ -13,7 +15,9 @@
           <div id="users">
             <div v-for="user in users" :key="user.userId" class="user">
               <p><i class="mdi mdi-account" /></p>
-              <p class="user-name">{{ user.userName }}</p>
+              <p class="user-name">
+                {{ user.userName }}
+              </p>
             </div>
           </div>
         </div>
@@ -31,45 +35,51 @@ export default {
     timeout2: null,
     room_name: '　　',
     users: [],
-    show: true
+    show: true,
+    switchRoomInterval: 12 * 1000,
+    // refreshRoomInfoInterval: 3 * 1000
   }),
   created () {
-    this.switchRoom()
-
-    const switchRoomInterval = 12 * 1000
     const vm = this
-    this.timeout1 = setInterval(() => {
-      vm.switchRoom()
-    }, switchRoomInterval)
 
-    this.intervalCheckPoint = new Date()
-    const refreshRoomInfoInterval = 3 * 1000
-    this.timeout2 = setInterval(() => {
-      vm.fetchRoomInfo()
-    }, refreshRoomInfoInterval)
+    vm.switchRoom()
+
+    // vm.timeout1 = setTimeout(() => {
+    //   vm.switchRoom()
+    // }, vm.switchRoomInterval)
+
+    // vm.timeout2 = setTimeout(() => {
+    //   vm.fetchRoomInfo()
+    // }, vm.refreshRoomInfoInterval)
   },
   destroyed () {
-    clearInterval(this.timeout1)
-    clearInterval(this.timeout2)
+    clearTimeout(this.timeout1)
+    // clearTimeout(this.timeout2)
   },
   methods: {
     async switchRoom () {
-      this.show = false
+      const vm = this
+
+      vm.show = false
 
       // 全てのroom_idのリストを更新
-      await this.retrieveRoomIdList()
+      await vm.retrieveRoomIdList()
 
       // room_idを次のものに進める。ない場合はリストの先頭から
-      const vm = this
-      const currentIndex = this.roomIdList.indexOf(vm.$store.state.roomId)
+      const currentIndex = vm.roomIdList.indexOf(vm.$store.state.roomId)
       if (currentIndex === -1) {
-        await this.$store.commit('setRoomId', vm.roomIdList[0])
+        await vm.$store.commit('setRoomId', vm.roomIdList[0])
       } else {
         const nextIndex = (currentIndex + 1) % this.roomIdList.length
-        await this.$store.commit('setRoomId', vm.roomIdList[nextIndex])
+        await vm.$store.commit('setRoomId', vm.roomIdList[nextIndex])
       }
-      await this.fetchRoomInfo()
-      this.show = true
+      await vm.fetchRoomInfo()
+
+      vm.timeout1 = setTimeout(() => {
+        vm.switchRoom()
+      }, vm.switchRoomInterval)
+
+      vm.show = true
     },
     async retrieveRoomIdList () {
       const vm = this
@@ -86,7 +96,8 @@ export default {
       }
     },
     async fetchRoomInfo () {
-      const roomId = this.$store.state.roomId
+      const vm = this
+      const roomId = vm.$store.state.roomId
       const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status')
       url.search = new URLSearchParams({ room_id: roomId }).toString()
       const resp = await fetch(url.toString(), { method: 'GET' }).then(response =>
@@ -95,17 +106,19 @@ export default {
       if (resp.result === 'ok') {
         this.room_name = resp.room_status.room_body.name
         const userIds = resp.room_status.room_body.users
-        const userNames = resp.user_names
-        if (userIds && userNames) {
-          if (userIds.length === userNames.length) {
+        const users = resp.users
+        if (userIds && users) {
+          if (userIds.length === users.length) {
             const list = []
             for (let i = 0; i < userIds.length; i++) {
               list.push({
                 userId: userIds[i],
-                userName: userNames[i]
+                userName: users[i].display_name,
               })
             }
             this.users = list
+          } else {
+            console.log('userIds.length !== users.length')
           }
         } else {
           this.users = []
@@ -113,15 +126,24 @@ export default {
       } else {
         console.log(resp.message)
       }
+
+      // this.timeout2 = setTimeout(() => {
+      //   vm.fetchRoomInfo()
+      // }, vm.refreshRoomInfoInterval)
     }
   }
 }
 </script>
 
 <style scoped>
+
+h2 {
+  color: #36479f;
+}
+
 #roomInfo {
   padding-top: 0.5rem;
-  background-color: #fcfcf2;
+  /*background-color: #fcfcf2;*/
   width: 1920px;
   height: 818px;
   overflow: auto;
@@ -139,7 +161,7 @@ export default {
 #room-name {
   display: inline-block;
   padding: .3rem .6rem;
-  border: solid 0.2rem black;
+  border: solid 0.2rem #36479f;
   border-radius: 1rem;
 }
 #room-category {
