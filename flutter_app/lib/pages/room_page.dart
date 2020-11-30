@@ -4,13 +4,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/api_links.dart';
-import 'package:flutter_app/controllers/loading_dialog.dart';
+import 'package:flutter_app/controllers/custom_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../home_page.dart';
+import '../main.dart';
 import 'in_room.dart';
 
 class RoomPage extends StatefulWidget {
+  static const String pageTitle = 'ルーム一覧';
+
   @override
   _RoomPageState createState() => _RoomPageState();
 }
@@ -18,6 +22,8 @@ class RoomPage extends StatefulWidget {
 class _RoomPageState extends State<RoomPage> {
   Future<List<Room>> _futureList;
   SharedPrefs _prefs;
+
+  DateTime _lastLoaded = DateTime.now().toLocal();
 
   Future<void> _init() async {
     _futureList = fetchRooms();
@@ -31,12 +37,40 @@ class _RoomPageState extends State<RoomPage> {
     return true;
   }
 
+  Future<List<Room>> fetchRooms() async {
+    print('fetchRooms()');
+    Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.Rooms);
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      RoomsResponse roomsResponse = RoomsResponse.fromJson(
+          json.decode(utf8.decode(response.bodyBytes)));
+      if (roomsResponse.result == 'ok') {
+        _lastLoaded = DateTime.now().toLocal();
+        return roomsResponse.rooms;
+      } else {
+        CustomDialog.showAlertDialog(context,
+          '読み込みに失敗しました。\n' + roomsResponse.message,
+          onOkPressed: () {
+            Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+          },
+        );
+      }
+    } else {
+      CustomDialog.showAlertDialog(context,
+        '通信に失敗しました。',
+        onOkPressed: () {
+          Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+        },
+      );
+    }
+  }
+
   Future<void> enterRoom(BuildContext context, Room roomInfo) async {
     _prefs = await generateSharedPrefs();
 
     final _body = json.encode({
       'room_id': roomInfo.roomId,
-      'user_id': await _prefs.getUserId(),
+      'user_id': FirebaseAuth.instance.currentUser.uid,
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
     });
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.EnterRoom);
@@ -63,46 +97,29 @@ class _RoomPageState extends State<RoomPage> {
     }
   }
 
+  void showEnterRoomDialog(BuildContext context, Room roomInfo) {
+    CustomDialog.showAlertDialog(context,
+      roomInfo.roomBody.name + 'の部屋に入りますか？',
+      onCancelPressed: () {
+        Navigator.pop(context);
+      },
+      onOkPressed: () {
+        CustomDialog.showLoadingDialog(context, title: '入室中');
+        enterRoom(context, roomInfo);
+      }
+    );
+  }
+
   @override
   void initState() {
     _init();
     super.initState();
   }
 
-  void showEnterRoomDialog(BuildContext context, Room roomInfo) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(roomInfo.roomBody.name + 'の部屋に入りますか？'),
-            content: null,
-            actions: <Widget>[
-              // ボタン領域
-              FlatButton(
-                child: Text("キャンセル"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              FlatButton(
-                child: Text("OK"),
-                onPressed: () {
-                  LoadingDialog.show(context, title: '入室中');
-                  enterRoom(context, roomInfo);
-                },
-              ),
-            ],
-          );
-        }
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Center(
-            child: Text('ルーム一覧')
-        ),
-      ),
       body: RefreshIndicator(
           onRefresh: () {
             return _onRefresh();
@@ -112,20 +129,52 @@ class _RoomPageState extends State<RoomPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final List<Room> rooms = snapshot.data;
-                return ListView.separated(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: rooms.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Container(
-                      child: ListTile(
-                        title: Text(rooms[index].roomBody.name),
-                        onTap: () {
-                          showEnterRoomDialog(context, rooms[index]);
-                        },
+                return Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(7.0),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Opacity(
+                          opacity: 0.5,
+                          child: Text(
+                            '最終更新：'
+                                + _lastLoaded.hour.toString() + '時 '
+                                + _lastLoaded.minute.toString() + '分',
+                            style: TextStyle(),
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) => const Divider(),
+                    ),
+                    Divider(),
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(8),
+                        itemCount: rooms.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                            child: ListTile(
+                              title: Text(
+                                rooms[index].roomBody.name,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              subtitle: Text(
+                                rooms[index].roomBody.users.length.toString() + '人',
+                                textAlign: TextAlign.right,
+                              ),
+                              onTap: () {
+                                showEnterRoomDialog(context, rooms[index]);
+                              },
+                            ),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) => const Divider(),
+                      ),
+                    ),
+                  ],
                 );
               } else if (snapshot.hasError) {
                 print(snapshot.error);
@@ -139,21 +188,6 @@ class _RoomPageState extends State<RoomPage> {
   }
 }
 
-Future<List<Room>> fetchRooms() async {
-  print('fetchRooms()');
-  Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.Rooms);
-  final response = await http.get(uri);
-  if (response.statusCode == 200) {
-    RoomsResponse roomsResponse = RoomsResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
-    if (roomsResponse.result == 'ok') {
-      return roomsResponse.rooms;
-    } else {
-      throw Exception('Failed to load room list: ' + roomsResponse.message);
-    }
-  } else {
-    throw Exception('http request failed');
-  }
-}
 
 class RoomsResponse {
   final String result;
@@ -164,8 +198,8 @@ class RoomsResponse {
 
   factory RoomsResponse.fromJson(Map<String, dynamic> json) {
     return RoomsResponse(
-      result: json['result'] as String,
-      message: json['message'] as String,
+      result: json['result'] ?? '',
+      message: json['message'] ?? '',
       rooms: (json['rooms'] as List<dynamic>).map((i) => Room.fromJson(i)).toList(),
     );
   }
@@ -179,7 +213,7 @@ class Room {
 
   factory Room.fromJson(Map<String, dynamic> json) {
     return Room(
-      roomId: json['room_id'] as String,
+      roomId: json['room_id'] ?? '',
       roomBody: RoomBody.fromJson(json['room_body']),
     );
   }
@@ -196,8 +230,8 @@ class RoomBody {
   factory RoomBody.fromJson(Map<String, dynamic> json) {
     return RoomBody(
       created: DateTime.parse(json['created'] as String),
-      name: json['name'] as String,
-      type: json['type'] as String,
+      name: json['name'] ?? '',
+      type: json['type'] ?? '',
       users: json['users'] as List<dynamic>,
     );
   }
@@ -211,8 +245,8 @@ class EnterRoomResponse {
 
   factory EnterRoomResponse.fromJson(Map<String, dynamic> json) {
     return EnterRoomResponse(
-      result: json['result'] as String,
-      message: json['message'] as String,
+      result: json['result'] ?? '',
+      message: json['message'] ?? '',
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_app/pages/in_news.dart';
 import 'package:flutter_app/pages/in_room.dart';
 
 import 'home_page.dart';
@@ -93,6 +94,7 @@ class _AppState extends State<App> {
         LoginPage.routeName: (_) => LoginPage(),
         MyHomePage.routeName: (_) => MyHomePage(),
         InRoom.routeName: (_) => InRoom(),
+        InNews.routeName: (_) => InNews(),
       },
     );
   }

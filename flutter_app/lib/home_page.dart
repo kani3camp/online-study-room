@@ -3,11 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/room_page.dart';
 import 'package:flutter_app/pages/setting_page.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'login_page.dart';
+import 'main.dart';
 import 'pages/news_page.dart';
 
 class MyHomePage extends StatefulWidget {
   static const routeName = '/home';
+
   MyHomePage({Key key}) : super(key: key);
 
   @override
@@ -16,12 +21,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static List<Widget> _pageList = [
-    RoomPage(),
-    NewsPage(),
-    SettingPage()
+  List<Page> _pageList = [
+    Page(RoomPage(), RoomPage.pageTitle),
+    Page(NewsPage(), NewsPage.pageTitle),
+    Page(SettingPage(), SettingPage.pageTitle),
   ];
 
   @override
@@ -32,10 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initializeFlutterFire() async {
     print('initializeFlutterFire()');
-    _auth.authStateChanges().listen((User user) async {
+    FirebaseAuth.instance.authStateChanges().listen((User user) async {
       if (user == null) {
         print('User is currently signed out!');
-        // todo サインインしてない時のアプリの状態
       } else {
         print('User is signed in! : ' + user.uid);
       }
@@ -48,23 +51,109 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Drawer _drawer = Drawer(
+    child: ListView(
+      children: [
+        DrawerHeader(
+          child: Center(
+            child: Text(
+              'メニュー',
+              style: TextStyle(
+                fontSize: 24,
+              ),
+            ),
+          ),
+        ),
+        ListTile(
+          leading: Icon(MdiIcons.fileDocument),
+          title: Text(
+            '利用規約'
+          ),
+          onTap: () async {
+            await launch('https://online-study-space.web.app/terms_of_service');
+          },
+          trailing: Icon(Icons.launch),
+        ),
+        ListTile(
+          leading: Icon(Icons.privacy_tip),
+          title: Text(
+            'プライバシーポリシー'
+          ),
+          onTap: () async {
+            await launch('https://online-study-space.web.app/privacy_policy');
+          },
+          trailing: Icon(Icons.launch),
+        ),
+        ListTile(
+          leading: Icon(MdiIcons.youtube),
+          title: Text(
+            'YouTubeチャンネル'
+          ),
+          onTap: () async {
+            final url = 'https://www.youtube.com/channel/UCXuD2XmPTdpVy7zmwbFVZWg';
+            await launch(url);
+          },
+          trailing: Icon(Icons.launch),
+        ),
+        ListTile(
+          leading: Icon(MdiIcons.twitter),
+          title: Text(
+            'Twitter'
+          ),
+          onTap: () async {
+            final url = 'https://twitter.com/osr_soraride';
+            await launch(url);
+          },
+          trailing: Icon(Icons.launch),
+        ),
+        ListTile(
+          leading: Icon(Icons.email),
+          title: Text(
+            'お問い合わせ'
+          ),
+          onTap: () async {
+            final url = 'https://online-study-space.web.app/contact_form';
+            await launch(url);
+          },
+          trailing: Icon(Icons.launch),
+        ),
+        ListTile(
+          leading: Icon(Icons.account_circle),
+          title: Text(
+            '開発者'
+          ),
+          onTap: () async {
+            final url = 'https://twitter.com/sorarideblog';
+            await launch(url);
+          },
+          trailing: Icon(Icons.launch),
+        ),
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pageList[_selectedIndex],
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(_pageList[_selectedIndex].title),
+      ),
+      body: _pageList[_selectedIndex].page,
+      drawer: _drawer,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('作業'),
+            label: '作業',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
-            title: Text('お知らせ'),
+            label: 'お知らせ',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
-            title: Text('設定'),
+            label: '設定',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -72,4 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+
+class Page {
+  final page;
+  final title;
+
+  Page(this.page, this.title);
 }

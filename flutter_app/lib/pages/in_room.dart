@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/api_links.dart';
-import 'package:flutter_app/controllers/loading_dialog.dart';
+import 'package:flutter_app/controllers/custom_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:flutter_app/pages/room_page.dart';
 import 'package:flutter_app/pages/setting_page.dart';
@@ -33,17 +33,16 @@ class _InRoomState extends State<InRoom> {
   String _roomId;
   String _roomName = '';
   Room _roomInfo;
-  String _enteredTime = '　時　分';
-  List<UserStatus> _roomUsers = [];
+  DateTime _enteredTime = DateTime.now();
+  List<UserStatus> _roomOtherUsers = [];
 
   IOWebSocketChannel _channel;
 
   bool _isButtonDisabled = true;
-  bool _isDisposed = false;
 
   Future _init() async {
     _prefs = await generateSharedPrefs();
-    _userId = await _prefs.getUserId();
+    _userId = FirebaseAuth.instance.currentUser.uid;
     _roomId = await _prefs.getCurrentRoomId();
     _roomName = await _prefs.getCurrentRoomName();
     await updateMyUserData();
@@ -62,14 +61,17 @@ class _InRoomState extends State<InRoom> {
       RoomStatusResponse roomStatus = RoomStatusResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       List<UserStatus> users = roomStatus.users;
 
-      setState(() {
-        _roomUsers = users;
-      });
+      if (this.mounted) {
+        setState(() {
+          users.removeWhere((element) => element.userId == FirebaseAuth.instance.currentUser.uid);
+          _roomOtherUsers = users;
+        });
+      }
     }
   }
 
   Future updateMyUserData() async {
-    Map<String, String> queryParams = {'user_id': await _prefs.getUserId()};
+    Map<String, String> queryParams = {'user_id': FirebaseAuth.instance.currentUser.uid};
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.UserStatus, queryParams);
     final response = await http.get(uri);
     if (response.statusCode == 200) {
@@ -77,10 +79,7 @@ class _InRoomState extends State<InRoom> {
           json.decode(utf8.decode(response.bodyBytes)));
       if (userStatusResp.result == 'ok') {
         UserBody user = userStatusResp.userStatus.userBody;
-        _enteredTime = user.lastEntered.hour.toString() +
-            '時' +
-            user.lastEntered.minute.toString() +
-            '分';
+        _enteredTime = user.lastEntered;
       }
     }
   }
@@ -89,33 +88,44 @@ class _InRoomState extends State<InRoom> {
     _channel = IOWebSocketChannel.connect(
         'wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production');
     _channel.stream.listen((event) {
-      StayStudyingResponse resp =
-          StayStudyingResponse.fromJson(json.decode(event.toString()));
-      if (resp.isOk) {
-        print('stay studying : OK (' + DateTime.now().toString() + ')');
-        setState(() {
-          _roomUsers = resp.users;
-        });
-      } else {
-        print('stay studying : NG');
-        print('message: ' + resp.message);
-        Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
-        // todo show alert
-        // todo 本当に想定外のことが起こったときにだけthrowするべきなので、いつかこのthrowは削除すること
-        throw Exception('Failed to exit room : ' + resp.message);
+      if (this.mounted) {
+        StayStudyingResponse resp = StayStudyingResponse.fromJson(json.decode(event.toString()));
+        if (resp.isOk) {
+          print('stay studying : OK (' + DateTime.now().toString() + ')');
+          List<UserStatus> users = resp.users;
+
+          for (UserStatus user in users) {
+            if (user.userId == FirebaseAuth.instance.currentUser.uid) {
+              _enteredTime = user.userBody.lastEntered;
+            }
+          }
+          users.removeWhere((element) => element.userId == FirebaseAuth.instance.currentUser.uid);
+          this.setState(() {
+            _roomOtherUsers = users;
+          });
+        } else {
+          print('stay studying : NG');
+          print('message: ' + resp.message);
+          CustomDialog.showAlertDialog(context,
+            '問題が発生しました。ルームを出ます。\n' + resp.message,
+            onOkPressed: () {
+              Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+            }
+          );
+        }
       }
     });
   }
 
   void stayStudying() async {
-    if (!_isDisposed) {
+    if (this.mounted) {
       final _params = json.encode({
         'user_id': _userId,
         'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
         'room_id': _roomId,
         'device_type': 'mobile'
       });
-      _channel.sink.add(_params);
+      _channel?.sink?.add(_params);
     }
     Timer(Duration(seconds: 5), stayStudying);
   }
@@ -125,7 +135,7 @@ class _InRoomState extends State<InRoom> {
 
     final _body = json.encode({
       'room_id': roomInfo.roomId,
-      'user_id': await _prefs.getUserId(),
+      'user_id': FirebaseAuth.instance.currentUser.uid,
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
     });
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.ExitRoom);
@@ -137,14 +147,20 @@ class _InRoomState extends State<InRoom> {
       if (exitRoomResp.result == 'ok') {
         Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
       } else {
-        Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
-        // todo show alert
-        throw Exception('Failed to exit room : ' + exitRoomResp.message);
+        CustomDialog.showAlertDialog(context,
+          '問題が発生しました。\n' + exitRoomResp.message,
+          onOkPressed: () {
+            Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+          }
+        );
       }
     } else {
-      // todo show alert
-      Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
-      throw Exception('http request failed');
+      CustomDialog.showAlertDialog(context,
+        '通信が失敗しました。\n',
+        onOkPressed: () {
+          Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+        }
+      );
     }
   }
 
@@ -164,7 +180,7 @@ class _InRoomState extends State<InRoom> {
               FlatButton(
                 child: Text("OK"),
                 onPressed: () async {
-                  LoadingDialog.show(context, title: '退室中');
+                  CustomDialog.showLoadingDialog(context, title: '退室中');
                   exitRoom(context, roomInfo);
                 },
               ),
@@ -205,46 +221,71 @@ class _InRoomState extends State<InRoom> {
           ),
         ),
         body: Column(children: [
-          Text('入室時刻：' + _enteredTime),
+          Padding(
+            padding: EdgeInsets.all(5.0),
+            child: Opacity(
+              opacity: 0.5,
+              child: Text('入室時刻：'
+                  + _enteredTime.hour.toString()
+                  + '時'
+                  + _enteredTime.minute.toString()
+                  + '分',
+              ),
+            ),
+          ),
           Divider(),
-          Align(child: Text('同じ部屋の他のユーザー'), alignment: Alignment.centerLeft),
+          Align(
+            child: Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text('同じ部屋の他のユーザー'),
+            ), 
+            alignment: Alignment.centerLeft,
+          ),
           Flexible(
             child: GridView.builder(
-              itemCount: _roomUsers.length,
+              itemCount: _roomOtherUsers.length,
               gridDelegate:
                   SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
               itemBuilder: (BuildContext context, int index) {
-                if (_roomUsers[index].userId !=
-                    FirebaseAuth.instance.currentUser.uid) {
-                  return Container(
-                    // alignment: Alignment.center,
+                // 滞在時間を計算
+                final int nowSecondsSinceEpoch = ((DateTime.now().millisecondsSinceEpoch) / 1000.0).floor();
+                final int lastEnteredSecondsSinceEpoch = ((_roomOtherUsers[index].userBody.lastEntered.millisecondsSinceEpoch) / 1000.0).floor();
+                final int timeStudySeconds = nowSecondsSinceEpoch - lastEnteredSecondsSinceEpoch;
+                final int timeStudyMinutes = (timeStudySeconds / 60.0).floor();
+                print('timeStudySeconds: ' + timeStudySeconds.toString());
+                print('timeStudyMinutes: ' + timeStudyMinutes.toString());
+
+                return Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
                     decoration: BoxDecoration(
-                      color: Colors.tealAccent,
+                      border: Border.all(
+                        width: 1,
+                      ),
                     ),
                     child: GridTile(
                       header: Padding(
-                        padding: EdgeInsets.all(20.0),
+                        padding: EdgeInsets.all(10.0),
                         child: Icon(
                           Icons.account_circle,
-                          size: 40,
+                          size: 50,
                         ),
                       ),
                       child: Center(
                         child: Text(
-                          _roomUsers[index].displayName.length < 10
-                              ? _roomUsers[index].displayName
-                              : _roomUsers[index].displayName.substring(0, 10) + '…',
+                          _roomOtherUsers[index].displayName.length < 10
+                              ? _roomOtherUsers[index].displayName
+                              : _roomOtherUsers[index].displayName.substring(0, 9) + '…',
                           style: TextStyle(
                             fontSize: 20,
                           ),
                         ),
                       ),
-                      footer: Center(child: Text('  分')),
+                      footer: Center(child: Text(timeStudyMinutes.toString() + '分')),
                     ),
-                  );
-                } else {
-                  return null;
-                }
+                  ),
+                );
               },
             ),
           )
@@ -253,8 +294,7 @@ class _InRoomState extends State<InRoom> {
 
   @override
   void dispose() {
-    _isDisposed = true;
-    _channel.sink.close();
+    _channel?.sink?.close();
     super.dispose();
   }
 }
@@ -272,9 +312,9 @@ class RoomStatusResponse {
       result: json['result'] as String,
       message: json['message'] as String,
       roomStatus: RoomStatus.fromJson(json['room_status']),
-      users: (json['users'] as List<dynamic>)
+      users: (json['users'] as List).length > 0 ? (json['users'] as List<dynamic>)
           .map((i) => UserStatus.fromJson(i))
-          .toList(),
+          .toList() : [],
     );
   }
 }
@@ -333,9 +373,9 @@ class StayStudyingResponse {
     return StayStudyingResponse(
       isOk: json['is_ok'] as bool,
       message: json['message'] as String,
-      users: (json['users'] as List<dynamic>)
-          .map((i) => UserStatus.fromJson(i))
-          .toList(),
+      users: json['users'] is List
+          ? (json['users'] as List<dynamic>).map((i) => UserStatus.fromJson(i)).toList()
+          : [],
     );
   }
 }

@@ -4,12 +4,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/controllers/api_links.dart';
+import 'package:flutter_app/controllers/custom_dialog.dart';
 import 'package:flutter_app/controllers/shared_preferences.dart';
 import 'package:flutter_app/login_page.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
+import '../home_page.dart';
+
 class SettingPage extends StatefulWidget {
+  static const String pageTitle = '設定';
+
   @override
   State<StatefulWidget> createState() => SettingPageState();
 }
@@ -21,7 +26,7 @@ class SettingPageState extends State<SettingPage> {
   String _quickWord = '';
   String _accountType = '';
   String _mailAddress = '';
-  Duration _sumStudyTime = new Duration();
+  int _totalStudyTime = 0;
   DateTime _registrationDate = DateTime.now();
 
   final _displayNameController = TextEditingController();
@@ -38,20 +43,28 @@ class SettingPageState extends State<SettingPage> {
 
   Future<void> _initPreferences() async {
     _prefs = await generateSharedPrefs();
-    _displayName = await _prefs.getDisplayName();
-    _quickWord = await _prefs.getQuickWord();
-    _accountType = await _prefs.getAccountType();
-    _mailAddress = await _prefs.getMailAddress();
-    _sumStudyTime = _prefs.getSumStudyTime();
-    _registrationDate = _prefs.getRegistrationDate();
+    if (FirebaseAuth.instance?.currentUser != null) {
+      _displayName = FirebaseAuth.instance.currentUser.displayName;
+      _quickWord = await _prefs.getQuickWord();
+      _accountType =
+          FirebaseAuth.instance.currentUser.providerData[0].providerId;
+      _mailAddress = FirebaseAuth.instance.currentUser.email;
+      _totalStudyTime = _prefs.getTotalStudyTime();
+      _registrationDate = _prefs.getRegistrationDate();
 
-    _displayNameController.text = _displayName;
-    _quickWordController.text = _quickWord;
+      _displayNameController.text = _displayName;
+      _quickWordController.text = _quickWord;
 
-    _displayNameController.addListener(updateButtonState);
-    _quickWordController.addListener(updateButtonState);
+      _displayNameController.addListener(updateButtonState);
+      _quickWordController.addListener(updateButtonState);
+    } else {
+      GoogleSignIn().signOut();
+      Navigator.of(context).pushReplacementNamed(LoginPage.routeName);
+    }
 
-    setState(() {});
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _fetchPreferences() async {
@@ -60,7 +73,7 @@ class SettingPageState extends State<SettingPage> {
       await _prefs.init();
     }
     Map<String, String> queryParams = {
-      'user_id': await _prefs.getUserId()
+      'user_id': FirebaseAuth.instance.currentUser.uid
     };
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.UserStatus, queryParams);
     final response = await http.get(uri);
@@ -69,7 +82,7 @@ class SettingPageState extends State<SettingPage> {
       if (userStatusResp.result == 'ok') {
         UserBody user = userStatusResp.userStatus.userBody;
         await _prefs.setQuickWord(user.status);
-        // await _prefs.setSumStudyTime(user.); todo
+        await _prefs.setTotalStudyTime(user.totalStudyTime);
         await _prefs.setRegistrationDate(user.registrationDate);
 
         await _initPreferences();
@@ -92,14 +105,14 @@ class SettingPageState extends State<SettingPage> {
   }
 
   Future<void> saveNewValues() async {
-    print('saveNewValues()');
+    CustomDialog.showLoadingDialog(context, title: '保存中');
     setState(() {
       _isButtonDisabled = true;
     });
     final _body = json.encode({
       'display_name': _displayNameController.text,
       'status_message': _quickWordController.text,
-      'user_id': await _prefs.getUserId(),
+      'user_id': FirebaseAuth.instance.currentUser.uid,
       'id_token': await FirebaseAuth.instance.currentUser.getIdToken(),
     });
     Uri uri = Uri.https(ApiLinks.Authority, ApiLinks.ChangeUserInfo);
@@ -110,35 +123,46 @@ class SettingPageState extends State<SettingPage> {
     if (response.statusCode == 200) {
       ChangeUserInfoResponse changeUserInfoResp = ChangeUserInfoResponse.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       if (changeUserInfoResp.result == 'ok') {
-        print('設定変更成功');
-        await _prefs.setDisplayName(_displayNameController.text);
-        await _prefs.setQuickWord(_quickWordController.text);
+        CustomDialog.showAlertDialog(
+          context,
+          '設定が完了しました。',
+          onOkPressed: () {
+            Navigator.pop(context);
+          },
+        );
 
+        await _prefs.setQuickWord(_quickWordController.text);
         await _initPreferences();
       } else {
+        CustomDialog.showAlertDialog(context,
+            '問題が発生しました。\n' + changeUserInfoResp.message,
+            onOkPressed: () {
+              Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+            }
+        );
         await _initPreferences();
         setState(() {
           _isButtonDisabled = false;
         });
-        throw Exception('Failed to change user info: ' + changeUserInfoResp.message);
       }
     } else {
+      CustomDialog.showAlertDialog(context,
+          '通信が失敗しました。\n',
+          onOkPressed: () {
+            Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
+          }
+      );
       await _initPreferences();
       setState(() {
         _isButtonDisabled = false;
       });
-      throw Exception('http request failed');
     }
+    Navigator.popUntil(context, ModalRoute.withName(MyHomePage.routeName));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Center(
-            child: Text('設定')
-        ),
-      ),
       body: ListView(
         children: [
           Text('表示名：'),
@@ -170,20 +194,26 @@ class SettingPageState extends State<SettingPage> {
           ),
           Text('合計学習時間：'),
           ListTile(
-            title: Text(_sumStudyTime.toString() + '分'),
+            title: Text(
+              (_totalStudyTime ~/ 3600).toString() + '時間' + ((_totalStudyTime % 3600) ~/ 60).toString() + '分',
+            ),
           ),
           Text('登録日：'),
           ListTile(
             title: Text(_registrationDate.toString()),
           ),
           Container(
+            padding: EdgeInsets.all(10.0),
             child: RaisedButton(
+              color: Colors.blueAccent,
               child: Text('保存'),
               onPressed: _isButtonDisabled ? null : saveNewValues,
             ),
           ),
           Container(
+            padding: EdgeInsets.all(10.0),
             child: RaisedButton(
+              color: Colors.yellow,
               child: Text('ログアウト'),
               onPressed: () {
                 setState(() {
@@ -252,10 +282,11 @@ class UserBody {
   final DateTime lastEntered;
   final DateTime lastExited;
   final DateTime lastStudied;
-  // final String name;
   final bool online;
   final String status;
   final DateTime registrationDate;
+  final int totalStudyTime;
+  final int totalBreakTime;
   
   UserBody({
     this.inRoom,
@@ -263,10 +294,11 @@ class UserBody {
     this.lastEntered,
     this.lastExited,
     this.lastStudied,
-    // this.name,
     this.online,
     this.status,
-    this.registrationDate
+    this.registrationDate,
+    this.totalStudyTime,
+    this.totalBreakTime,
   });
   
   factory UserBody.fromJson(Map<String, dynamic> json) {
@@ -276,10 +308,11 @@ class UserBody {
       lastEntered: DateTime.parse(json['last_entered']).toLocal(),
       lastExited: DateTime.parse(json['last_exited']).toLocal(),
       lastStudied: DateTime.parse(json['last_studied']).toLocal(),
-      // name: json['name'] as String,
       online: json['online'] as bool,
       status: json['status'] as String,
-      registrationDate: DateTime.parse(json['registration_date'])
+      registrationDate: DateTime.parse(json['registration_date']),
+      totalStudyTime: json['total_study_time'] as int,
+      totalBreakTime: json['total_break_time'] as int,
     );
   }
 }

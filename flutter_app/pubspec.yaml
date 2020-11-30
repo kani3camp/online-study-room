@@ -32,6 +32,8 @@ dependencies:
   flutter_secure_storage: ^3.3.3
   flutter_launcher_icons: ^0.8.1
   web_socket_channel: ^1.1.0
+  url_launcher: ^5.7.10
+  material_design_icons_flutter: 4.0.5755
   
 flutter_icons:
   image_path: "icon/app_icon.png"

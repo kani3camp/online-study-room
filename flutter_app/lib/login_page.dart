@@ -29,7 +29,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('ログイン中...'),
+        child: RaisedButton(
+          color: Colors.white,
+          onPressed: () {
+            signInWithGoogle();
+          },
+          child: Text('ログイン'),
+        ),
       )
     );
   }
@@ -37,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> signInWithGoogle() async {
     print('signInWithGoogle()');
     GoogleSignInAccount googleCurrentUser = _googleSignIn.currentUser;
-    print('p0');
+
     try {
       // if (googleCurrentUser == null) googleCurrentUser = await _googleSignIn.signInSilently();
       if (googleCurrentUser == null) googleCurrentUser = await _googleSignIn.signIn();
@@ -50,20 +56,8 @@ class _LoginPageState extends State<LoginPage> {
       );
       final User user = (await _auth.signInWithCredential(credential)).user;
 
-      // final SharedPrefs _prefs = await SharedPrefs.create();
-      SharedPrefs _prefs = new SharedPrefs();
-      await _prefs.init();
-      // await _prefs.setIdToken(await user.getIdToken());
-      await _prefs.setUserId(user.uid); // todo shared preferencesには保存しない
-      await _prefs.setDisplayName(user.displayName); // todo 同上
-      await _prefs.setMailAddress(user.email);
-      await _prefs.setAccountType(user.providerData[0].providerId);
-
       print('google sign in が終わりました');
       if (user == null) {
-        // setState(() {
-        //   _error = true;
-        // }); todo
       } else {
         Navigator.of(context).pushReplacementNamed(MyHomePage.routeName);
       }
