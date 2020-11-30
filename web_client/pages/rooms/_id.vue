@@ -101,6 +101,7 @@
 
 <script>
 import common from '~/plugins/common'
+import firebase from '@/plugins/firebase'
 
 export default {
   name: 'Room',
@@ -142,17 +143,16 @@ export default {
     async startStudying() {
       const vm = this
       vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
-      vm.socket.onopen = () => {
+      vm.socket.onopen = async () => {
         vm.is_socket_open = true
-        vm.socket.send(
-          JSON.stringify({
-            action: 'connect',
-            user_id: vm.$store.state.user.user_id,
-            id_token: vm.$store.state.user.id_token,
-            room_id: vm.$store.state.room_id,
-            device_type: '',
-          })
-        )
+        const params = {
+          action: 'connect',
+          user_id: firebase.auth().currentUser.uid,
+          id_token: await firebase.auth().currentUser.getIdToken(false),
+          room_id: vm.$store.state.room_id,
+          device_type: '',
+        }
+        vm.socket.send(JSON.stringify(params))
       }
       vm.socket.onmessage = async (event) => {
         const resp = JSON.parse(event.data)
@@ -160,7 +160,7 @@ export default {
           let info = []
           let amIin = false
           for (const user of resp['users']) {
-            if (user.user_id !== vm.$store.state.user.user_id) {
+            if (user.user_id !== firebase.auth().currentUser.uid) {
               const study_seconds = new Date().getTime() - new Date(user['user_body'].last_entered).getTime()
               info.push({
                 display_name: user.display_name.substr(0, 3),
@@ -176,7 +176,7 @@ export default {
           }
           this.other_users_info = info
         } else {
-          console.log(resp.message)
+          console.error(resp.message)
           await vm.$router.push('/')
         }
       }

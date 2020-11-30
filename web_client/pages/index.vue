@@ -163,6 +163,7 @@
 import common from '~/plugins/common'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
+import firebase from '@/plugins/firebase'
 
 export default {
   components: {
