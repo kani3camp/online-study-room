@@ -4,20 +4,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>english-room</title>
+    
+    <style>
+        :root {
+            --base-rem-size: 100vw;
+            
+            --room-width: 76rem;
+            --room-height: 62rem;
+            
+            --desk-width: 9rem;
+            --desk-height: 7rem;
+            --desk-color: #ddcec3;
+            --desk-font-size: 3rem;
+            
+            --separator-width: 1rem;
+            --separator-extra-length: 3rem;
+            
+            --group-2-top: 7rem;
+            --group-2-left: 25rem;
+            
+            --group-4-top: 35rem;
+            --group-4-left: 25rem;
+            
+        }
+        
+        * {
+            margin: 0;
+        }
+        
+        html {
+            font-size: calc(0.013 * var(--base-rem-size));
+        }
+        
+        #room {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--room-width);
+            height: var(--room-height);
+            box-sizing: border-box;
+            border: solid 1rem black;
+        }
+        
+        .desk {
+            width: var(--desk-width);
+            height: var(--desk-height);
+            background-color: var(--desk-color);
+            font-size: var(--desk-font-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .separator {
+            background-color: gray;
+        }
+        
+        .separator-horizontal {
+            width: 12rem;
+            height: 1rem;
+        }
+        
+        .separator-vertical {
+            width: 1rem;
+            height: 10rem;
+        }
+        
+        .group {
+            display: inline-block;
+        }
+        
+        #group-1 {
+            /*background-color: aliceblue;*/
+        }
+        
+        #group-2 {
+            position: absolute;
+            top: var(--group-2-top);
+            left: var(--group-2-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+        
+        #group-2 .separator {
+            position: relative;
+            top: calc(var(--separator-extra-length) * -1);
+        }
+        
+        #separator-1 {
+            position: absolute;
+            top: calc(var(--group-2-top) + var(--desk-height));
+            left: var(--group-2-left);
+            width: calc(4 * var(--desk-width) + 5 * var(--separator-width));
+            height: var(--separator-width);
+        }
+
+        #group-3 {
+            position: absolute;
+            top: calc(var(--group-2-top) + var(--desk-height) + var(--separator-width));
+            left: var(--group-2-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+        
+        
+        #group-4 {
+            position: absolute;
+            top: var(--group-4-top);
+            left: var(--group-4-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+        
+        #group-4 .separator {
+            position: relative;
+            top: calc(var(--separator-extra-length) * -1);
+        }
+        
+        #separator-2 {
+            position: absolute;
+            top: calc(var(--group-4-top) + var(--desk-height));
+            left: var(--group-4-left);
+            width: calc(4 * var(--desk-width) + 5 * var(--separator-width));
+            height: var(--separator-width);
+        }
+
+        #group-5 {
+            position: absolute;
+            top: calc(var(--group-4-top) + var(--desk-height) + var(--separator-width));
+            left: var(--group-4-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+        
+    </style>
 </head>
 <body>
 
     <div id="room">
-        <div id="desk1">
+        <div id="group-1" class="group">
+            <div id="desk-1" class="desk"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="desk-2" class="desk"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="desk-3" class="desk"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="desk-4" class="desk"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="desk-5" class="desk"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="desk-6" class="desk"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="desk-7" class="desk"></div>
         </div>
+        
+        <div id="group-2" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="desk-8" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-9" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-10" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-11" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+        
+        <div id="separator-1" class="separator separator-horizontal"></div>
+    
+        <div id="group-3" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="desk-12" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-13" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-14" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-15" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+        
+        
+        <div id="group-4" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="desk-16" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-17" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-18" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-19" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+        
+        <div id="separator-2" class="separator separator-horizontal"></div>
+    
+        <div id="group-5" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="desk-20" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-21" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-22" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="desk-23" class="desk"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+        
     </div>
 
     <script>
-        <style>
-#room {
+        window.onload = function () {
+            const numDesks = 23
     
-}
-</style>
+            for(let n = 0; n < numDesks; n++) {
+                const id = n + 1
+                const elementId = 'desk-' + id.toString()
+                document.getElementById(elementId).innerText = id.toString()
+            }
+        }
     </script>
 
 </body>
