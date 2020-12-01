@@ -170,11 +170,12 @@
   </v-app>
 </template>
 
-<script>
-import firebase from '../plugins/firebase'
-import common from '@/plugins/common'
+<script lang="ts">
+import Vue from 'vue'
+import firebase from 'firebase'
+// import common from '~/plugins/common'
 
-export default {
+export default Vue.extend({
   name: 'Settings',
   data: () => ({
     display_name: null,
@@ -184,54 +185,54 @@ export default {
     saving: false,
   }),
   computed: {
-    is_some_value_changed: function () {
+    is_some_value_changed() {
       const bool1 = this.display_name !== this.firebase_display_name
       const bool2 = this.status_message !== this.firebase_status_message
       return bool1 || bool2
     },
-    is_some_value_blank: function () {
+    is_some_value_blank() {
       return !this.display_name || !this.status_message
     },
-    firebase_display_name: function () {
+    firebase_display_name() {
       return firebase.auth().currentUser.displayName
     },
-    firebase_status_message: function () {
+    firebase_status_message() {
       return this.$store.state.user.status_message
     },
-    registration_date_str: function () {
-      const registration_date = this.$store.state.user.registration_date
-      if (registration_date) {
+    registration_date_str() {
+      const registrationDate = this.$store.state.user.registration_date
+      if (registrationDate) {
         return (
-          registration_date.getFullYear() +
+          registrationDate.getFullYear() +
           '年' +
-          (registration_date.getMonth() + 1) +
+          (registrationDate.getMonth() + 1) +
           '月' +
-          registration_date.getDate() +
+          registrationDate.getDate() +
           '日'
         )
       } else {
         return null
       }
     },
-    mail_address: function () {
+    mail_address() {
       return firebase.auth().currentUser.email
     },
-    provider_id: function () {
+    provider_id() {
       return firebase.auth().currentUser.providerData[0].providerId
     },
-    total_study_time: function () {
-      const total_seconds = this.$store.state.user.total_study_time
-      if (total_seconds) {
-        const hours = Math.floor(total_seconds / 3600)
-        const total_minutes = Math.floor(total_seconds / 60)
-        const minutes = total_minutes % 60
+    total_study_time() {
+      const totalSeconds = this.$store.state.user.total_study_time
+      if (totalSeconds) {
+        const hours = Math.floor(totalSeconds / 3600)
+        const totalMinutes = Math.floor(totalSeconds / 60)
+        const minutes = totalMinutes % 60
         return hours + '時間' + minutes + '分'
       }
       return null
     },
   },
   watch: {
-    firebase_display_name: function (newValue, oldValue) {
+    firebase_display_name(newValue, oldValue) {
       console.log('watch: ' + this.display_name + ': new: ' + newValue + ', old: ' + oldValue)
       if (oldValue === null && newValue !== null) {
         this.display_name = newValue
@@ -239,7 +240,7 @@ export default {
         this.display_name = newValue
       }
     },
-    firebase_status_message: function (newValue, oldValue) {
+    firebase_status_message(newValue, oldValue) {
       console.log('watch')
       if ((oldValue === null && newValue !== null) || oldValue !== newValue) {
         this.status_message = newValue
@@ -249,9 +250,9 @@ export default {
     },
   },
   async created() {
-    await common.onAuthStateChanged(this)
+    await this.$onAuthStateChanged(this)
   },
-  async mounted() {
+  mounted() {
     this.display_name = this.firebase_display_name
     this.status_message = this.firebase_status_message
   },
@@ -292,12 +293,12 @@ export default {
         display_name: this.display_name,
         status_message: this.status_message,
       }
-      const resp = await common.httpPost(url, params)
+      const resp = await this.$httpPost(url, params)
       if (resp.result === 'ok') {
         console.log('設定変更成功')
-        const new_display_name = this.display_name
+        const newDisplayName = this.display_name
         await firebase.auth().currentUser.updateProfile({
-          displayName: new_display_name,
+          displayName: newDisplayName,
         })
         this.$store.commit('user/setStatusMessage', this.status_message)
       } else {
@@ -308,7 +309,7 @@ export default {
       this.saving = false
     },
   },
-}
+})
 </script>
 
 <style scoped>

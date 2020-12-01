@@ -99,11 +99,12 @@
   </v-app>
 </template>
 
-<script>
-import common from '~/plugins/common'
-import firebase from '@/plugins/firebase'
+<script lang="ts">
+// import common from '~/plugins/common'
+import Vue from 'vue'
+import firebase from 'firebase'
 
-export default {
+export default Vue.extend({
   name: 'Room',
   data: () => ({
     room_name: null,
@@ -119,7 +120,7 @@ export default {
   }),
   async created() {
     const vm = this
-    common.onAuthStateChanged(vm)
+    this.$onAuthStateChanged(vm)
 
     if (vm.$store.state.isSignedIn) {
       // 入室時刻を取得
@@ -140,7 +141,7 @@ export default {
     this.socket.close()
   },
   methods: {
-    async startStudying() {
+    startStudying() {
       const vm = this
       vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
       vm.socket.onopen = async () => {
@@ -156,15 +157,15 @@ export default {
       }
       vm.socket.onmessage = async (event) => {
         const resp = JSON.parse(event.data)
-        if (resp['is_ok']) {
-          let info = []
+        if (resp.is_ok) {
+          const info = []
           let amIin = false
-          for (const user of resp['users']) {
+          for (const user of resp.users) {
             if (user.user_id !== firebase.auth().currentUser.uid) {
-              const study_seconds = new Date().getTime() - new Date(user['user_body'].last_entered).getTime()
+              const studySeconds = new Date().getTime() - new Date(user.user_body.last_entered).getTime()
               info.push({
                 display_name: user.display_name.substr(0, 3),
-                time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分',
+                time_study: Math.floor(studySeconds / (1000 * 60)).toString() + '分',
               })
             } else {
               amIin = true
@@ -204,13 +205,13 @@ export default {
     async fetchRoomData() {
       if (this.$store.state.isSignedIn) {
         const vm = this
-        const room_id = vm.$store.state.room_id
-        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
-        let params = { room_id }
-        const resp = await common.httpGet(url, params)
+        const roomId = vm.$store.state.room_id
+        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
+        const params = { room_id: roomId }
+        const resp = await this.$httpGet(url, params)
 
         if (resp.result === 'ok') {
-          this.room_name = resp.room_status['room_body'].name
+          this.room_name = resp.room_status.room_body.name
           this.room_status = resp.room_status
         }
       } else {
@@ -218,10 +219,10 @@ export default {
       }
     },
     async updateUserData() {
-      await common.getUserData(this)
-      const date_time = this.$store.state.user.last_entered
-      if (date_time) {
-        this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
+      await this.$getUserData(this)
+      const dateTime = this.$store.state.user.last_entered
+      if (dateTime) {
+        this.entered_time = dateTime.getHours() + '時' + dateTime.getMinutes() + '分'
       }
     },
     async exitRoom() {
@@ -235,7 +236,7 @@ export default {
         room_id: vm.$store.state.room_id,
         id_token: await firebase.auth().currentUser.getIdToken(false),
       }
-      const resp = await common.httpPost(url, params)
+      const resp = await this.$httpPost(url, params)
 
       if (resp.result === 'ok') {
         vm.$store.commit('setRoomId', null)
@@ -248,7 +249,7 @@ export default {
       vm.if_show_dialog = false
     },
   },
-}
+})
 </script>
 
 <style scoped></style>

@@ -107,13 +107,11 @@
 </template>
 
 <script>
-import common from '@/plugins/common'
+// import common from '@/plugins/common.ts'
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'NavigationDrawer',
-  data: () => ({
-    youtubeLink: common.key.youtubeLink,
-  }),
   computed: {
     drawer: {
       get() {
@@ -141,7 +139,7 @@ export default {
       this.CloseDrawer()
     },
     goToYoutubeLive() {
-      window.open(this.youtubeLink, '_blank')
+      window.open(this.$key.youtubeLink, '_blank')
       this.CloseDrawer()
     },
     goToNewsPage() {
@@ -165,7 +163,7 @@ export default {
       this.CloseDrawer()
     },
   },
-}
+})
 </script>
 
 <style scoped></style>

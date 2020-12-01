@@ -23,6 +23,9 @@
   },
   "devDependencies": {
     "@mdi/font": "^5.4.55",
+    "@nuxt/types": "^2.14.7",
+    "@nuxt/typescript-build": "^2.0.3",
+    "@nuxtjs/eslint-config-typescript": "^5.0.0",
     "@nuxtjs/google-analytics": "^2.4.0",
     "@nuxtjs/vuetify": "^1.11.2",
     "axios": "^0.19.2",

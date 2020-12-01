@@ -13,7 +13,9 @@
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+
+export default Vue.extend({
   name: 'Menu',
   data() {
     return {
@@ -25,7 +27,7 @@ export default {
       ],
     }
   },
-}
+})
 </script>
 
 <style scoped></style>

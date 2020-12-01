@@ -15,3 +15,5 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 export default firebase
 // export default !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+
+// declare module 'firebase'

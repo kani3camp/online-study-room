@@ -81,17 +81,18 @@
   </v-app>
 </template>
 
-<script>
+<script lang="ts">
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'PrivacyPolicy',
   components: {
     NavigationDrawer,
     ToolBar,
   },
-}
+})
 </script>
 
 <style scoped>

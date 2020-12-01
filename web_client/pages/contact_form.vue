@@ -73,15 +73,16 @@
   </v-app>
 </template>
 
-<script>
+<script lang="ts">
 // Regular expression from W3C HTML5.2 input specification:
 // https://www.w3.org/TR/html/sec-forms.html#email-state-typeemail
-import common from '~/plugins/common'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
-import firebase from '@/plugins/firebase'
+// import common from '~/plugins/common'
+import Vue from 'vue'
+import firebase from 'firebase'
 
-export default {
+export default Vue.extend({
   name: 'ContactForm',
   components: {
     NavigationDrawer,
@@ -107,7 +108,7 @@ export default {
     },
   },
   mounted() {
-    common.onAuthStateChanged(this)
+    this.$onAuthStateChanged(this)
   },
   methods: {
     goToHomePage() {
@@ -131,7 +132,7 @@ export default {
           contact_type: this.selected_contact_type,
           message: this.message,
         }
-        const resp = await common.httpPost(url, params)
+        const resp = await this.$httpPost(url, params)
 
         if (resp.result === 'ok') {
           this.message = null
@@ -148,7 +149,7 @@ export default {
       }
     },
   },
-}
+})
 </script>
 
 <style scoped></style>

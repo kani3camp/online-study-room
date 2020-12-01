@@ -1,4 +1,6 @@
-export default {
+import { NuxtConfig } from '@nuxt/types'
+
+const config: NuxtConfig = {
   ssr: false,
   /*
    ** Nuxt target
@@ -33,7 +35,7 @@ export default {
    */
   plugins: [
     {
-      src: '~/plugins/ga.js',
+      src: '~/plugins/ga.ts',
       mode: 'client',
     },
   ],
@@ -45,7 +47,7 @@ export default {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxtjs/vuetify'],
+  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify'],
   /*
    ** Nuxt.js modules
    */
@@ -58,4 +60,13 @@ export default {
   //   base: './'
   // },
   build: {},
+  typescript: {
+    typeCheck: {
+      eslint: {
+        files: './src/**/*.{ts,js,vue}',
+      },
+    },
+  },
 }
+
+export default config

@@ -78,15 +78,16 @@
   </v-app>
 </template>
 
-<script>
+<script lang="ts">
+import NavigationDrawer from '@/components/NavigationDrawer'
+import ToolBar from '@/components/ToolBar'
+import Vue from 'vue'
+import firebase from 'firebase'
 import normalImage from '~/assets/google_signin_buttons/web/2x/btn_google_signin_light_normal_web@2x.png'
 import hoveredImage from '~/assets/google_signin_buttons/web/2x/btn_google_signin_light_focus_web@2x.png'
 import pressedImage from '~/assets/google_signin_buttons/web/2x/btn_google_signin_light_pressed_web@2x.png'
-import firebase from '@/plugins/firebase'
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
 
-export default {
+export default Vue.extend({
   name: 'SignIn',
   components: {
     NavigationDrawer,
@@ -132,7 +133,7 @@ export default {
       vm.if_show_dialog_2 = true
     },
   },
-}
+})
 </script>
 
 <style scoped>

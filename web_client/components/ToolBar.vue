@@ -91,17 +91,22 @@
 
 <script>
 import Logo from '@/components/Logo'
-import common from '@/plugins/common'
+import Vue from 'vue'
+// import common from '@/plugins/common.ts'
 
-export default {
+export default Vue.extend({
   name: 'ToolBar',
   components: {
     Logo,
   },
-  data: () => ({
-    youtubeLink: common.key.youtubeLink,
-  }),
+  data: () => ({}),
   computed: {
+    youtubeLink: () => {
+      if (this) {
+        return this.$key.youtubeLink
+      }
+      return ''
+    },
     drawer: {
       get() {
         return this.$store.state.drawer
@@ -122,7 +127,7 @@ export default {
       this.$router.push('/sign_in')
     },
   },
-}
+})
 </script>
 
 <style scoped>

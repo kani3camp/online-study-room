@@ -119,16 +119,17 @@
 </template>
 
 <script>
-import common from '@/plugins/common'
+// import common from '@/plugins/common.ts'
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'Footer',
   data: () => ({
-    youtubeLink: common.key.youtubeLink,
-    twitterLink: common.key.twitterLink,
+    youtubeLink: this.$key.youtubeLink,
+    twitterLink: this.$key.twitterLink,
   }),
   methods: {},
-}
+})
 </script>
 
 <style scoped>

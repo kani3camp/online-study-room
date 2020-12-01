@@ -50,12 +50,13 @@
   </v-app>
 </template>
 
-<script>
-import common from '@/plugins/common'
+<script lang="ts">
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
+import Vue from 'vue'
+// import common from '~/plugins/common'
 
-export default {
+export default Vue.extend({
   name: 'News',
   components: {
     NavigationDrawer,
@@ -74,7 +75,7 @@ export default {
     }
     const resp = await common.httpGet(url, params)
     if (resp.result === 'ok') {
-      this.newsList = resp['news_list']
+      this.newsList = resp.news_list
     } else {
       console.log(resp.message)
     }
@@ -100,7 +101,7 @@ export default {
       return `${y}/${mo}/${d} ${h}:${mi}`
     },
   },
-}
+})
 </script>
 
 <style scoped></style>
