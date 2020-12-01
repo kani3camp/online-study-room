@@ -12,10 +12,10 @@
             --room-width: 76rem;
             --room-height: 62rem;
             
-            --desk-width: 9rem;
-            --desk-height: 7rem;
-            --desk-color: #ddcec3;
-            --desk-font-size: 3rem;
+            --seat-width: 9rem;
+            --seat-height: 7rem;
+            --empty-seat-color: #ddcec3;
+            --seat-font-size: 1.5rem;
             
             --separator-width: 1rem;
             --separator-extra-length: 3rem;
@@ -46,11 +46,11 @@
             border: solid 1rem black;
         }
         
-        .desk {
-            width: var(--desk-width);
-            height: var(--desk-height);
-            background-color: var(--desk-color);
-            font-size: var(--desk-font-size);
+        .seat {
+            width: var(--seat-width);
+            height: var(--seat-height);
+            background-color: var(--empty-seat-color);
+            font-size: var(--seat-font-size);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -93,15 +93,15 @@
         
         #separator-1 {
             position: absolute;
-            top: calc(var(--group-2-top) + var(--desk-height));
+            top: calc(var(--group-2-top) + var(--seat-height));
             left: var(--group-2-left);
-            width: calc(4 * var(--desk-width) + 5 * var(--separator-width));
+            width: calc(4 * var(--seat-width) + 5 * var(--separator-width));
             height: var(--separator-width);
         }
 
         #group-3 {
             position: absolute;
-            top: calc(var(--group-2-top) + var(--desk-height) + var(--separator-width));
+            top: calc(var(--group-2-top) + var(--seat-height) + var(--separator-width));
             left: var(--group-2-left);
             /*background-color: azure;*/
             display: flex;
@@ -123,15 +123,15 @@
         
         #separator-2 {
             position: absolute;
-            top: calc(var(--group-4-top) + var(--desk-height));
+            top: calc(var(--group-4-top) + var(--seat-height));
             left: var(--group-4-left);
-            width: calc(4 * var(--desk-width) + 5 * var(--separator-width));
+            width: calc(4 * var(--seat-width) + 5 * var(--separator-width));
             height: var(--separator-width);
         }
 
         #group-5 {
             position: absolute;
-            top: calc(var(--group-4-top) + var(--desk-height) + var(--separator-width));
+            top: calc(var(--group-4-top) + var(--seat-height) + var(--separator-width));
             left: var(--group-4-left);
             /*background-color: azure;*/
             display: flex;
@@ -143,30 +143,30 @@
 
     <div id="room">
         <div id="group-1" class="group">
-            <div id="desk-1" class="desk"></div>
+            <div id="seat-1" class="seat"></div>
             <div class="separator separator-horizontal"></div>
-            <div id="desk-2" class="desk"></div>
+            <div id="seat-2" class="seat"></div>
             <div class="separator separator-horizontal"></div>
-            <div id="desk-3" class="desk"></div>
+            <div id="seat-3" class="seat"></div>
             <div class="separator separator-horizontal"></div>
-            <div id="desk-4" class="desk"></div>
+            <div id="seat-4" class="seat"></div>
             <div class="separator separator-horizontal"></div>
-            <div id="desk-5" class="desk"></div>
+            <div id="seat-5" class="seat"></div>
             <div class="separator separator-horizontal"></div>
-            <div id="desk-6" class="desk"></div>
+            <div id="seat-6" class="seat"></div>
             <div class="separator separator-horizontal"></div>
-            <div id="desk-7" class="desk"></div>
+            <div id="seat-7" class="seat"></div>
         </div>
         
         <div id="group-2" class="group">
             <div class="separator separator-vertical"></div>
-            <div id="desk-8" class="desk"></div>
+            <div id="seat-8" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-9" class="desk"></div>
+            <div id="seat-9" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-10" class="desk"></div>
+            <div id="seat-10" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-11" class="desk"></div>
+            <div id="seat-11" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
         
@@ -174,26 +174,26 @@
     
         <div id="group-3" class="group">
             <div class="separator separator-vertical"></div>
-            <div id="desk-12" class="desk"></div>
+            <div id="seat-12" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-13" class="desk"></div>
+            <div id="seat-13" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-14" class="desk"></div>
+            <div id="seat-14" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-15" class="desk"></div>
+            <div id="seat-15" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
         
         
         <div id="group-4" class="group">
             <div class="separator separator-vertical"></div>
-            <div id="desk-16" class="desk"></div>
+            <div id="seat-16" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-17" class="desk"></div>
+            <div id="seat-17" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-18" class="desk"></div>
+            <div id="seat-18" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-19" class="desk"></div>
+            <div id="seat-19" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
         
@@ -201,27 +201,51 @@
     
         <div id="group-5" class="group">
             <div class="separator separator-vertical"></div>
-            <div id="desk-20" class="desk"></div>
+            <div id="seat-20" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-21" class="desk"></div>
+            <div id="seat-21" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-22" class="desk"></div>
+            <div id="seat-22" class="seat"></div>
             <div class="separator separator-vertical"></div>
-            <div id="desk-23" class="desk"></div>
+            <div id="seat-23" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
         
     </div>
 
     <script>
+        const emptySeatColor = '#ddcec3'
+
+        // 半角10文字, 全角6文字までOK
+        const maxDisplayNameLength = 6
+
         window.onload = function () {
-            const numDesks = 23
-    
-            for(let n = 0; n < numDesks; n++) {
-                const id = n + 1
-                const elementId = 'desk-' + id.toString()
-                document.getElementById(elementId).innerText = id.toString()
+            const numSeats = 23
+            
+            for(let n = 0; n < numSeats; n++) {
+                const seatNum = n + 1
+                const seatElement = document.getElementById('seat-' + seatNum.toString())
+                seatElement.innerText = seatNum.toString() + '\n'
+                // document.getElementById(elementId).style.backgroundColor = emptySeatColor
+                
+                seatElement.onclick = function () {
+                    // flutter
+                    getData.postMessage(seatNum)
+                }
             }
+        }
+        
+        function flutterSetUser(seatNum, displayName) {
+            const seatElement = document.getElementById('seat-' + seatNum.toString())
+            if (displayName.length > maxDisplayNameLength) {
+                displayName = displayName.substring(0, 4) + '…'
+            }
+            seatElement.innerText = seatNum.toString() + '\n' + displayName
+        }
+        
+        function flutterUnsetUser(seatNum) {
+            const seatElement = document.getElementById('seat-' + seatNum.toString())
+            seatElement.innerText = seatNum.toString()
         }
     </script>
 
