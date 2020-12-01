@@ -87,14 +87,10 @@
         </v-flex>
         <v-flex>
           <v-row justify="center">
-            <iframe
-              id="youtube-live-video"
-              width="424"
-              height="240"
-              src="https://www.youtube.com/embed/mXHlgRsoXz8"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            />
+            <a
+              target="_blank"
+              :href="youtubeLink"
+            ><h3>ライブ配信を見に行く</h3></a>
           </v-row>
         </v-flex>
       </v-container>
@@ -181,6 +177,7 @@ export default {
     selected_room_name: null,
     entering: false,
     loading: false,
+    youtubeLink: common.key.youtubeLink,
   }),
   computed: {
     drawer: {

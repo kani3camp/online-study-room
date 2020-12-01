@@ -9,3 +9,4 @@ web_client/.firebase/
 .DS_Store
 web_client/.firebase/hosting.ZGlzdA.cache
 flutter_app/android/app/google-services.json
+room_layouts/.idea/
