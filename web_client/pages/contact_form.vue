@@ -102,7 +102,6 @@ export default {
   computed: {
     mail_address: {
       get() {
-        // return this.$store.state.user.mail_address todo
         return firebase.auth().currentUser.email
       },
     },
