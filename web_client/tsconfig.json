@@ -8,6 +8,8 @@
       "ESNext.AsyncIterable",
       "DOM"
     ],
+    "experimentalDecorators": true,
+    "importHelpers": true,
     "esModuleInterop": true,
     "allowJs": true,
     "sourceMap": true,

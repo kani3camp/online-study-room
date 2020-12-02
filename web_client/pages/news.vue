@@ -51,10 +51,9 @@
 </template>
 
 <script lang="ts">
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import ToolBar from '@/components/ToolBar.vue'
 import Vue from 'vue'
-// import common from '~/plugins/common'
 
 export default Vue.extend({
   name: 'News',
@@ -73,7 +72,7 @@ export default Vue.extend({
     const params = {
       num_news: 10,
     }
-    const resp = await common.httpGet(url, params)
+    const resp = await this.$httpGet(url, params)
     if (resp.result === 'ok') {
       this.newsList = resp.news_list
     } else {

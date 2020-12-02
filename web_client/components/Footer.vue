@@ -119,7 +119,6 @@
 </template>
 
 <script>
-// import common from '@/plugins/common.ts'
 import Vue from 'vue'
 
 export default Vue.extend({

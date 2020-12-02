@@ -90,9 +90,8 @@
 </template>
 
 <script>
-import Logo from '@/components/Logo'
+import Logo from '@/components/Logo.vue'
 import Vue from 'vue'
-// import common from '@/plugins/common.ts'
 
 export default Vue.extend({
   name: 'ToolBar',
@@ -129,6 +128,7 @@ export default Vue.extend({
   },
 })
 </script>
+
 
 <style scoped>
 #tool-right {

@@ -1,44 +1,72 @@
-export const state = () => ({
-  // user_id: null,
-  // display_name: null,
-  // mail_address: null,
-  total_study_time: null,
-  registration_date: null,
-  status_message: null,
-  // id_token: null,
-  // provider_id: null,
-  last_entered: null,
-})
+import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 
-export const mutations = {
-  // setUserId(state, user_id) {
-  //   state.user_id = user_id
-  // },
-  // setDisplayName(state, display_name) {
-  //   console.log('表示名変更 => ' + display_name)
-  //   state.display_name = display_name
-  // },
-  // setMailAddress(state, mail_address) {
-  //   state.mail_address = mail_address
-  // },
-  setTotalStudyTime(state, total_study_time) {
-    state.total_study_time = total_study_time
-  },
-  setRegistrationDate(state, registration_date) {
-    state.registration_date = registration_date
-  },
-  setStatusMessage(state, status_message) {
-    state.status_message = status_message
-  },
-  // setIdToken(state, id_token) {
-  //   state.id_token = id_token
-  // },
-  // setProviderId(state, provider_id) {
-  //   state.provider_id = provider_id
-  // },
-  setLastEntered(state, last_entered) {
-    state.last_entered = last_entered
-  },
+type UserData = {
+  isSignedIn: boolean
+  roomId: string
+  drawer: boolean
+  totalStudyTime: number
+  registrationDate: Date
+  statusMessage: string
+  lastEntered: Date
 }
 
-export const actions = {}
+@Module({
+  name: 'user',
+  stateFactory: true,
+  namespaced: true,
+})
+export default class User extends VuexModule {
+  public info: UserData = {
+    isSignedIn: false,
+    roomId: '',
+    drawer: false,
+    totalStudyTime: 0,
+    registrationDate: new Date(),
+    statusMessage: '',
+    lastEntered: new Date(),
+  }
+
+  @Mutation
+  public setSignInState(isSignedIn: boolean): void {
+    this.info.isSignedIn = isSignedIn
+  }
+
+  @Mutation
+  public setRoomId(roomId: string) {
+    this.info.roomId = roomId
+  }
+
+  @Mutation
+  public setDrawer(newDrawer: boolean) {
+    this.info.drawer = newDrawer
+  }
+
+  @Action
+  public signOut() {
+    this.info.isSignedIn = false
+    this.info.totalStudyTime = 0
+    this.info.registrationDate = new Date()
+    this.info.statusMessage = ''
+    this.info.lastEntered = new Date()
+  }
+
+  @Mutation
+  public setTotalStudyTime(totalStudyTime: number) {
+    this.info.totalStudyTime = totalStudyTime
+  }
+
+  @Mutation
+  public setRegistrationDate(registrationDate: Date) {
+    this.info.registrationDate = registrationDate
+  }
+
+  @Mutation
+  public setStatusMessage(statusMessage: string) {
+    this.info.statusMessage = statusMessage
+  }
+
+  @Mutation
+  public setLastEntered(lastEntered: Date) {
+    this.info.lastEntered = lastEntered
+  }
+}

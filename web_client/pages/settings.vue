@@ -173,7 +173,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import firebase from 'firebase'
-// import common from '~/plugins/common'
+import { UserStore } from '~/store'
 
 export default Vue.extend({
   name: 'Settings',
@@ -197,10 +197,10 @@ export default Vue.extend({
       return firebase.auth().currentUser.displayName
     },
     firebase_status_message() {
-      return this.$store.state.user.status_message
+      return UserStore.info.statusMessage
     },
     registration_date_str() {
-      const registrationDate = this.$store.state.user.registration_date
+      const registrationDate = UserStore.info.registrationDate
       if (registrationDate) {
         return (
           registrationDate.getFullYear() +
@@ -221,7 +221,7 @@ export default Vue.extend({
       return firebase.auth().currentUser.providerData[0].providerId
     },
     total_study_time() {
-      const totalSeconds = this.$store.state.user.total_study_time
+      const totalSeconds = UserStore.info.totalStudyTime
       if (totalSeconds) {
         const hours = Math.floor(totalSeconds / 3600)
         const totalMinutes = Math.floor(totalSeconds / 60)
@@ -300,7 +300,7 @@ export default Vue.extend({
         await firebase.auth().currentUser.updateProfile({
           displayName: newDisplayName,
         })
-        this.$store.commit('user/setStatusMessage', this.status_message)
+        UserStore.setStatusMessage(this.status_message)
       } else {
         console.log(resp)
         this.display_name = this.firebase_display_name

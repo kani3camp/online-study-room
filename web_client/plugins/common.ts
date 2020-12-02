@@ -1,16 +1,13 @@
 import Vue from 'vue'
 import firebase from 'firebase'
+import { UserStore } from '~/store'
 
 declare module 'vue/types/vue' {
   interface Vue {
     $onAuthStateChanged(vm: any): void
-
     $key: { youtubeLink: string; twitterLink: string }
-
     $getUserData(vm: any): void
-
     $httpGet(urlStr: string, params: Object): string
-
     $httpPost(urlStr: string, _params: Object): string
   }
 }
@@ -24,7 +21,8 @@ Vue.prototype.$onAuthStateChanged = (vm: any) => {
   firebase.auth().onAuthStateChanged(async (user: any) => {
     if (user) {
       console.log('User is signed in.')
-      vm.$store.commit('setSignInState', true)
+      // vm.$store.commit('setSignInState', true)
+      UserStore.setSignInState(true)
 
       await Vue.prototype.$getUserData(vm)
 

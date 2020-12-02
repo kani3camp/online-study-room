@@ -162,11 +162,11 @@
 </template>
 
 <script lang="ts">
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
-import Vue from 'vue'
 import firebase from 'firebase'
-// import common from '~/plugins/common'
+import Vue from 'vue'
+import NavigationDrawer from '~/components/NavigationDrawer.vue'
+import ToolBar from '~/components/ToolBar.vue'
+import { UserStore } from '~/store'
 
 export default Vue.extend({
   components: {
@@ -186,10 +186,10 @@ export default Vue.extend({
   computed: {
     drawer: {
       get() {
-        return this.$store.state.drawer
+        return UserStore.info.drawer
       },
       set(value) {
-        this.$store.commit('setDrawer', value)
+        UserStore.setDrawer(value)
       },
     },
   },
@@ -205,7 +205,7 @@ export default Vue.extend({
       this.if_show_dialog = true
     },
     async enterRoom() {
-      if (this.$store.state.isSignedIn) {
+      if (UserStore.isSignedIn) {
         const vm = this
 
         this.entering = true
@@ -226,7 +226,7 @@ export default Vue.extend({
 
         if (res.result === 'ok') {
           this.if_show_dialog = false
-          this.$store.commit('setRoomId', selectedRoomId)
+          UserStore.setRoomId(selectedRoomId)
           await this.$router.push('/rooms/' + selectedRoomId)
         } else {
           console.log(res)
@@ -257,6 +257,9 @@ export default Vue.extend({
 })
 </script>
 
+
+
+
 <style>
 main {
   /*background-color: #dffaf6;*/
@@ -279,3 +282,5 @@ iframe {
   color: #7f828b;
 }
 </style>
+
+

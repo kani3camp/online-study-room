@@ -47,7 +47,7 @@ const config: NuxtConfig = {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify'],
+  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify', 'nuxt-typed-vuex'],
   /*
    ** Nuxt.js modules
    */
@@ -59,7 +59,9 @@ const config: NuxtConfig = {
   // router: {
   //   base: './'
   // },
-  build: {},
+  build: {
+    transpile: [/typed-vuex/],
+  },
   typescript: {
     typeCheck: {
       eslint: {

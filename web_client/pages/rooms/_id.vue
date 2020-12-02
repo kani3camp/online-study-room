@@ -100,9 +100,9 @@
 </template>
 
 <script lang="ts">
-// import common from '~/plugins/common'
 import Vue from 'vue'
 import firebase from 'firebase'
+import { UserStore } from '~/utils/store-accessor'
 
 export default Vue.extend({
   name: 'Room',
@@ -183,7 +183,7 @@ export default Vue.extend({
       }
     },
     async stayStudying() {
-      if (this.$store.state.isSignedIn) {
+      if (UserStore.info.isSignedIn) {
         const vm = this
         if (vm.is_socket_open) {
           const params = {
@@ -203,9 +203,9 @@ export default Vue.extend({
       }
     },
     async fetchRoomData() {
-      if (this.$store.state.isSignedIn) {
-        const vm = this
-        const roomId = vm.$store.state.room_id
+      if (UserStore.info.isSignedIn) {
+        // const vm = this
+        const roomId = UserStore.info.roomId
         const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
         const params = { room_id: roomId }
         const resp = await this.$httpGet(url, params)
@@ -220,7 +220,7 @@ export default Vue.extend({
     },
     async updateUserData() {
       await this.$getUserData(this)
-      const dateTime = this.$store.state.user.last_entered
+      const dateTime = UserStore.info.lastEntered
       if (dateTime) {
         this.entered_time = dateTime.getHours() + '時' + dateTime.getMinutes() + '分'
       }
@@ -239,7 +239,7 @@ export default Vue.extend({
       const resp = await this.$httpPost(url, params)
 
       if (resp.result === 'ok') {
-        vm.$store.commit('setRoomId', null)
+        UserStore.setRoomId('')
         await vm.$router.push('/')
       } else {
         console.log('Failed to exit room.')

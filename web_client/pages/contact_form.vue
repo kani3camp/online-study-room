@@ -76,9 +76,8 @@
 <script lang="ts">
 // Regular expression from W3C HTML5.2 input specification:
 // https://www.w3.org/TR/html/sec-forms.html#email-state-typeemail
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
-// import common from '~/plugins/common'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import ToolBar from '@/components/ToolBar.vue'
 import Vue from 'vue'
 import firebase from 'firebase'
 

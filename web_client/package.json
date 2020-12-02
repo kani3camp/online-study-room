@@ -15,6 +15,7 @@
     "firebase": "^7.22.0",
     "firebaseui": "^4.6.1",
     "nuxt": "^2.13.0",
+    "nuxt-typed-vuex": "^0.1.22",
     "request": "^2.88.2",
     "vue": "^2.6.12",
     "vue-template-compiler": "^2.6.12",
@@ -34,6 +35,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-prettier-vue": "^2.1.1",
     "eslint-plugin-vue": "^7.1.0",
-    "prettier": "^2.1.1"
+    "prettier": "^2.1.1",
+    "vuex-module-decorators": "^1.0.1"
   }
 }

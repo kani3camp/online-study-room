@@ -195,8 +195,8 @@
 </template>
 
 <script lang="ts">
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import ToolBar from '@/components/ToolBar.vue'
 import Vue from 'vue'
 
 export default Vue.extend({

@@ -122,11 +122,11 @@
 </template>
 
 <script lang="ts">
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
+import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import ToolBar from '@/components/ToolBar.vue'
 import firebase from 'firebase'
-// import common from '~/plugins/common'
 import Vue from 'vue'
+import { UserStore } from '~/store'
 
 export default Vue.extend({
   name: 'AllRooms',
@@ -164,7 +164,7 @@ export default Vue.extend({
       this.if_show_dialog = true
     },
     async enterRoom() {
-      if (this.$store.state.isSignedIn) {
+      if (UserStore.info.isSignedIn) {
         const vm = this
 
         this.entering = true
@@ -185,7 +185,7 @@ export default Vue.extend({
 
         if (res.result === 'ok') {
           this.if_show_dialog = false
-          this.$store.commit('setRoomId', selectedRoomId)
+          UserStore.setRoomId(selectedRoomId)
           await this.$router.push('/rooms/' + selectedRoomId)
         } else {
           console.log(res)
@@ -204,5 +204,6 @@ export default Vue.extend({
   },
 })
 </script>
+
 
 <style scoped></style>
