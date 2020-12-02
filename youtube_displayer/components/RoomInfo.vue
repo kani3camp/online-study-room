@@ -36,25 +36,13 @@ export default {
     room_name: '　　',
     users: [],
     show: true,
-    switchRoomInterval: 12 * 1000,
-    // refreshRoomInfoInterval: 3 * 1000
+    switchRoomInterval: 8 * 1000,
   }),
   created () {
-    const vm = this
-
-    vm.switchRoom()
-
-    // vm.timeout1 = setTimeout(() => {
-    //   vm.switchRoom()
-    // }, vm.switchRoomInterval)
-
-    // vm.timeout2 = setTimeout(() => {
-    //   vm.fetchRoomInfo()
-    // }, vm.refreshRoomInfoInterval)
+    this.switchRoom()
   },
   destroyed () {
     clearTimeout(this.timeout1)
-    // clearTimeout(this.timeout2)
   },
   methods: {
     async switchRoom () {
@@ -126,10 +114,6 @@ export default {
       } else {
         console.log(resp.message)
       }
-
-      // this.timeout2 = setTimeout(() => {
-      //   vm.fetchRoomInfo()
-      // }, vm.refreshRoomInfoInterval)
     }
   }
 }
@@ -148,6 +132,8 @@ h2 {
   height: 818px;
   overflow: auto;
 }
+
+/*Vue.jsの書き方(<transition>に作用)*/
 .fade-enter-active {
   transition: .3s;
 }

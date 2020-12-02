@@ -4,6 +4,8 @@
 
     <ToolBar />
 
+    <RoomLayout />
+
     <v-main>
       <v-container>
         <v-flex>
@@ -162,11 +164,13 @@ import common from '~/plugins/common'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
 import firebase from '@/plugins/firebase'
+import RoomLayout from '~/components/RoomLayout'
 
 export default {
   components: {
     NavigationDrawer,
     ToolBar,
+    RoomLayout,
   },
   data: () => ({
     rooms: null,

@@ -4,38 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>english-room</title>
-    
+
     <style>
         :root {
             --base-rem-size: 100vw;
-            
+
             --room-width: 76rem;
             --room-height: 62rem;
-            
+
             --seat-width: 9rem;
             --seat-height: 7rem;
             --empty-seat-color: #ddcec3;
             --seat-font-size: 1.5rem;
-            
+
             --separator-width: 1rem;
             --separator-extra-length: 3rem;
-            
+
             --group-2-top: 7rem;
             --group-2-left: 25rem;
-            
+
             --group-4-top: 35rem;
             --group-4-left: 25rem;
-            
+
         }
-        
+
         * {
             margin: 0;
         }
-        
+
         html {
             font-size: calc(0.013 * var(--base-rem-size));
         }
-        
+
         #room {
             position: absolute;
             top: 0;
@@ -45,7 +45,7 @@
             box-sizing: border-box;
             border: solid 1rem black;
         }
-        
+
         .seat {
             width: var(--seat-width);
             height: var(--seat-height);
@@ -55,29 +55,29 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .separator {
             background-color: gray;
         }
-        
+
         .separator-horizontal {
             width: 12rem;
             height: 1rem;
         }
-        
+
         .separator-vertical {
             width: 1rem;
             height: 10rem;
         }
-        
+
         .group {
             display: inline-block;
         }
-        
+
         #group-1 {
             /*background-color: aliceblue;*/
         }
-        
+
         #group-2 {
             position: absolute;
             top: var(--group-2-top);
@@ -85,12 +85,12 @@
             /*background-color: azure;*/
             display: flex;
         }
-        
+
         #group-2 .separator {
             position: relative;
             top: calc(var(--separator-extra-length) * -1);
         }
-        
+
         #separator-1 {
             position: absolute;
             top: calc(var(--group-2-top) + var(--seat-height));
@@ -106,8 +106,8 @@
             /*background-color: azure;*/
             display: flex;
         }
-        
-        
+
+
         #group-4 {
             position: absolute;
             top: var(--group-4-top);
@@ -115,12 +115,12 @@
             /*background-color: azure;*/
             display: flex;
         }
-        
+
         #group-4 .separator {
             position: relative;
             top: calc(var(--separator-extra-length) * -1);
         }
-        
+
         #separator-2 {
             position: absolute;
             top: calc(var(--group-4-top) + var(--seat-height));
@@ -136,8 +136,45 @@
             /*background-color: azure;*/
             display: flex;
         }
-        
+
     </style>
+
+    <script>
+    const emptySeatColor = '#ddcec3'
+
+    // 半角10文字, 全角6文字までOK
+    const maxDisplayNameLength = 6
+
+    window.onload = function () {
+      const numSeats = 23
+
+      for(let n = 0; n < numSeats; n++) {
+        const seatNum = n + 1
+        const seatElement = document.getElementById('seat-' + seatNum.toString())
+        seatElement.innerText = seatNum.toString() + '\n'
+        // document.getElementById(elementId).style.backgroundColor = emptySeatColor
+
+        seatElement.onclick = function () {
+          // flutter
+          getData.postMessage(seatNum)
+        }
+      }
+    }
+
+    function flutterSetUser(seatNum, displayName) {
+      const seatElement = document.getElementById('seat-' + seatNum.toString())
+      if (displayName.length > maxDisplayNameLength) {
+        displayName = displayName.substring(0, 4) + '…'
+      }
+      seatElement.innerText = seatNum.toString() + '\n' + displayName
+    }
+
+    function flutterUnsetUser(seatNum) {
+      const seatElement = document.getElementById('seat-' + seatNum.toString())
+      seatElement.innerText = seatNum.toString()
+    }
+  </script>
+
 </head>
 <body>
 
@@ -157,7 +194,7 @@
             <div class="separator separator-horizontal"></div>
             <div id="seat-7" class="seat"></div>
         </div>
-        
+
         <div id="group-2" class="group">
             <div class="separator separator-vertical"></div>
             <div id="seat-8" class="seat"></div>
@@ -169,9 +206,9 @@
             <div id="seat-11" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
-        
+
         <div id="separator-1" class="separator separator-horizontal"></div>
-    
+
         <div id="group-3" class="group">
             <div class="separator separator-vertical"></div>
             <div id="seat-12" class="seat"></div>
@@ -183,8 +220,8 @@
             <div id="seat-15" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
-        
-        
+
+
         <div id="group-4" class="group">
             <div class="separator separator-vertical"></div>
             <div id="seat-16" class="seat"></div>
@@ -196,9 +233,9 @@
             <div id="seat-19" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
-        
+
         <div id="separator-2" class="separator separator-horizontal"></div>
-    
+
         <div id="group-5" class="group">
             <div class="separator separator-vertical"></div>
             <div id="seat-20" class="seat"></div>
@@ -210,44 +247,8 @@
             <div id="seat-23" class="seat"></div>
             <div class="separator separator-vertical"></div>
         </div>
-        
+
     </div>
-
-    <script>
-        const emptySeatColor = '#ddcec3'
-
-        // 半角10文字, 全角6文字までOK
-        const maxDisplayNameLength = 6
-
-        window.onload = function () {
-            const numSeats = 23
-            
-            for(let n = 0; n < numSeats; n++) {
-                const seatNum = n + 1
-                const seatElement = document.getElementById('seat-' + seatNum.toString())
-                seatElement.innerText = seatNum.toString() + '\n'
-                // document.getElementById(elementId).style.backgroundColor = emptySeatColor
-                
-                seatElement.onclick = function () {
-                    // flutter
-                    getData.postMessage(seatNum)
-                }
-            }
-        }
-        
-        function flutterSetUser(seatNum, displayName) {
-            const seatElement = document.getElementById('seat-' + seatNum.toString())
-            if (displayName.length > maxDisplayNameLength) {
-                displayName = displayName.substring(0, 4) + '…'
-            }
-            seatElement.innerText = seatNum.toString() + '\n' + displayName
-        }
-        
-        function flutterUnsetUser(seatNum) {
-            const seatElement = document.getElementById('seat-' + seatNum.toString())
-            seatElement.innerText = seatNum.toString()
-        }
-    </script>
 
 </body>
 </html>
