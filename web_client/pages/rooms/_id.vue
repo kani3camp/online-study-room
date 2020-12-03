@@ -141,6 +141,7 @@ export default {
   },
   methods: {
     async startStudying() {
+      // websocket
       const vm = this
       vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
       vm.socket.onopen = async () => {
@@ -179,6 +180,14 @@ export default {
           console.error(resp.message)
           await vm.$router.push('/')
         }
+      }
+      vm.socket.onclose = async () => {
+        console.log('socket closed.')
+        // todo
+      }
+      vm.socket.onerror = async () => {
+        console.error('socket error.')
+        // todo
       }
     },
     async stayStudying() {
@@ -239,13 +248,13 @@ export default {
 
       if (resp.result === 'ok') {
         vm.$store.commit('setRoomId', null)
-        await vm.$router.push('/')
       } else {
-        console.log('Failed to exit room.')
+        console.log('Failed to exit room successfully.')
         console.log(resp)
       }
       vm.exiting = false
       vm.if_show_dialog = false
+      await vm.$router.push('/')
     },
   },
 }
