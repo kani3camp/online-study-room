@@ -15,58 +15,58 @@ type UserData = {
   stateFactory: true,
   namespaced: true,
 })
-export default class User extends VuexModule {
-  public info: UserData = {
-    isSignedIn: false,
-    roomId: '',
-    drawer: false,
-    totalStudyTime: 0,
-    registrationDate: new Date(),
-    statusMessage: '',
-    lastEntered: new Date(),
-  }
+class User extends VuexModule implements UserData {
+  isSignedIn = false
+  roomId = ''
+  drawer = false
+  totalStudyTime = 0
+  registrationDate = new Date()
+  statusMessage = ''
+  lastEntered = new Date()
 
   @Mutation
   public setSignInState(isSignedIn: boolean): void {
-    this.info.isSignedIn = isSignedIn
+    this.isSignedIn = isSignedIn
   }
 
   @Mutation
   public setRoomId(roomId: string) {
-    this.info.roomId = roomId
+    this.roomId = roomId
   }
 
   @Mutation
   public setDrawer(newDrawer: boolean) {
-    this.info.drawer = newDrawer
+    this.drawer = newDrawer
   }
 
   @Action
   public signOut() {
-    this.info.isSignedIn = false
-    this.info.totalStudyTime = 0
-    this.info.registrationDate = new Date()
-    this.info.statusMessage = ''
-    this.info.lastEntered = new Date()
+    this.isSignedIn = false
+    this.totalStudyTime = 0
+    this.registrationDate = new Date()
+    this.statusMessage = ''
+    this.lastEntered = new Date()
   }
 
   @Mutation
   public setTotalStudyTime(totalStudyTime: number) {
-    this.info.totalStudyTime = totalStudyTime
+    this.totalStudyTime = totalStudyTime
   }
 
   @Mutation
   public setRegistrationDate(registrationDate: Date) {
-    this.info.registrationDate = registrationDate
+    this.registrationDate = registrationDate
   }
 
   @Mutation
   public setStatusMessage(statusMessage: string) {
-    this.info.statusMessage = statusMessage
+    this.statusMessage = statusMessage
   }
 
   @Mutation
   public setLastEntered(lastEntered: Date) {
-    this.info.lastEntered = lastEntered
+    this.lastEntered = lastEntered
   }
 }
+
+export default User

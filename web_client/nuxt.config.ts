@@ -60,13 +60,21 @@ const config: NuxtConfig = {
   //   base: './'
   // },
   build: {
-    transpile: [/typed-vuex/],
+    transpile: [/typed-vuex/, 'vuex-module-decorators'],
   },
   typescript: {
     typeCheck: {
       eslint: {
         files: './src/**/*.{ts,js,vue}',
       },
+    },
+  },
+  loaders: {
+    ts: {
+      silent: true,
+    },
+    tsx: {
+      silent: true,
     },
   },
 }

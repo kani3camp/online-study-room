@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import firebase from 'firebase'
-import { UserStore } from '~/store'
+import { UserStore } from '../store'
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -21,7 +21,6 @@ Vue.prototype.$onAuthStateChanged = (vm: any) => {
   firebase.auth().onAuthStateChanged(async (user: any) => {
     if (user) {
       console.log('User is signed in.')
-      // vm.$store.commit('setSignInState', true)
       UserStore.setSignInState(true)
 
       await Vue.prototype.$getUserData(vm)
@@ -29,7 +28,7 @@ Vue.prototype.$onAuthStateChanged = (vm: any) => {
       await firebase.auth().currentUser.getIdToken(true) // refresh idToken
     } else {
       console.log('User is signed out.')
-      vm.$store.commit('signOut')
+      UserStore.signOut()
     }
   })
 }
@@ -44,10 +43,10 @@ Vue.prototype.$getUserData = async (vm: any) => {
     console.log(userData)
   } else {
     const userBody = userData.user_status.user_body
-    vm.$store.commit('user/setStatusMessage', userBody.status)
-    vm.$store.commit('user/setTotalStudyTime', userBody.total_study_time)
-    vm.$store.commit('user/setRegistrationDate', new Date(userBody.registration_date))
-    vm.$store.commit('user/setLastEntered', new Date(userBody.last_entered))
+    UserStore.setStatusMessage(userBody.status)
+    UserStore.setTotalStudyTime(userBody.total_study_time)
+    UserStore.setRegistrationDate(new Date(userBody.registration_date))
+    UserStore.setLastEntered(new Date(userBody.last_entered))
   }
 }
 

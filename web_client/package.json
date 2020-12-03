@@ -11,31 +11,32 @@
     "generate": "./node_modules/.bin/nuxt generate"
   },
   "dependencies": {
+    "core-js": "^2.6.12",
     "css-loader": "^4.3.0",
     "firebase": "^7.22.0",
-    "firebaseui": "^4.6.1",
-    "nuxt": "^2.13.0",
+    "firebaseui": "^4.7.1",
+    "nuxt": "^2.14.9",
     "nuxt-typed-vuex": "^0.1.22",
     "request": "^2.88.2",
     "vue": "^2.6.12",
     "vue-template-compiler": "^2.6.12",
-    "vuetify": "^2.3.12",
+    "vuetify": "^2.3.19",
     "webpack": "^4.44.2"
   },
   "devDependencies": {
-    "@mdi/font": "^5.4.55",
-    "@nuxt/types": "^2.14.7",
+    "@mdi/font": "^5.8.55",
+    "@nuxt/types": "^2.14.9",
     "@nuxt/typescript-build": "^2.0.3",
     "@nuxtjs/eslint-config-typescript": "^5.0.0",
     "@nuxtjs/google-analytics": "^2.4.0",
     "@nuxtjs/vuetify": "^1.11.2",
     "axios": "^0.19.2",
-    "eslint": "^7.13.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.2.0",
     "eslint-plugin-prettier-vue": "^2.1.1",
     "eslint-plugin-vue": "^7.1.0",
-    "prettier": "^2.1.1",
+    "prettier": "^2.2.1",
     "vuex-module-decorators": "^1.0.1"
   }
 }

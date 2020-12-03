@@ -8,8 +8,6 @@
       "ESNext.AsyncIterable",
       "DOM"
     ],
-    "experimentalDecorators": true,
-    "importHelpers": true,
     "esModuleInterop": true,
     "allowJs": true,
     "sourceMap": true,
@@ -29,9 +27,11 @@
       "@nuxt/types",
       "vuetify",
       "firebase"
-    ]
+    ],
+    "experimentalDecorators": true,
+    "importHelpers": true
   },
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

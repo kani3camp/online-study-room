@@ -102,7 +102,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import firebase from 'firebase'
-import { UserStore } from '~/utils/store-accessor'
+import { UserStore } from '@/store'
 
 export default Vue.extend({
   name: 'Room',

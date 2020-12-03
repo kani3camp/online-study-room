@@ -164,9 +164,9 @@
 <script lang="ts">
 import firebase from 'firebase'
 import Vue from 'vue'
+import { UserStore } from '@/store'
 import NavigationDrawer from '~/components/NavigationDrawer.vue'
 import ToolBar from '~/components/ToolBar.vue'
-import { UserStore } from '~/store'
 
 export default Vue.extend({
   components: {
@@ -174,21 +174,21 @@ export default Vue.extend({
     ToolBar,
   },
   data: () => ({
-    rooms: null,
+    rooms: [],
     if_show_dialog: false,
     if_show_dialog_2: false,
-    dialog_message: null,
-    selected_index: null,
-    selected_room_name: null,
+    dialog_message: '',
+    selected_index: -1,
+    selected_room_name: '',
     entering: false,
     loading: false,
   }),
   computed: {
     drawer: {
-      get() {
-        return UserStore.info.drawer
+      get(): boolean {
+        return UserStore.drawer
       },
-      set(value) {
+      set(value: boolean): void {
         UserStore.setDrawer(value)
       },
     },
@@ -199,13 +199,13 @@ export default Vue.extend({
     await this.loadRooms()
   },
   methods: {
-    confirmEntering(index) {
+    confirmEntering(index: number) {
       this.selected_index = index
       this.selected_room_name = this.rooms[this.selected_index].room_body.name
       this.if_show_dialog = true
     },
     async enterRoom() {
-      if (UserStore.isSignedIn) {
+      if (UserStore.info.isSignedIn) {
         const vm = this
 
         this.entering = true

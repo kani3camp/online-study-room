@@ -126,7 +126,7 @@ import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import ToolBar from '@/components/ToolBar.vue'
 import firebase from 'firebase'
 import Vue from 'vue'
-import { UserStore } from '~/store'
+import { UserStore } from '@/store'
 
 export default Vue.extend({
   name: 'AllRooms',
