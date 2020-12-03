@@ -167,6 +167,7 @@ import Vue from 'vue'
 import { UserStore } from '@/store'
 import NavigationDrawer from '~/components/NavigationDrawer.vue'
 import ToolBar from '~/components/ToolBar.vue'
+import RoomsResponse from '~/types/index'
 
 export default Vue.extend({
   components: {
@@ -205,7 +206,7 @@ export default Vue.extend({
       this.if_show_dialog = true
     },
     async enterRoom() {
-      if (UserStore.info.isSignedIn) {
+      if (UserStore.isSignedIn) {
         const vm = this
 
         this.entering = true

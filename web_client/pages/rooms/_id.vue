@@ -102,27 +102,27 @@
 <script lang="ts">
 import Vue from 'vue'
 import firebase from 'firebase'
-import { UserStore } from '@/store'
+import { UserStore } from '~/store'
 
 export default Vue.extend({
   name: 'Room',
   data: () => ({
-    room_name: null,
-    entered_time: null,
-    room_status: null,
+    room_name: '',
+    entered_time: new Date(),
+    room_status: {},
     if_show_dialog: false,
     exiting: false,
     other_users_info: [],
     stay_awake_timeout: null,
     user_timeout: null,
-    socket: null,
+    socket: new WebSocket(''),
     is_socket_open: false,
   }),
   async created() {
     const vm = this
     this.$onAuthStateChanged(vm)
 
-    if (vm.$store.state.isSignedIn) {
+    if (UserStore.isSignedIn) {
       // 入室時刻を取得
       vm.user_timeout = setTimeout(() => {
         vm.updateUserData()
@@ -183,13 +183,13 @@ export default Vue.extend({
       }
     },
     async stayStudying() {
-      if (UserStore.info.isSignedIn) {
+      if (UserStore.isSignedIn) {
         const vm = this
         if (vm.is_socket_open) {
           const params = {
             user_id: firebase.auth().currentUser.uid,
             id_token: await firebase.auth().currentUser.getIdToken(false),
-            room_id: vm.$store.state.room_id,
+            room_id: UserStore.roomId,
             device_type: '',
           }
           vm.socket.send(JSON.stringify(params))
@@ -203,9 +203,9 @@ export default Vue.extend({
       }
     },
     async fetchRoomData() {
-      if (UserStore.info.isSignedIn) {
+      if (UserStore.isSignedIn) {
         // const vm = this
-        const roomId = UserStore.info.roomId
+        const roomId = UserStore.roomId
         const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
         const params = { room_id: roomId }
         const resp = await this.$httpGet(url, params)
@@ -220,7 +220,7 @@ export default Vue.extend({
     },
     async updateUserData() {
       await this.$getUserData(this)
-      const dateTime = UserStore.info.lastEntered
+      const dateTime = UserStore.lastEntered
       if (dateTime) {
         this.entered_time = dateTime.getHours() + '時' + dateTime.getMinutes() + '分'
       }

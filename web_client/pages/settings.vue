@@ -178,10 +178,10 @@ import { UserStore } from '@/store'
 export default Vue.extend({
   name: 'Settings',
   data: () => ({
-    display_name: null,
-    status_message: null,
+    display_name: '',
+    status_message: '',
     if_show_dialog_2: false,
-    sign_out_result: null,
+    sign_out_result: '',
     saving: false,
   }),
   computed: {
@@ -197,10 +197,10 @@ export default Vue.extend({
       return firebase.auth().currentUser.displayName
     },
     firebase_status_message() {
-      return UserStore.info.statusMessage
+      return UserStore.statusMessage
     },
     registration_date_str() {
-      const registrationDate = UserStore.info.registrationDate
+      const registrationDate = UserStore.registrationDate
       if (registrationDate) {
         return (
           registrationDate.getFullYear() +
@@ -221,7 +221,7 @@ export default Vue.extend({
       return firebase.auth().currentUser.providerData[0].providerId
     },
     total_study_time() {
-      const totalSeconds = UserStore.info.totalStudyTime
+      const totalSeconds = UserStore.totalStudyTime
       if (totalSeconds) {
         const hours = Math.floor(totalSeconds / 3600)
         const totalMinutes = Math.floor(totalSeconds / 60)
