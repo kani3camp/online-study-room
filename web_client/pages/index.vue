@@ -4,9 +4,6 @@
 
     <ToolBar />
 
-    <!--    todo-->
-    <!--    <RoomLayout />-->
-
     <v-main>
       <RoomLayout />
 
