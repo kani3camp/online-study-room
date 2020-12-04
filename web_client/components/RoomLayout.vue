@@ -1,6 +1,6 @@
-<template :src="layoutFile">
+<template>
   <!--  todo このdivは消す-->
-  <div />
+  <iframe src="../assets/english-room.html" />
 </template>
 
 <script>
@@ -20,10 +20,12 @@ export default {
       for (let n = 0; n < numSeats; n++) {
         const seatNum = n + 1
         const seatElement = document.getElementById('seat-' + seatNum.toString())
-        seatElement.innerText = seatNum.toString() + '\n'
-        // document.getElementById(elementId).style.backgroundColor = emptySeatColor
+        if (seatElement) {
+          seatElement.innerText = seatNum.toString() + '\n'
+          // document.getElementById(elementId).style.backgroundColor = emptySeatColor
 
-        seatElement.onclick = function () {}
+          seatElement.onclick = function () {}
+        }
       }
     }),
   },

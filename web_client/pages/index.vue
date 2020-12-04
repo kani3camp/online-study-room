@@ -5,7 +5,7 @@
     <ToolBar />
 
     <!--    todo-->
-    <!--    <RoomLayout />-->
+    <RoomLayout />
 
     <v-main>
       <v-container>
@@ -171,7 +171,7 @@ export default {
   components: {
     NavigationDrawer,
     ToolBar,
-    // RoomLayout,
+    RoomLayout,
   },
   data: () => ({
     rooms: null,
