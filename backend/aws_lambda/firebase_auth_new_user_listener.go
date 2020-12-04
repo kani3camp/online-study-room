@@ -32,7 +32,7 @@ func CreateNewUser(userId string, client *firestore.Client, ctx context.Context)
 }
 
 func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent) error {
-	_, client := InitializeEventFunc()
+	_, client := InitializeEventFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	userId := e.UID

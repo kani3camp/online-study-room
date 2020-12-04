@@ -13,7 +13,7 @@ type RoomsResponseStruct struct {
 }
 
 func Rooms(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx, client := InitializeHttpFunc()
+	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	var apiResp RoomsResponseStruct

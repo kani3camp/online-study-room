@@ -50,7 +50,7 @@ type Values struct {
 // ユーザーの入退室がトリガー
 func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	now := time.Now()
-	_, client := InitializeEventFunc()
+	_, client := InitializeEventFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	_, err := metadata.FromContext(ctx)

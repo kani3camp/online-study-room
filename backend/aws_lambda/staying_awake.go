@@ -17,7 +17,7 @@ type StayingAwakeResponseStruct struct {
 }
 
 func StayingAwake(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx, client := InitializeHttpFunc()
+	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	var apiResp StayingAwakeResponseStruct

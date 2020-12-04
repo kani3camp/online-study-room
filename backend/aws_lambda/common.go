@@ -2,6 +2,7 @@ package main
 
 import (
 	"cloud.google.com/go/firestore"
+	"cloud.google.com/go/storage"
 	"context"
 	"encoding/base64"
 	firebase "firebase.google.com/go"
@@ -23,6 +24,7 @@ const USERS = "users"
 const HISTORY = "history"
 const CONFIG = "config"
 const API = "api"
+const ROOM_LAYOUTS_INFO = "room-layouts-info"
 const NEWS = "news"
 
 const ProjectId = "online-study-space"
@@ -99,13 +101,28 @@ type EnteringAndLeavingHistoryStruct struct {
 	UserId   string    `firestore:"user-id"`
 }
 
-func InitializeHttpFunc() (context.Context, *firestore.Client) {
-	return InitializeEventFunc()
+type RoomLayoutsInfoConfigStruct struct {
+	BucketName  string            `firestore:"bucket-name"`
+	ObjectPaths map[string]string `firestore:"object-paths"`
 }
 
-func InitializeEventFunc() (context.Context, *firestore.Client) {
+func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
+	return InitializeEventFuncWithFirestore()
+}
+
+func InitializeEventFuncWithFirestore() (context.Context, *firestore.Client) {
 	ctx := context.Background()
 	client, _ := InitializeFirestoreClient(ctx)
+	return ctx, client
+}
+
+func InitializeHttpFuncWithCloudStorage() (context.Context, *storage.Client) {
+	return InitializeEventFuncWithCloudStorage()
+}
+
+func InitializeEventFuncWithCloudStorage() (context.Context, *storage.Client) {
+	ctx := context.Background()
+	client, _ := InitializeCloudStorageClient(ctx)
 	return ctx, client
 }
 
@@ -118,6 +135,23 @@ func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 	} else {
 		sa := option.WithCredentialsJSON(awsCredential)
 		client, err2 = firestore.NewClient(ctx, ProjectId, sa)
+	}
+	if err2 != nil {
+		log.Println(err2)
+		return nil, err2
+	}
+	return client, nil
+}
+
+func InitializeCloudStorageClient(ctx context.Context) (*storage.Client, error) {
+	var client *storage.Client
+	var err1, err2 error
+	awsCredential, err1 := RetrieveCloudStorageCredentialInBytes()
+	if err1 != nil {
+		client, err2 = storage.NewClient(ctx)
+	} else {
+		sa := option.WithCredentialsJSON(awsCredential)
+		client, err2 = storage.NewClient(ctx, sa)
 	}
 	if err2 != nil {
 		log.Println(err2)
@@ -160,6 +194,15 @@ func CloseFirestoreClient(client *firestore.Client) {
 		log.Println("failed to close firestore client.")
 	} else {
 		log.Println("firestore client closed.")
+	}
+}
+
+func CloseCloudStorageClient(client *storage.Client) {
+	err := client.Close()
+	if err != nil {
+		log.Println("failed to close cloud storage client.")
+	} else {
+		log.Println("cloud storage client closed.")
 	}
 }
 
@@ -226,6 +269,70 @@ func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
 		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
 		return []byte(decodedBinarySecret), nil
 	}
+}
+
+func RetrieveCloudStorageCredentialInBytes() ([]byte, error) {
+	secretName := "cloudstorage-service-account"
+	region := "ap-northeast-1"
+
+	//Create a Secrets Manager client
+	svc := secretsmanager.New(session.New(),
+		aws.NewConfig().WithRegion(region))
+	input := &secretsmanager.GetSecretValueInput{
+		SecretId:     aws.String(secretName),
+		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
+	}
+
+	result, err := svc.GetSecretValue(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case secretsmanager.ErrCodeDecryptionFailure:
+				// Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+				fmt.Println(secretsmanager.ErrCodeDecryptionFailure, aerr.Error())
+
+			case secretsmanager.ErrCodeInternalServiceError:
+				// An error occurred on the server side.
+				fmt.Println(secretsmanager.ErrCodeInternalServiceError, aerr.Error())
+
+			case secretsmanager.ErrCodeInvalidParameterException:
+				// You provided an invalid value for a parameter.
+				fmt.Println(secretsmanager.ErrCodeInvalidParameterException, aerr.Error())
+
+			case secretsmanager.ErrCodeInvalidRequestException:
+				// You provided a parameter value that is not valid for the current state of the resource.
+				fmt.Println(secretsmanager.ErrCodeInvalidRequestException, aerr.Error())
+
+			case secretsmanager.ErrCodeResourceNotFoundException:
+				// We can't find the resource that you asked for.
+				fmt.Println(secretsmanager.ErrCodeResourceNotFoundException, aerr.Error())
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			fmt.Println(err.Error())
+		}
+		return nil, err
+	}
+
+	// Decrypts secret using the associated KMS CMK.
+	// Depending on whether the secret is a string or binary, one of these fields will be populated.
+	var secretString, decodedBinarySecret string
+	if result.SecretString != nil {
+		secretString = *result.SecretString
+		return []byte(secretString), nil
+	} else {
+		decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
+		_len, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
+		if err != nil {
+			fmt.Println("Base64 Decode Error:", err)
+			return nil, err
+		}
+		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
+		return []byte(decodedBinarySecret), nil
+	}
+
+	// Your code goes here.
 }
 
 func IsUserVerified(userId string, idToken string, client *firestore.Client, ctx context.Context) (bool, error) {

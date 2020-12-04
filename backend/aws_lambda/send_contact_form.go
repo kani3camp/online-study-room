@@ -23,7 +23,7 @@ type SendContactFormResponseStruct struct {
 
 // 環境変数はコンソールの関数の編集から設定してる
 func SendContactForm(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx, client := InitializeHttpFunc()
+	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	var apiResp SendContactFormResponseStruct

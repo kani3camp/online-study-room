@@ -22,7 +22,7 @@ type StartStudyingResponse struct {
 }
 
 func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
-	_, client := InitializeEventFunc()
+	_, client := InitializeEventFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	var requestData StartStudyingRequest
