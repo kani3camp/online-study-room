@@ -62,12 +62,12 @@
               lg="3"
               xl="3"
               dense
-              @click="confirmEntering(index)"
             >
               <v-hover v-slot="{ hover }">
                 <v-card
                   class="ma-2 pa-3"
                   :elevation="hover ? 10 : 2"
+                  @click="confirmEntering(index)"
                 >
                   <v-card-title>
                     {{ room['room_body'].name }}
