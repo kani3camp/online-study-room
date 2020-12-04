@@ -4,7 +4,8 @@
 
     <ToolBar />
 
-    <RoomLayout />
+    <!--    todo-->
+    <!--    <RoomLayout />-->
 
     <v-main>
       <v-container>
@@ -170,7 +171,7 @@ export default {
   components: {
     NavigationDrawer,
     ToolBar,
-    RoomLayout,
+    // RoomLayout,
   },
   data: () => ({
     rooms: null,
@@ -194,6 +195,7 @@ export default {
     },
   },
   async created() {
+    console.log(window)
     common.onAuthStateChanged(this)
 
     await this.loadRooms()
@@ -268,10 +270,6 @@ h2 {
 
 iframe {
   border-width: 0;
-}
-
-#youtube-live-video {
-  max-width: 90%;
 }
 
 .big-char {
