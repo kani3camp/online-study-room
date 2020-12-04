@@ -129,7 +129,7 @@
             </v-flex>
             <v-flex>
               <v-list-item-content>
-                <v-list-item-title>{{ sum_study_time }}</v-list-item-title>
+                <v-list-item-title>{{ total_study_time }}</v-list-item-title>
               </v-list-item-content>
             </v-flex>
           </v-list-item>
@@ -185,17 +185,17 @@ export default {
   }),
   computed: {
     is_some_value_changed: function () {
-      const bool1 = this.display_name !== this.vuex_display_name
-      const bool2 = this.status_message !== this.vuex_status_message
+      const bool1 = this.display_name !== this.firebase_display_name
+      const bool2 = this.status_message !== this.firebase_status_message
       return bool1 || bool2
     },
     is_some_value_blank: function () {
       return !this.display_name || !this.status_message
     },
-    vuex_display_name: function () {
-      return this.$store.state.user.display_name
+    firebase_display_name: function () {
+      return firebase.auth().currentUser.displayName
     },
-    vuex_status_message: function () {
+    firebase_status_message: function () {
       return this.$store.state.user.status_message
     },
     registration_date_str: function () {
@@ -214,32 +214,46 @@ export default {
       }
     },
     mail_address: function () {
-      return this.$store.state.user.mail_address
+      return firebase.auth().currentUser.email
     },
     provider_id: function () {
-      return this.$store.state.user.provider_id
+      return firebase.auth().currentUser.providerData[0].providerId
     },
-    sum_study_time: function () {
-      return this.$store.state.user.sum_study_time
+    total_study_time: function () {
+      const total_seconds = this.$store.state.user.total_study_time
+      if (total_seconds) {
+        const hours = Math.floor(total_seconds / 3600)
+        const total_minutes = Math.floor(total_seconds / 60)
+        const minutes = total_minutes % 60
+        return hours + '時間' + minutes + '分'
+      }
+      return null
     },
   },
   watch: {
-    vuex_display_name: function (newValue, oldValue) {
+    firebase_display_name: function (newValue, oldValue) {
+      console.log('watch: ' + this.display_name + ': new: ' + newValue + ', old: ' + oldValue)
       if (oldValue === null && newValue !== null) {
+        this.display_name = newValue
+      } else if (oldValue !== newValue) {
         this.display_name = newValue
       }
     },
-    vuex_status_message: function (newValue, oldValue) {
-      if (oldValue === null && newValue !== null) {
+    firebase_status_message: function (newValue, oldValue) {
+      console.log('watch')
+      if ((oldValue === null && newValue !== null) || oldValue !== newValue) {
         this.status_message = newValue
+      } else if (oldValue !== newValue) {
+        this.display_name = newValue
       }
     },
   },
   async created() {
     await common.onAuthStateChanged(this)
-
-    this.display_name = this.$store.state.user.display_name
-    this.status_message = this.$store.state.user.status_message
+  },
+  async mounted() {
+    this.display_name = this.firebase_display_name
+    this.status_message = this.firebase_status_message
   },
   methods: {
     goToHomePage() {
@@ -273,20 +287,23 @@ export default {
 
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/change_user_info'
       const params = {
-        user_id: this.$store.state.user.user_id,
-        id_token: this.$store.state.user.id_token,
+        user_id: firebase.auth().currentUser.uid,
+        id_token: await firebase.auth().currentUser.getIdToken(false),
         display_name: this.display_name,
         status_message: this.status_message,
       }
       const resp = await common.httpPost(url, params)
       if (resp.result === 'ok') {
         console.log('設定変更成功')
-        this.$store.commit('user/setDisplayName', this.display_name)
+        const new_display_name = this.display_name
+        await firebase.auth().currentUser.updateProfile({
+          displayName: new_display_name,
+        })
         this.$store.commit('user/setStatusMessage', this.status_message)
       } else {
         console.log(resp)
-        this.display_name = this.vuex_display_name
-        this.status_message = this.vuex_status_message
+        this.display_name = this.firebase_display_name
+        this.status_message = this.firebase_status_message
       }
       this.saving = false
     },

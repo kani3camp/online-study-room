@@ -2,8 +2,8 @@ import firebase from '~/plugins/firebase'
 
 const common = {
   key: {
-    youtubeLink: 'https://www.youtube.com/',
-    twitterLink: 'https://twitter.com/home',
+    youtubeLink: 'https://www.youtube.com/channel/UCXuD2XmPTdpVy7zmwbFVZWg',
+    twitterLink: 'https://twitter.com/osr_soraride',
   },
 }
 
@@ -14,25 +14,12 @@ common.c = (m) => {
 common.onAuthStateChanged = (vm) => {
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user) {
-      vm.$store.commit('user/setMailAddress', user.email)
-      vm.$store.commit('user/setUserId', user.uid)
-      vm.$store.commit('user/setProviderId', user.providerData[0].providerId)
-      vm.$store.commit('user/setDisplayName', user.displayName)
-
       console.log('User is signed in.')
       vm.$store.commit('setSignInState', true)
 
       await common.getUserData(vm)
 
-      firebase
-        .auth()
-        .currentUser.getIdToken(/* forceRefresh */ true)
-        .then(function (idToken) {
-          vm.$store.commit('user/setIdToken', idToken)
-        })
-        .catch(function (error) {
-          console.error(error)
-        })
+      await firebase.auth().currentUser.getIdToken(true) // refresh idToken
     } else {
       console.log('User is signed out.')
       vm.$store.commit('signOut')
@@ -42,14 +29,16 @@ common.onAuthStateChanged = (vm) => {
 
 common.getUserData = async (vm) => {
   const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/user_status')
-  const params = { user_id: vm.$store.state.user.user_id }
+  const params = {
+    user_id: firebase.auth().currentUser.uid,
+  }
   const user_data = await common.httpGet(url, params)
   if (user_data.result !== 'ok') {
     console.log(user_data)
   } else {
     const user_body = user_data['user_status']['user_body']
     vm.$store.commit('user/setStatusMessage', user_body.status)
-    // this.$store.commit('user/setSumStudyTime', use) // Todo
+    vm.$store.commit('user/setTotalStudyTime', user_body.total_study_time)
     vm.$store.commit('user/setRegistrationDate', new Date(user_body.registration_date))
     vm.$store.commit('user/setLastEntered', new Date(user_body.last_entered))
   }

@@ -1,27 +1,28 @@
 export const state = () => ({
-  user_id: null,
-  display_name: null,
-  mail_address: null,
-  sum_study_time: null,
+  // user_id: null,
+  // display_name: null,
+  // mail_address: null,
+  total_study_time: null,
   registration_date: null,
   status_message: null,
-  id_token: null,
-  provider_id: null,
+  // id_token: null,
+  // provider_id: null,
   last_entered: null,
 })
 
 export const mutations = {
-  setUserId(state, user_id) {
-    state.user_id = user_id
-  },
-  setDisplayName(state, display_name) {
-    state.display_name = display_name
-  },
-  setMailAddress(state, mail_address) {
-    state.mail_address = mail_address
-  },
-  setSumStudyTime(state, sum_study_time) {
-    state.sum_study_time = sum_study_time
+  // setUserId(state, user_id) {
+  //   state.user_id = user_id
+  // },
+  // setDisplayName(state, display_name) {
+  //   console.log('表示名変更 => ' + display_name)
+  //   state.display_name = display_name
+  // },
+  // setMailAddress(state, mail_address) {
+  //   state.mail_address = mail_address
+  // },
+  setTotalStudyTime(state, total_study_time) {
+    state.total_study_time = total_study_time
   },
   setRegistrationDate(state, registration_date) {
     state.registration_date = registration_date
@@ -29,12 +30,12 @@ export const mutations = {
   setStatusMessage(state, status_message) {
     state.status_message = status_message
   },
-  setIdToken(state, id_token) {
-    state.id_token = id_token
-  },
-  setProviderId(state, provider_id) {
-    state.provider_id = provider_id
-  },
+  // setIdToken(state, id_token) {
+  //   state.id_token = id_token
+  // },
+  // setProviderId(state, provider_id) {
+  //   state.provider_id = provider_id
+  // },
   setLastEntered(state, last_entered) {
     state.last_entered = last_entered
   },

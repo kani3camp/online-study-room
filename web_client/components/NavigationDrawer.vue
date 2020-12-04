@@ -4,6 +4,7 @@
     app
     right
     disable-resize-watcher
+    overlay-color="#36479f"
   >
     <v-list dense>
       <v-list-item
@@ -106,8 +107,13 @@
 </template>
 
 <script>
+import common from '@/plugins/common'
+
 export default {
   name: 'NavigationDrawer',
+  data: () => ({
+    youtubeLink: common.key.youtubeLink,
+  }),
   computed: {
     drawer: {
       get() {
@@ -135,7 +141,7 @@ export default {
       this.CloseDrawer()
     },
     goToYoutubeLive() {
-      // todo
+      window.open(this.youtubeLink, '_blank')
       this.CloseDrawer()
     },
     goToNewsPage() {

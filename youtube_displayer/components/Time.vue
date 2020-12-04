@@ -1,7 +1,9 @@
 <template>
   <div id="time">
     <p>{{ year }}年 {{ month }}月 {{ day }}日</p>
-    <p class="clock">{{ hours }}：{{ minutes }}</p>
+    <p class="clock">
+      {{ hours }}：{{ minutes }}
+    </p>
   </div>
 </template>
 
@@ -27,7 +29,7 @@ export default {
     minutes () {
       let min = this.date.getMinutes().toString()
       if (min.length === 1) {
-        min = '0' + min
+        min = `0${min}`
       }
       return min
     },

@@ -39,18 +39,19 @@
             lg="3"
             xl="3"
             dense
-            @click="confirmEntering(index)"
           >
             <v-hover v-slot="{ hover }">
               <v-card
                 class="ma-2 pa-3"
                 :elevation="hover ? 10 : 2"
+                @click="confirmEntering(index)"
               >
-                <v-layout justify-center>
-                  <v-card-title>
-                    {{ room['room_body'].name }}
-                  </v-card-title>
-                </v-layout>
+                <v-card-title>
+                  {{ room['room_body'].name }}
+                </v-card-title>
+                <v-card-subtitle>
+                  {{ room['room_body']['users'].length }}人
+                </v-card-subtitle>
               </v-card>
             </v-hover>
           </v-col>
@@ -124,6 +125,7 @@
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
 import common from '@/plugins/common'
+import firebase from 'firebase/app'
 
 export default {
   name: 'AllRooms',
@@ -169,9 +171,9 @@ export default {
         const selected_room_id = this.rooms[this.selected_index].room_id
         const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
         const params = {
-          user_id: this.$store.state.user.user_id,
+          user_id: firebase.auth().currentUser.uid,
           room_id: selected_room_id,
-          id_token: this.$store.state.user.id_token,
+          id_token: await firebase.auth().currentUser.getIdToken(false),
         }
         const res = await common.httpPost(url, params).catch((e) => {
           console.log(e)

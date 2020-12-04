@@ -54,7 +54,7 @@
         >
           <h4>APP</h4>
           <ul>
-            <li>Android</li>
+            <li>Android (開発中)</li>
           </ul>
         </v-col>
 
@@ -143,16 +143,21 @@ export default {
 }
 
 .child-center h4 {
-  color: #006cb8;
+  color: #36479f;
   font-family: sans-serif;
 }
 
-.child-center ul li,
+.child-center ul li a {
+  color: #647a7f;
+}
+
+.child-center ul li a,
 :visited {
   color: #647a7f;
 }
 .child-center ul li :hover {
-  color: #a8babe;
+  /*color: #a8babe;*/
+  text-decoration: underline;
 }
 
 .child-center ul li a {

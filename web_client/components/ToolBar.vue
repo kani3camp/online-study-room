@@ -46,10 +46,16 @@
           </nuxt-link>
         </div>
         <div class="tool-content">
-          <nuxt-link to="/">
+          <a
+            :href="youtubeLink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <v-icon>mdi-youtube</v-icon>
             YouTube
-          </nuxt-link>
-        </div> <!-- todo -->
+          </a>
+
+        </div>
         <div class="tool-content">
           <nuxt-link to="/news">
             お知らせ
@@ -85,12 +91,16 @@
 
 <script>
 import Logo from '@/components/Logo'
+import common from '@/plugins/common'
 
 export default {
   name: 'ToolBar',
   components: {
     Logo,
   },
+  data: () => ({
+    youtubeLink: common.key.youtubeLink,
+  }),
   computed: {
     drawer: {
       get() {
@@ -104,9 +114,6 @@ export default {
   methods: {
     goToTopPage() {
       this.$router.push('/')
-    },
-    goToYoutubeLive() {
-      // todo
     },
     goToSettingsPage() {
       this.$router.push('/settings')

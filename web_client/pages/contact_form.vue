@@ -79,6 +79,7 @@
 import common from '~/plugins/common'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
+import firebase from '@/plugins/firebase'
 
 export default {
   name: 'ContactForm',
@@ -101,7 +102,7 @@ export default {
   computed: {
     mail_address: {
       get() {
-        return this.$store.state.user.mail_address
+        return firebase.auth().currentUser.email
       },
     },
   },
@@ -125,8 +126,8 @@ export default {
         const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
         const params = {
           mail_address: this.mail_address.toString(),
-          user_id: this.$store.state.user.user_id,
-          id_token: this.$store.state.user.id_token,
+          user_id: firebase.auth().currentUser.uid,
+          id_token: await firebase.auth().currentUser.getIdToken(false),
           contact_type: this.selected_contact_type,
           message: this.message,
         }

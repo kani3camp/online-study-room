@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>english-room</title>
+
+    <style>
+        :root {
+            --base-rem-size: 100vw;
+
+            --room-width: 76rem;
+            --room-height: 62rem;
+
+            --seat-width: 9rem;
+            --seat-height: 7rem;
+            --empty-seat-color: #ddcec3;
+            --seat-font-size: 1.5rem;
+
+            --separator-width: 1rem;
+            --separator-extra-length: 3rem;
+
+            --group-2-top: 7rem;
+            --group-2-left: 25rem;
+
+            --group-4-top: 35rem;
+            --group-4-left: 25rem;
+
+        }
+
+        * {
+            margin: 0;
+        }
+
+        html {
+            font-size: calc(0.013 * var(--base-rem-size));
+        }
+
+        #room {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--room-width);
+            height: var(--room-height);
+            box-sizing: border-box;
+            border: solid 1rem black;
+        }
+
+        .seat {
+            width: var(--seat-width);
+            height: var(--seat-height);
+            background-color: var(--empty-seat-color);
+            font-size: var(--seat-font-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .separator {
+            background-color: gray;
+        }
+
+        .separator-horizontal {
+            width: 12rem;
+            height: 1rem;
+        }
+
+        .separator-vertical {
+            width: 1rem;
+            height: 10rem;
+        }
+
+        .group {
+            display: inline-block;
+        }
+
+        #group-1 {
+            /*background-color: aliceblue;*/
+        }
+
+        #group-2 {
+            position: absolute;
+            top: var(--group-2-top);
+            left: var(--group-2-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+
+        #group-2 .separator {
+            position: relative;
+            top: calc(var(--separator-extra-length) * -1);
+        }
+
+        #separator-1 {
+            position: absolute;
+            top: calc(var(--group-2-top) + var(--seat-height));
+            left: var(--group-2-left);
+            width: calc(4 * var(--seat-width) + 5 * var(--separator-width));
+            height: var(--separator-width);
+        }
+
+        #group-3 {
+            position: absolute;
+            top: calc(var(--group-2-top) + var(--seat-height) + var(--separator-width));
+            left: var(--group-2-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+
+
+        #group-4 {
+            position: absolute;
+            top: var(--group-4-top);
+            left: var(--group-4-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+
+        #group-4 .separator {
+            position: relative;
+            top: calc(var(--separator-extra-length) * -1);
+        }
+
+        #separator-2 {
+            position: absolute;
+            top: calc(var(--group-4-top) + var(--seat-height));
+            left: var(--group-4-left);
+            width: calc(4 * var(--seat-width) + 5 * var(--separator-width));
+            height: var(--separator-width);
+        }
+
+        #group-5 {
+            position: absolute;
+            top: calc(var(--group-4-top) + var(--seat-height) + var(--separator-width));
+            left: var(--group-4-left);
+            /*background-color: azure;*/
+            display: flex;
+        }
+
+    </style>
+
+    <script>
+    const emptySeatColor = '#ddcec3'
+
+    // 半角10文字, 全角6文字までOK
+    const maxDisplayNameLength = 6
+
+    window.onload = function () {
+      const numSeats = 23
+
+      for(let n = 0; n < numSeats; n++) {
+        const seatNum = n + 1
+        const seatElement = document.getElementById('seat-' + seatNum.toString())
+        seatElement.innerText = seatNum.toString() + '\n'
+        // document.getElementById(elementId).style.backgroundColor = emptySeatColor
+
+        seatElement.onclick = function () {
+          // flutter
+          getData.postMessage(seatNum)
+        }
+      }
+    }
+
+    function flutterSetUser(seatNum, displayName) {
+      const seatElement = document.getElementById('seat-' + seatNum.toString())
+      if (displayName.length > maxDisplayNameLength) {
+        displayName = displayName.substring(0, 4) + '…'
+      }
+      seatElement.innerText = seatNum.toString() + '\n' + displayName
+    }
+
+    function flutterUnsetUser(seatNum) {
+      const seatElement = document.getElementById('seat-' + seatNum.toString())
+      seatElement.innerText = seatNum.toString()
+    }
+  </script>
+
+</head>
+<body>
+
+    <div id="room">
+        <div id="group-1" class="group">
+            <div id="seat-1" class="seat"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="seat-2" class="seat"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="seat-3" class="seat"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="seat-4" class="seat"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="seat-5" class="seat"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="seat-6" class="seat"></div>
+            <div class="separator separator-horizontal"></div>
+            <div id="seat-7" class="seat"></div>
+        </div>
+
+        <div id="group-2" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="seat-8" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-9" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-10" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-11" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+
+        <div id="separator-1" class="separator separator-horizontal"></div>
+
+        <div id="group-3" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="seat-12" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-13" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-14" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-15" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+
+
+        <div id="group-4" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="seat-16" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-17" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-18" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-19" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+
+        <div id="separator-2" class="separator separator-horizontal"></div>
+
+        <div id="group-5" class="group">
+            <div class="separator separator-vertical"></div>
+            <div id="seat-20" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-21" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-22" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+            <div id="seat-23" class="seat"></div>
+            <div class="separator separator-vertical"></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
