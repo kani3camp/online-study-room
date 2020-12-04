@@ -75,7 +75,7 @@ module.exports = {
         trailingComma: 'es5',
         semi: false,
         printWidth: 110,
-        endOfLine: 'lf',
+        endOfLine: 'auto',
       },
     ],
     'vue/singleline-html-element-content-newline': 'off',

@@ -20,9 +20,14 @@ export default {
     const response = await fetch(url.toString(), { method: 'GET' })
     const res_html = await response.text()
     const dom_parser = new DOMParser()
-    const layout_doc = dom_parser.parseFromString(this.escape_html(res_html), 'text/html')
-    document.getElementById('room-layout').appendChild(layout_doc.body)
-    console.log('どう？')
+    try {
+      const layout_doc = dom_parser.parseFromString(this.escape_html(res_html), 'text/html')
+      document.getElementById('room-layout').appendChild(layout_doc.body)
+      console.log('どう？')
+      console.log(layout_doc)
+    } catch (e) {
+      console.error(e)
+    }
   },
   methods: {
     escape_html(string) {
