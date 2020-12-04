@@ -14,9 +14,7 @@ type RoomsResponseStruct struct {
 
 func Rooms(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
-
-	UpdateDatabase(client, ctx) // todo 頻繁にアクセスされるこの関数で毎回するには適さない。読み込みが増えすぎる。
+	defer CloseFirestoreClient(client)
 
 	var apiResp RoomsResponseStruct
 

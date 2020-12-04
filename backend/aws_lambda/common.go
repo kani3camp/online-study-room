@@ -26,11 +26,11 @@ const API = "api"
 const NEWS = "news"
 
 const ProjectId = "online-study-space"
-const PathToServiceAccount = "path/to/serviceAccount.json"	// todo
+const PathToServiceAccount = "path/to/serviceAccount.json" // todo
 
 //var ProjectId = os.Getenv("GOOGLE_CLOUD_PROJECT")	// なんか代入されない
 
-const TimeLimit = 1800 // 秒
+const TimeLimit = 180 // 秒
 
 const user_id = "user_id"
 const room_id = "room_id"
@@ -55,11 +55,11 @@ type RoomStruct struct {
 }
 
 type RoomBodyStruct struct {
-	Created time.Time `firestore:"created" json:"created"`
-	Name    string    `firestore:"name" json:"name"`
-	Users   []string  `firestore:"users" json:"users"`
-	Type string `firestore:"type" json:"type"`
-	ThemeColorHex string `firestore:"theme-color-hex" json:"theme_color_hex"`
+	Created       time.Time `firestore:"created" json:"created"`
+	Name          string    `firestore:"name" json:"name"`
+	Users         []string  `firestore:"users" json:"users"`
+	Type          string    `firestore:"type" json:"type"`
+	ThemeColorHex string    `firestore:"theme-color-hex" json:"theme_color_hex"`
 }
 
 type UserStruct struct {
@@ -69,16 +69,16 @@ type UserStruct struct {
 }
 
 type UserBodyStruct struct {
-	In          string    `firestore:"in" json:"in"`
-	LastAccess  time.Time `firestore:"last-access" json:"last_access"`
-	LastEntered time.Time `firestore:"last-entered" json:"last_entered"`
-	LastExited  time.Time `firestore:"last-exited" json:"last_exited"`
-	LastStudied time.Time `firestore:"last-studied" json:"last_studied"`
+	In               string    `firestore:"in" json:"in"`
+	LastAccess       time.Time `firestore:"last-access" json:"last_access"`
+	LastEntered      time.Time `firestore:"last-entered" json:"last_entered"`
+	LastExited       time.Time `firestore:"last-exited" json:"last_exited"`
+	LastStudied      time.Time `firestore:"last-studied" json:"last_studied"`
 	Online           bool      `firestore:"online" json:"online"`
 	Status           string    `firestore:"status" json:"status"`
 	RegistrationDate time.Time `firestore:"registration-date" json:"registration_date"`
-	TotalStudyTime int64 `firestore:"total-study-time" json:"total_study_time"`
-	TotalBreakTime int64 `firestore:"total-break-time" json:"total_break_time"`
+	TotalStudyTime   int64     `firestore:"total-study-time" json:"total_study_time"`
+	TotalBreakTime   int64     `firestore:"total-break-time" json:"total_break_time"`
 }
 
 type NewsStruct struct {
@@ -94,10 +94,10 @@ type NewsBodyStruct struct {
 }
 
 type EnteringAndLeavingHistoryStruct struct {
-	Activity string `firestore:"activity"`
-	Room string `firestore:"room"`
-	Date time.Time `firestore:"date"`
-	UserId string `firestore:"user-id"`
+	Activity string    `firestore:"activity"`
+	Room     string    `firestore:"room"`
+	Date     time.Time `firestore:"date"`
+	UserId   string    `firestore:"user-id"`
 }
 
 func InitializeHttpFunc() (context.Context, *firestore.Client) {
@@ -113,7 +113,7 @@ func InitializeEventFunc() (context.Context, *firestore.Client) {
 func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 	var client *firestore.Client
 	var err1, err2 error
-	awsCredential, err1 := retrieveFirebaseCredentialInBytes()
+	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
 	if err1 != nil {
 		client, err2 = firestore.NewClient(ctx, ProjectId)
 	} else {
@@ -130,7 +130,7 @@ func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
 	var app *firebase.App
 	var err1, err2 error
-	awsCredential, err1 := retrieveFirebaseCredentialInBytes()
+	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
 	if err1 != nil {
 		app, err2 = firebase.NewApp(ctx, nil)
 	} else {
@@ -155,7 +155,14 @@ func InitializeFirebaseAuthClient(ctx context.Context) (*auth.Client, error) {
 	return authClient, err
 }
 
-func retrieveFirebaseCredentialInBytes() ([]byte, error) {
+func CloseFirestoreClient(client *firestore.Client) {
+	err := client.Close()
+	if err != nil {
+		log.Println("failed to close firestore client.")
+	}
+}
+
+func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
 	secretName := "firestore-service-account"
 	region := "ap-northeast-1"
 
@@ -415,7 +422,7 @@ func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Conte
 	} else {
 		_ = room.DataTo(&roomBodyStruct)
 		if roomBodyStruct.Users == nil {
-			roomBodyStruct.Users = []string{}	// jsonにした時、中身がない場合にnullではなく[]にする
+			roomBodyStruct.Users = []string{} // jsonにした時、中身がない場合にnullではなく[]にする
 		}
 		return roomBodyStruct, nil
 	}
@@ -533,10 +540,10 @@ func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (
 
 func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorHex string, client *firestore.Client, ctx context.Context) error {
 	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
-		"name":    roomName,
-		"type":    roomType,
-		"users":   []string{},
-		"created": time.Now(),
+		"name":            roomName,
+		"type":            roomType,
+		"users":           []string{},
+		"created":         time.Now(),
 		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
 	if err != nil {
@@ -546,8 +553,8 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorH
 }
 
 // 全オンラインユーザーの最終アクセス時間を調べ、タイムアウトを判断して処理
-func UpdateDatabase(client *firestore.Client, ctx context.Context)  {
-	fmt.Println("updating database...")
+func _UpdateDatabase(client *firestore.Client, ctx context.Context) {
+	log.Println("updating database...")
 
 	users, err := RetrieveOnlineUsers(client, ctx)
 	if err != nil {
@@ -590,7 +597,6 @@ func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx cont
 	return err
 }
 
-
 // todo 定期実行
 //func CheckHistoryConsistency(client *firestore.Client, ctx context.Context) error {
 //	// 全ユーザーの入退室の整合性がとれているか（入室と退室が必ずペアで記録できているか）
@@ -616,7 +622,7 @@ func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx cont
 
 func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *firestore.Client, ctx context.Context) {
 	var historyData EnteringAndLeavingHistoryStruct
-	
+
 	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room", "==", roomId).Where("activity", "==", EnterActivity).OrderBy("date", firestore.Desc).Limit(1).Documents(ctx).GetAll()
 	if err != nil {
 		log.Fatalln("could not fetch entering history: " + err.Error())
@@ -625,14 +631,14 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 	enteredDate := historyData.Date
 	duration := leftDate.Sub(enteredDate)
 	log.Printf("duration: %v", duration)
-	
+
 	roomBody, _ := RetrieveRoomInfo(roomId, client, ctx)
 	roomType := roomBody.Type
-	
+
 	userBody, _ := RetrieveUserInfo(userId, client, ctx)
 	totalStudyTime := time.Duration(userBody.TotalStudyTime) * time.Second
 	totalBreakTime := time.Duration(userBody.TotalBreakTime) * time.Second
-	
+
 	if roomType == "study" {
 		totalStudyTime = totalStudyTime + duration
 		log.Printf("new totalStudyTime: %v", totalStudyTime)
