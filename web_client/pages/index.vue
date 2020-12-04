@@ -5,9 +5,10 @@
     <ToolBar />
 
     <!--    todo-->
-    <!--    <RoomLayout />-->
 
     <v-main>
+      <RoomLayout />
+
       <v-container>
         <v-flex>
           <v-row>

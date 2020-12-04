@@ -1,6 +1,12 @@
 <template :src="layoutFile">
   <!--  todo このdivは消す-->
-  <div />
+  <div>
+    <input
+      type="file"
+      @change="onChangeFile"
+    >
+    <div v-html="layoutRawHtml" />
+  </div>
 </template>
 
 <script>
@@ -9,11 +15,26 @@ export default {
   props: [],
   data: () => ({
     layoutFile: '@/assets/english-room.html',
+    layoutRawHtml: '',
     emptySeatColor: '#ddcec3',
     maxDisplayNameLength: 6,
   }),
-  mounted() {},
+  async mounted() {},
   methods: {
+    onChangeFile: function (event) {
+      const file = event.target.files[0]
+      if (!file) {
+        console.log('no file')
+        return false
+      }
+      const vm = this
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        vm.layoutRawHtml = e.target.result
+        console.log('layoutRawHtml: ', this.layoutRawHtml)
+      }
+      reader.readAsText(file)
+    },
     window: (onload = function () {
       const numSeats = 23
 
