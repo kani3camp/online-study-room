@@ -105,9 +105,25 @@ import firebase from '@/plugins/firebase'
 
 export default {
   name: 'Room',
+  beforeRouteLeave(to, from, next) {
+    if (this.$store.state.room_id != null) {
+      window.alert('退室する場合は退室ボタンを押してください。')
+    } else {
+      window.onbeforeunload = null
+      console.log('remove beforeunload')
+      console.log(window.onbeforeunload)
+      next()
+    }
+  },
+  props: {
+    propRoomName: {
+      type: String,
+      default: '',
+    },
+  },
   data: () => ({
-    room_name: null,
-    entered_time: null,
+    room_name: '',
+    entered_time: new Date().getHours() + '時' + new Date().getMinutes() + '分',
     room_status: null,
     if_show_dialog: false,
     exiting: false,
@@ -134,17 +150,32 @@ export default {
       await vm.$router.push('/')
     }
   },
-  destroyed() {
+  mounted() {
+    if (this.propRoomName) {
+      this.room_name = this.propRoomName
+    }
+    window.onbeforeunload = (e) => this.showAlert(e)
+    console.log('add beforeunload')
+    console.log(window.onbeforeunload)
+  },
+  beforeDestroy() {
     clearTimeout(this.stay_awake_timeout)
     clearTimeout(this.user_timeout)
     this.socket.close()
+    if (this.$store.state.room_id != null) {
+      this.exitRoom()
+    }
   },
   methods: {
+    showAlert(e) {
+      e.returnValue = '退室する場合は退室ボタンを押してください。'
+    },
     async startStudying() {
       // websocket
       const vm = this
       vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
       vm.socket.onopen = async () => {
+        console.log('socket opened.')
         vm.is_socket_open = true
         const params = {
           action: 'connect',
