@@ -1,39 +1,49 @@
-<template :src="layoutFile">
-  <!--  todo このdivは消す-->
-  <div>
-    <input
-      type="file"
-      @change="onChangeFile"
-    >
-    <div v-html="layoutRawHtml" />
-  </div>
+<template>
+  <div id="room-layout" />
 </template>
 
 <script>
+import common from '@/plugins/common'
 export default {
   name: 'RoomLayout',
   props: [],
   data: () => ({
     layoutFile: '@/assets/english-room.html',
-    layoutRawHtml: '',
     emptySeatColor: '#ddcec3',
     maxDisplayNameLength: 6,
   }),
-  async mounted() {},
+  async created() {
+    const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_layout')
+    url.search = new URLSearchParams({
+      room_id: 'english-room',
+    }).toString()
+    const response = await fetch(url.toString(), { method: 'GET' })
+    const res_html = await response.text()
+    const dom_parser = new DOMParser()
+    try {
+      const layout_doc = dom_parser.parseFromString(this.escape_html(res_html), 'text/html')
+      document.getElementById('room-layout').appendChild(layout_doc.body)
+      console.log('どう？')
+      console.log(layout_doc)
+    } catch (e) {
+      console.error(e)
+    }
+  },
   methods: {
-    onChangeFile: function (event) {
-      const file = event.target.files[0]
-      if (!file) {
-        console.log('no file')
-        return false
+    escape_html(string) {
+      if (typeof string !== 'string') {
+        return string
       }
-      const vm = this
-      const reader = new FileReader()
-      reader.onload = function (e) {
-        vm.layoutRawHtml = e.target.result
-        console.log('layoutRawHtml: ', this.layoutRawHtml)
-      }
-      reader.readAsText(file)
+      return string.replace(/[&'`"<>]/g, function (match) {
+        return {
+          '&': '&amp;',
+          "'": '&#x27;',
+          '`': '&#x60;',
+          '"': '&quot;',
+          '<': '&lt;',
+          '>': '&gt;',
+        }[match]
+      })
     },
     window: (onload = function () {
       const numSeats = 23
@@ -41,10 +51,12 @@ export default {
       for (let n = 0; n < numSeats; n++) {
         const seatNum = n + 1
         const seatElement = document.getElementById('seat-' + seatNum.toString())
-        seatElement.innerText = seatNum.toString() + '\n'
-        // document.getElementById(elementId).style.backgroundColor = emptySeatColor
+        if (seatElement) {
+          seatElement.innerText = seatNum.toString() + '\n'
+          // document.getElementById(elementId).style.backgroundColor = emptySeatColor
 
-        seatElement.onclick = function () {}
+          seatElement.onclick = function () {}
+        }
       }
     }),
   },
