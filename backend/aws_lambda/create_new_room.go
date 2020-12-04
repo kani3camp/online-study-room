@@ -8,10 +8,10 @@ import (
 )
 
 type CreateNewRoomParams struct {
-	RoomId string `json:"room_id"`
-	RoomName string `json:"room_name"`
-	RoomType string `json:"room_type"`
-	Password string `json:"password"`
+	RoomId        string `json:"room_id"`
+	RoomName      string `json:"room_name"`
+	RoomType      string `json:"room_type"`
+	Password      string `json:"password"`
 	ThemeColorHex string `json:"theme_color_hex"`
 }
 
@@ -22,7 +22,7 @@ type CreateNewRoomResponseStruct struct {
 
 func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp CreateNewRoomResponseStruct
 	body := request.Body
@@ -31,12 +31,11 @@ func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 
 	roomId, roomName, roomType, themeColorHex := params.RoomId, params.RoomName, params.RoomType, params.ThemeColorHex
 	password := params.Password
-	
+
 	if roomId == "" || roomName == "" || roomType == "" || password == "" || themeColorHex == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
-	} else
-	if password != os.Getenv("password") {
+	} else if password != os.Getenv("password") {
 		apiResp.Result = ERROR
 		apiResp.Message = "Invalid password."
 	} else {
@@ -65,4 +64,3 @@ func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 func main() {
 	lambda.Start(CreateNewRoom)
 }
-

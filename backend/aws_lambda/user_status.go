@@ -15,7 +15,7 @@ type UserStatusResponseStruct struct {
 
 func UserStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	userId := request.QueryStringParameters[user_id]
 	var apiResp UserStatusResponseStruct

@@ -158,6 +158,8 @@ func CloseFirestoreClient(client *firestore.Client) {
 	err := client.Close()
 	if err != nil {
 		log.Println("failed to close firestore client.")
+	} else {
+		log.Println("firestore client closed.")
 	}
 }
 

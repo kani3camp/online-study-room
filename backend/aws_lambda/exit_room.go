@@ -7,8 +7,8 @@ import (
 )
 
 type ExitRoomParams struct {
-	RoomId string `json:"room_id"`
-	UserId string `json:"user_id"`
+	RoomId  string `json:"room_id"`
+	UserId  string `json:"user_id"`
 	IdToken string `json:"id_token"`
 }
 
@@ -19,7 +19,7 @@ type ExitRoomResponseStruct struct {
 
 func ExitRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp ExitRoomResponseStruct
 	body := request.Body
@@ -46,6 +46,6 @@ func ExitRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResp
 	return Response(bytes)
 }
 
-func main()  {
+func main() {
 	lambda.Start(ExitRoom)
 }

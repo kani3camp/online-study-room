@@ -21,8 +21,8 @@ func CreateNewUser(userId string, client *firestore.Client, ctx context.Context)
 		"last-access":       time.Now(),
 		"online":            false,
 		"status":            "",
-		"total-study-time": 0,
-		"total-break-time": 0,
+		"total-study-time":  0,
+		"total-break-time":  0,
 	})
 	if err != nil {
 		log.Println("failed to create new user")
@@ -31,10 +31,10 @@ func CreateNewUser(userId string, client *firestore.Client, ctx context.Context)
 	return err
 }
 
-func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent)  error {
+func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent) error {
 	_, client := InitializeEventFunc()
-	defer client.Close()
-	
+	defer CloseFirestoreClient(client)
+
 	userId := e.UID
 	_ = CreateNewUser(userId, client, ctx)
 	return nil

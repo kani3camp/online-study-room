@@ -51,18 +51,18 @@ type Values struct {
 func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	now := time.Now()
 	_, client := InitializeEventFunc()
-	defer client.Close()
-	
+	defer CloseFirestoreClient(client)
+
 	_, err := metadata.FromContext(ctx)
 	if err != nil {
 		return fmt.Errorf("metadata.FromContext: %v", err)
 	}
-	
+
 	previousUsers := e.OldValue.Fields.Users.ArrayValue.Values
 	newUsers := e.Value.Fields.Users.ArrayValue.Values
-	
+
 	var enteredUser, leftUser []string
-	
+
 	for _, newUser := range newUsers {
 		if len(previousUsers) > 0 {
 			for j, previousUser := range previousUsers {
@@ -89,7 +89,7 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 			leftUser = append(leftUser, previousUser.StringValue)
 		}
 	}
-	
+
 	if len(enteredUser) > 1 {
 		log.Fatalln("more than 1 people entered : ", enteredUser)
 	}
@@ -100,18 +100,18 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		log.Println("previousUsers : ", previousUsers)
 		log.Println("newUsers : ", newUsers)
 	}
-	
+
 	usersCollectionRef := client.Collection(USERS)
 	fullPath := strings.Split(e.Value.Name, "/documents/")[1]
 	pathParts := strings.Split(fullPath, "/")
 	doc := strings.Join(pathParts[1:], "/")
-	
+
 	if len(enteredUser) > 0 {
 		log.Printf("Entered! entered_user is %s\n", enteredUser[0])
 		userId := enteredUser[0]
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
-			"online":      true,
-			"in":          doc,
+			"online": true,
+			"in":     doc,
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Println("failed to update user info of " + userId + ".")
@@ -148,7 +148,7 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 			"date":     now,
 		}, client, ctx)
 		defer UpdateTotalTime(userId, doc, now, client, ctx)
-		
+
 		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
 		user, _ := authClient.GetUser(ctx, userId)

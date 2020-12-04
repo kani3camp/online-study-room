@@ -15,7 +15,7 @@ type RoomStatusResponseStruct struct {
 
 func RoomStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp RoomStatusResponseStruct
 	roomId := request.QueryStringParameters[room_id]

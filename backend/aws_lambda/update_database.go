@@ -13,7 +13,7 @@ type UpdateDatabaseResponseStruct struct {
 
 func UpdateDatabase(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp UpdateDatabaseResponseStruct
 

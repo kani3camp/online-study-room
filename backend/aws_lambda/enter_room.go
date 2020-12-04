@@ -8,8 +8,8 @@ import (
 )
 
 type EnterRoomParams struct {
-	RoomId string `json:"room_id"`
-	UserId string `json:"user_id"`
+	RoomId  string `json:"room_id"`
+	UserId  string `json:"user_id"`
 	IdToken string `json:"id_token"`
 }
 
@@ -20,7 +20,7 @@ type EnterRoomResponseStruct struct {
 
 func EnterRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp EnterRoomResponseStruct
 	body := request.Body
@@ -51,7 +51,7 @@ func EnterRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRes
 				apiResp.Message = "you are already in the " + currentRoomId
 			} else {
 				_ = LeaveRoom(currentRoomId, userId, client, ctx)
-				client.Close()
+				_ = client.Close()
 
 				client, _ = InitializeFirestoreClient(ctx)
 				_ = _EnterRoom(roomId, userId, client, ctx)
@@ -73,4 +73,3 @@ func EnterRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRes
 func main() {
 	lambda.Start(EnterRoom)
 }
-

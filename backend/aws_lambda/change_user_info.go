@@ -8,9 +8,9 @@ import (
 )
 
 type ChangeUserInfoParams struct {
-	UserId string `json:"user_id"`
-	IdToken string `json:"id_token"`
-	DisplayName string `json:"display_name"`
+	UserId        string `json:"user_id"`
+	IdToken       string `json:"id_token"`
+	DisplayName   string `json:"display_name"`
 	StatusMessage string `json:"status_message"`
 }
 
@@ -19,10 +19,9 @@ type ChangeUserInfoResponseStruct struct {
 	Message string `json:"message"`
 }
 
-
 func ChangeUserInfo(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp ChangeUserInfoResponseStruct
 	body := request.Body

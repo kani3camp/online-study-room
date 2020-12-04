@@ -14,7 +14,7 @@ type OnlineUsersResponse struct {
 
 func OnlineUsers(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp OnlineUsersResponse
 	onlineUsers, _ := RetrieveOnlineUsers(client, ctx)

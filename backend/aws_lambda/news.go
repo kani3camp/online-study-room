@@ -15,10 +15,9 @@ type NewsResponseStruct struct {
 	NewsList []NewsStruct `json:"news_list"`
 }
 
-
 func News(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp NewsResponseStruct
 

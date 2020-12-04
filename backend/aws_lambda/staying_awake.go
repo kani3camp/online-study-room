@@ -7,7 +7,7 @@ import (
 )
 
 type StayingAwakeParams struct {
-	UserId string `json:"user_id"`
+	UserId  string `json:"user_id"`
 	IdToken string `json:"id_token"`
 }
 type StayingAwakeResponseStruct struct {
@@ -18,7 +18,7 @@ type StayingAwakeResponseStruct struct {
 
 func StayingAwake(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	defer CloseFirestoreClient(client)
 
 	var apiResp StayingAwakeResponseStruct
 	body := request.Body
