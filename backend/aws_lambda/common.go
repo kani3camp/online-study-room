@@ -26,7 +26,6 @@ const API = "api"
 const NEWS = "news"
 
 const ProjectId = "online-study-space"
-const PathToServiceAccount = "path/to/serviceAccount.json" // todo
 
 //var ProjectId = os.Getenv("GOOGLE_CLOUD_PROJECT")	// なんか代入されない
 
