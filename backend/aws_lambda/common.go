@@ -25,6 +25,7 @@ const HISTORY = "history"
 const CONFIG = "config"
 const API = "api"
 const ROOM_LAYOUTS_INFO = "room-layouts-info"
+const ROOM_LAYOUTS = "room-layouts"
 const NEWS = "news"
 
 const ProjectId = "online-study-space"
@@ -104,6 +105,35 @@ type EnteringAndLeavingHistoryStruct struct {
 type RoomLayoutsInfoConfigStruct struct {
 	BucketName  string            `firestore:"bucket-name"`
 	ObjectPaths map[string]string `firestore:"object-paths"`
+}
+
+type RoomLayoutStruct struct {
+	RoomId string `json:"room_id" firestore:"room-id"`
+	Version int `json:"version" firestore:"version"`
+	RoomShape struct {
+		Height int `json:"height" firestore:"height"`
+		Width int `json:"width" firestore:"width"`
+	} `json:"room_shape" firestore:"room-shape"`
+	SeatShape struct {
+		Height int `json:"height" firestore:"height"`
+		Width int `json:"width" firestore:"width"`
+	} `json:"seat_shape" firestore:"seat-shape"`
+	PartitionShapes []struct{
+		Name string `json:"name" firestore:"name"`
+		Width int `json:"width" firestore:"width"`
+		Height int `json:"height" firestore:"height"`
+	} `json:"partition_shapes" firestore:"partition-shapes"`
+	Seats []struct {
+		Id int `json:"id" firestore:"id"`
+		X int `json:"x" firestore:"x"`
+		Y int `json:"y" firestore:"y"`
+	} `json:"seats" firestore:"seats"`
+	Partitions []struct {
+		Id int `json:"id" firestore:"id"`
+		X int `json:"x" firestore:"x"`
+		Y int `json:"y" firestore:"y"`
+		ShapeType string `json:"shape_type" firestore:"shape-type"`
+	} `json:"partitions" firestore:"partitions"`
 }
 
 func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
@@ -765,4 +795,13 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 			log.Fatalln("Failed to update user info of " + userId)
 		}
 	}
+}
+
+func RetrieveRoomLayout(roomId string, client *firestore.Client, ctx context.Context) (RoomLayoutStruct, error) {
+	
+	return
+}
+
+func CurrentRoomLayoutVersion(roomId string, client *firestore.Client, ctx context.Context) (int, error) {
+	client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get()
 }

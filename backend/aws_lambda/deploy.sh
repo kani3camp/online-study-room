@@ -1,12 +1,12 @@
 # Windows
 
 set GOOS=linux
-go build -o main common.go room_layout.go
+go build -o main common.go upload_room_layout.go
 C:\Users\momom\go\bin\build-lambda-zip.exe -output main.zip main
 
-aws lambda create-function --function-name room_layout --runtime go1.x --zip-file fileb://main.zip --handler main --role arn:aws:iam::652333062396:role/service-role/my-first-golang-lambda-function-role-cb8uw4th
+aws lambda create-function --function-name upload_room_layout --runtime go1.x --zip-file fileb://main.zip --handler main --role arn:aws:iam::652333062396:role/service-role/my-first-golang-lambda-function-role-cb8uw4th
 
-aws lambda update-function-code --function-name room_layout --zip-file fileb://main.zip
+aws lambda update-function-code --function-name upload_room_layout --zip-file fileb://main.zip
 
 
 # Mac OS
