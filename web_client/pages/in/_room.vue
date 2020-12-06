@@ -23,7 +23,7 @@
       />
 
       <v-layout justify-center>
-        <v-toolbar-title>{{ room_name }} の部屋</v-toolbar-title>
+        <v-toolbar-title>{{ propRoomName }} の部屋</v-toolbar-title>
       </v-layout>
     </v-app-bar>
 
@@ -105,11 +105,10 @@ export default {
   props: {
     propRoomName: {
       type: String,
-      default: '',
+      required: true,
     },
   },
   data: () => ({
-    room_name: '',
     entered_time: new Date().getHours() + '時' + new Date().getMinutes() + '分',
     room_status: null,
     if_show_dialog: false,
@@ -138,9 +137,6 @@ export default {
     }
   },
   mounted() {
-    if (this.propRoomName) {
-      this.room_name = this.propRoomName
-    }
     window.onbeforeunload = (e) => this.showAlert(e)
     console.log('add beforeunload')
     console.log(window.onbeforeunload)
@@ -231,13 +227,12 @@ export default {
     async fetchRoomData() {
       if (this.$store.state.isSignedIn) {
         const vm = this
-        const room_id = vm.$store.state.room_id
+        const room_name = vm.$store.state.room_id
         let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
         let params = { room_id }
         const resp = await common.httpGet(url, params)
 
         if (resp.result === 'ok') {
-          this.room_name = resp.room_status['room_body'].name
           this.room_status = resp.room_status
         }
       } else {

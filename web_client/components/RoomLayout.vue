@@ -1,39 +1,71 @@
 <template>
-  <div
-    id="room-layout"
-    ref="roomLayout"
-    :style="{
-      width: roomShape.width,
-      height: roomShape.height
-    }"
-  >
-    <div
-      v-for="(seat, index) in layout.seats"
-      :key="seat.id"
-      class="seat"
-      :style="{
-        backgroundColor: emptySeatColor,
-        left: seatPositions[index].x+'%',
-        top: seatPositions[index].y+'%',
-        width: seatShape.width+'%',
-        height: seatShape.height+'%',
-        fontSize: seatFontSize
-      }"
-    >
-      {{ seat.id + '\n' }}
+  <div>
+
+    <div id="seat-selector">
+      <v-form class="mx-auto">
+        <v-select
+          v-model="selected_seat_id"
+          :items="layout.seats"
+          item-value="id"
+          item-text="id"
+          label="座席番号"
+          outlined
+        />
+        <div>
+          <v-btn
+            color="primary"
+            block
+            elevation="3"
+            :disabled="! selected_seat_id"
+            @click="select"
+          >
+            決定
+          </v-btn>
+        </div>
+      </v-form>
     </div>
 
-    <div
-      v-for="(partition, index) in layout.partitions"
-      :key="partition.id"
-      class="partition"
-      :style="{
-        left: partitionPositions[index].x+'%',
-        top: partitionPositions[index].y+'%',
-        width: partitionShapes[index].width+'%',
-        height: partitionShapes[index].height+'%'
-      }"
-    />
+    <v-card
+      class="mt-3"
+    >
+
+      <div
+        id="room-layout"
+        ref="roomLayout"
+        :style="{
+          width: roomShape.width,
+          height: roomShape.height
+        }"
+      >
+        <div
+          v-for="(seat, index) in layout.seats"
+          :key="seat.id"
+          class="seat"
+          :style="{
+            backgroundColor: emptySeatColor,
+            left: seatPositions[index].x+'%',
+            top: seatPositions[index].y+'%',
+            width: seatShape.width+'%',
+            height: seatShape.height+'%',
+            fontSize: seatFontSize
+          }"
+        >
+          {{ seat.id + '\n' }}
+        </div>
+
+        <div
+          v-for="(partition, index) in layout.partitions"
+          :key="partition.id"
+          class="partition"
+          :style="{
+            left: partitionPositions[index].x+'%',
+            top: partitionPositions[index].y+'%',
+            width: partitionShapes[index].width+'%',
+            height: partitionShapes[index].height+'%'
+          }"
+        />
+      </div>
+    </v-card>
   </div>
 </template>
 
@@ -46,43 +78,66 @@ export default {
   comments: {
     Seat,
   },
-  props: [],
+  props: {
+    roomId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       emptySeatColor: '#e5b796',
       seatFontSize: 80 + '%',
       layout: roomLayoutJson,
       isMounted: false,
+      selected_seat_id: null,
     }
   },
   computed: {
     roomShape: {
+      // get() {
+      //   if (this.isMounted) {
+      //     console.log('再度')
+      //     const roomLayoutWidth = this.$refs.roomLayout.clientWidth
+      //     const roomLayoutHeight = this.$refs.roomLayout.clientHeight
+      //     if (roomLayoutWidth > roomLayoutHeight) {
+      //       // 横長画面
+      //       const widthPx =
+      //         (roomLayoutHeight * this.layout['room_shape'].width) / this.layout['room_shape'].height
+      //       return {
+      //         width: widthPx + 'px',
+      //         height: roomLayoutHeight + 'px',
+      //         seatFontSize: widthPx * this.layout['font_size_ratio'] + 'px',
+      //       }
+      //     } else {
+      //       // 縦長画面
+      //       return {
+      //         width: roomLayoutWidth + 'px',
+      //         height:
+      //           (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
+      //       }
+      //     }
+      //   } else {
+      //     return {
+      //       width: 100 + 'vw',
+      //       height: 90 + 'vh',
+      //     }
+      //   }
+      // },
       get() {
         if (this.isMounted) {
-          console.log('再度')
+          console.log('再度roomShape')
           const roomLayoutWidth = this.$refs.roomLayout.clientWidth
-          const roomLayoutHeight = this.$refs.roomLayout.clientHeight
-          if (roomLayoutWidth > roomLayoutHeight) {
-            // 横長画面
-            const widthPx =
-              (roomLayoutHeight * this.layout['room_shape'].width) / this.layout['room_shape'].height
-            return {
-              width: widthPx + 'px',
-              height: roomLayoutHeight + 'px',
-              seatFontSize: widthPx * this.layout['font_size_ratio'] + 'px',
-            }
-          } else {
-            // 縦長画面
-            return {
-              width: roomLayoutWidth + 'px',
-              height:
-                (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
-            }
+          return {
+            width: 100 + '%',
+            height:
+              (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
+            seatFontSize: roomLayoutWidth * this.layout['font_size_ratio'] + 'px',
           }
         } else {
           return {
-            width: 100 + 'vw',
-            height: 90 + 'vh',
+            width: 100 + '%',
+            height: 100 + 'vh',
           }
         }
       },
@@ -139,16 +194,22 @@ export default {
     roomShape: function (newValue, oldValue) {
       this.seatFontSize = newValue.seatFontSize
     },
+    created() {
+      console.log(this.layout)
+    },
+    async mounted() {
+      console.log('mounted()')
+      this.isMounted = true
+      this.determineFontSize()
+    },
   },
-  created() {
-    console.log(this.layout)
-  },
-  async mounted() {
-    console.log('mounted()')
+  mounted() {
     this.isMounted = true
-    this.determineFontSize()
   },
   methods: {
+    select() {
+      this.$emit('selected', this.selected_seat_id)
+    },
     determineFontSize() {
       const roomLayoutWidth = this.$refs.roomLayout.clientWidth
       const roomLayoutHeight = this.$refs.roomLayout.clientHeight

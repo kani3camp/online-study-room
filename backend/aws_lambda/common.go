@@ -60,7 +60,10 @@ type RoomStruct struct {
 type RoomBodyStruct struct {
 	Created       time.Time `firestore:"created" json:"created"`
 	Name          string    `firestore:"name" json:"name"`
-	Users         []string  `firestore:"users" json:"users"`
+	Users         []struct {
+		SeatId int `firestore:"seat-id" json:"seat_id"`
+		UserId string `firestore:"user-id" json:"user_id"`
+	}  `firestore:"users" json:"users"`
 	Type          string    `firestore:"type" json:"type"`
 	ThemeColorHex string    `firestore:"theme-color-hex" json:"theme_color_hex"`
 }
@@ -406,7 +409,7 @@ func IsInRoom(roomId string, userId string, client *firestore.Client, ctx contex
 	}
 	users := room.Users
 	for _, u := range users {
-		if u == userId {
+		if u.UserId == userId {
 			return true, nil
 		}
 	}
@@ -475,7 +478,10 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 			Body:   _room,
 		}
 		if room.Body.Users == nil {
-			room.Body.Users = []string{}
+			room.Body.Users = []struct{
+				SeatId int `firestore:"seat-id" json:"seat_id"`
+				UserId string `firestore:"user-id" json:"user_id"`
+			}{}
 		}
 		rooms = append(rooms, room)
 	}
@@ -533,14 +539,14 @@ func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Cont
 	roomInfo, err := RetrieveRoomInfo(roomId, client, ctx)
 	if err != nil {
 	} else {
-		for _, userId := range roomInfo.Users {
-			userBody, err := RetrieveUserInfo(userId, client, ctx)
+		for _, user := range roomInfo.Users {
+			userBody, err := RetrieveUserInfo(user.UserId, client, ctx)
 			if err != nil {
 			} else {
-				user, _ := authClient.GetUser(ctx, userId)
+				userInfo, _ := authClient.GetUser(ctx, user.UserId)
 				users = append(users, UserStruct{
-					UserId:      userId,
-					DisplayName: user.DisplayName,
+					UserId:      user.UserId,
+					DisplayName: userInfo.DisplayName,
 					Body:        userBody,
 				})
 			}
@@ -562,7 +568,10 @@ func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Conte
 	} else {
 		_ = room.DataTo(&roomBodyStruct)
 		if roomBodyStruct.Users == nil {
-			roomBodyStruct.Users = []string{} // jsonにした時、中身がない場合にnullではなく[]にする
+			roomBodyStruct.Users = []struct{
+				SeatId int `firestore:"seat-id" json:"seat_id"`
+				UserId string `firestore:"user-id" json:"user_id"`
+			}{} // jsonにした時、中身がない場合にnullではなく[]にする
 		}
 		return roomBodyStruct, nil
 	}
@@ -669,7 +678,7 @@ func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (
 		for _, room := range rooms {
 			users := room.Body.Users
 			for _, user := range users {
-				if user == userId {
+				if user.UserId == userId {
 					return room.RoomId, nil
 				}
 			}

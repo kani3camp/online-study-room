@@ -64,7 +64,7 @@
                 <v-card
                   class="ma-2 pa-3"
                   :elevation="hover ? 10 : 2"
-                  @click="confirmEntering(index)"
+                  @click="enterRoom(index)"
                 >
                   <v-card-title>
                     {{ room['room_body'].name }}
@@ -95,15 +95,11 @@
         </v-flex>
       </v-container>
 
-
       <Dialog
         :if-show-dialog="if_show_dialog"
-        :loading="entering"
         :card-title="dialog_message"
-        :accept-needed="true"
-        accept-option-string="入室する"
-        cancel-option-string="キャンセル"
-        @accept="enterRoom"
+        :accept-needed="false"
+        cancel-option-string="OK"
         @cancel="if_show_dialog = false"
       />
 
@@ -142,7 +138,6 @@ export default {
     dialog_message: '',
     selected_index: -1,
     selected_room_name: '',
-    entering: false,
     loading: false,
     youtubeLink: common.key.youtubeLink,
   }),
@@ -162,46 +157,14 @@ export default {
     await this.loadRooms()
   },
   methods: {
-    confirmEntering(index) {
-      this.selected_index = index
-      this.selected_room_name = this.rooms[this.selected_index]['room_body'].name
+    async enterRoom(roomIndex) {
+      this.selected_room_name = this.rooms[roomIndex]['room_body'].name
       this.dialog_message = this.selected_room_name + 'の部屋 に入室しますか？'
-      this.if_show_dialog = true
-    },
-    async enterRoom() {
+
       if (this.$store.state.isSignedIn) {
         const vm = this
-
-        this.entering = true
-
-        const selected_room_id = this.rooms[this.selected_index].room_id
-        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
-        const params = {
-          user_id: firebase.auth().currentUser.uid,
-          id_token: await firebase.auth().currentUser.getIdToken(false),
-          room_id: selected_room_id,
-        }
-        const res = await common.httpPost(url, params).catch((e) => {
-          console.log(e)
-          vm.if_show_dialog = false
-          vm.dialog_message = '通信に失敗しました。もう一度試してください。'
-          vm.if_show_dialog_2 = true
-        })
-
-        if (res.result === 'ok') {
-          this.if_show_dialog = false
-          this.$store.commit('setRoomId', selected_room_id)
-          await this.$router.push('/in/' + selected_room_id)
-        } else {
-          console.log(res)
-          this.if_show_dialog = false
-          this.dialog_message = 'エラーが発生しました。'
-          this.if_show_dialog_2 = true
-        }
-
-        this.entering = false
+        await this.$router.push('/enter/' + vm.rooms[roomIndex].room_id)
       } else {
-        this.if_show_dialog = false
         this.dialog_message = 'サインインしてください。'
         this.if_show_dialog_2 = true
       }

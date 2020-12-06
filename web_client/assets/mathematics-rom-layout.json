@@ -1,5 +1,5 @@
 {
-  "room_id": "mathematics-room",
+  "room_name": "mathematics-room",
   "version": 4,
   "num_seats": 23,
   "font_size_ratio": 0.04,
