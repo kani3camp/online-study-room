@@ -49,29 +49,13 @@
         <p>アカウント設定ページからサインアウトできます。</p>
       </v-container>
 
-
-      <v-dialog
-        v-model="if_show_dialog_2"
-        width="500"
-      >
-        <v-card
-          class="mx-auto"
-          outlined
-        >
-          <v-card-title>{{ dialog_message }}</v-card-title>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              pr-0
-              text
-              @click="goToTopPage"
-            >
-              閉じる
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <Dialog
+        :if-show-dialog="if_show_dialog"
+        :card-title="dialog_message"
+        :accept-needed="false"
+        cancel-option-string="閉じる"
+        @cancel="goToTopPage"
+      />
     </v-main>
 
     <Footer />
@@ -85,16 +69,18 @@ import pressedImage from '~/assets/google_signin_buttons/web/2x/btn_google_signi
 import firebase from '@/plugins/firebase'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
+import Dialog from '~/components/Dialog'
 
 export default {
   name: 'SignIn',
   components: {
     NavigationDrawer,
     ToolBar,
+    Dialog,
   },
   data: () => ({
     imageSource: '',
-    if_show_dialog_2: false,
+    if_show_dialog: false,
     dialog_message: '',
   }),
   created() {
@@ -129,7 +115,7 @@ export default {
           console.log(error)
           vm.dialog_message = 'ログインに失敗しました。'
         })
-      vm.if_show_dialog_2 = true
+      vm.if_show_dialog = true
     },
   },
 }

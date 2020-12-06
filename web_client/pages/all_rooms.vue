@@ -58,63 +58,26 @@
         </v-row>
       </v-container>
 
-      <v-dialog
-        v-model="if_show_dialog"
-        width="500"
-      >
-        <v-card
-          class="mx-auto"
-          outlined
-          :loading="entering"
-        >
-          <v-card-title>
-            {{ selected_room_name }}の部屋 に入室しますか？
-          </v-card-title>
+      <Dialog
+        :if-show-dialog="if_show_dialog"
+        :loading="entering"
+        :card-title="dialog_message"
+        :accept-needed="true"
+        accept-option-string="入室する"
+        cancel-option-string="キャンセル"
+        @accept="enterRoom"
+        @cancel="if_show_dialog = false"
+      />
 
-          <v-card-actions box-sizing>
-            <v-spacer />
-            <v-btn
-              :disabled="entering"
-              text
-              color="primary"
-              @click="enterRoom"
-            >
-              入室する
-            </v-btn>
-            <v-btn
-              :disabled="entering"
-              pr-0
-              text
-              @click="if_show_dialog = false"
-            >
-              キャンセル
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-dialog
-        v-model="if_show_dialog_2"
-        width="500"
-      >
-        <v-card
-          class="mx-auto"
-          outlined
-        >
-          <v-card-title>{{ dialog_message }}</v-card-title>
-
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              text
-              pr-0
-              @click="if_show_dialog_2 = false"
-            >
-              閉じる
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <Dialog
+        :if-show-dialog="if_show_dialog_2"
+        :card-title="dialog_message"
+        :accept-needed="true"
+        accept-option-string="サインイン"
+        cancel-option-string="閉じる"
+        @accept="$router.push('/sign_in')"
+        @cancel="if_show_dialog_2=false"
+      />
     </v-main>
 
     <Footer />
@@ -126,20 +89,22 @@ import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
 import common from '@/plugins/common'
 import firebase from 'firebase/app'
+import Dialog from '~/components/Dialog'
 
 export default {
   name: 'AllRooms',
   components: {
     NavigationDrawer,
     ToolBar,
+    Dialog,
   },
   data: () => ({
     rooms: null,
     if_show_dialog: false,
     if_show_dialog_2: false,
-    dialog_message: null,
-    selected_index: null,
-    selected_room_name: null,
+    dialog_message: '',
+    selected_index: -1,
+    selected_room_name: '',
     entering: false,
     loading: false,
   }),
@@ -160,6 +125,7 @@ export default {
     confirmEntering(index) {
       this.selected_index = index
       this.selected_room_name = this.rooms[this.selected_index]['room_body'].name
+      this.dialog_message = this.selected_room_name + 'の部屋 に入室しますか？'
       this.if_show_dialog = true
     },
     async enterRoom() {
@@ -185,7 +151,7 @@ export default {
         if (res.result === 'ok') {
           this.if_show_dialog = false
           this.$store.commit('setRoomId', selected_room_id)
-          await this.$router.push('/rooms/' + selected_room_id)
+          await this.$router.push('/in/' + selected_room_id)
         } else {
           console.log(res)
           this.if_show_dialog = false

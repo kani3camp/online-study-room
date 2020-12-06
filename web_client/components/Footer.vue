@@ -133,7 +133,7 @@ export default {
 
 <style scoped>
 #footer {
-  background-color: #d3e6f6;
+  background-color: #dfe9f1;
 }
 
 .child-center > * {

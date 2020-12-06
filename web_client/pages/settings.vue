@@ -10,7 +10,9 @@
       >
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-layout justify-center>
+      <v-layout
+        justify-center
+      >
         <v-toolbar-title>設定</v-toolbar-title>
       </v-layout>
       <v-btn
@@ -20,150 +22,102 @@
       >
         サインアウト
       </v-btn>
-
-      <v-dialog
-        v-model="if_show_dialog_2"
-        width="500"
-      >
-        <v-card>
-          <v-card-title>{{ sign_out_result }}</v-card-title>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              text
-              @click="goToHomePage"
-            >
-              閉じる
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-app-bar>
 
     <v-main>
-      <v-layout justify-center>
+      <v-card
+        class="mx-auto"
+        max-width="500px"
+        outlined
+      >
         <v-list
           id="setting-list"
           two-line
           subheader
         >
           <v-subheader>設定</v-subheader>
-          <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>表示名</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>
-                  <v-text-field v-model="display_name" />
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title>表示名</v-list-item-title>
+              <v-list-item-subtitle>
+                <v-text-field v-model="display_name" />
+              </v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
 
-          <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>ひとこと</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>
-                  <v-text-field v-model="status_message" />
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title>ひとこと</v-list-item-title>
+              <v-list-item-subtitle>
+                <v-text-field v-model="status_message" />
+              </v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
-
-          <!--        <v-list-item>-->
-          <!--          <v-list-item-avatar>-->
-          <!--            <v-icon></v-icon>-->
-          <!--          </v-list-item-avatar>-->
-
-          <!--          <v-list-item-content>-->
-          <!--            <v-list-item-title>パスワード</v-list-item-title>-->
-          <!--          </v-list-item-content>-->
-          <!--          <v-list-item-content>-->
-          <!--            <v-list-item-title><v-btn color="primary" @click="confirmChangingPassword" outlined>変更する</v-btn></v-list-item-title>-->
-          <!--          </v-list-item-content>-->
-          <!--        </v-list-item>-->
 
           <v-divider />
 
           <v-subheader>情報</v-subheader>
 
-          <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>ログイン中のアカウント</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>{{ provider_id }}</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title>ログイン中のアカウント</v-list-item-title>
+              <v-list-item-subtitle class="text-center">
+                {{ provider_id }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
 
-          <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>メールアドレス</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>{{ mail_address }}</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title>メールアドレス</v-list-item-title>
+              <v-list-item-subtitle class="text-center">
+                {{ mail_address }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
 
-          <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>合計学習時間</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>{{ total_study_time }}</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title>合計学習時間</v-list-item-title>
+              <v-list-item-subtitle class="text-center">
+                {{ total_study_time }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
 
-          <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-list-item-title>登録日</v-list-item-title>
-              </v-list-item-content>
-            </v-flex>
-            <v-flex>
-              <v-list-item-content>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title>登録日</v-list-item-title>
+              <v-list-item-subtitle class="text-center">
                 {{ registration_date_str }}
-              </v-list-item-content>
-            </v-flex>
+              </v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
 
           <v-list-item>
-            <v-flex>
-              <v-list-item-content>
-                <v-btn
-                  color="primary"
-                  :disabled="
-                    !is_some_value_changed || is_some_value_blank || saving
-                  "
-                  @click="saveNewValues"
-                >
-                  保存
-                </v-btn>
-              </v-list-item-content>
-            </v-flex>
+            <v-list-item-content>
+              <v-btn
+                color="primary"
+                :disabled="
+                  !is_some_value_changed || is_some_value_blank || saving
+                "
+                @click="saveNewValues"
+              >
+                保存
+              </v-btn>
+            </v-list-item-content>
           </v-list-item>
         </v-list>
-      </v-layout>
+      </v-card>
+
+      <Dialog
+        :if-show-dialog="if_show_dialog"
+        :card-title="dialog_message"
+        :loading="saving"
+        :accept-needed="false"
+        cancel-option-string="閉じる"
+        @cancel="goToHomePage"
+      />
     </v-main>
 
     <Footer />
@@ -173,14 +127,18 @@
 <script>
 import firebase from '../plugins/firebase'
 import common from '@/plugins/common'
+import Dialog from '~/components/Dialog'
 
 export default {
   name: 'Settings',
+  components: {
+    Dialog,
+  },
   data: () => ({
-    display_name: null,
-    status_message: null,
-    if_show_dialog_2: false,
-    sign_out_result: null,
+    display_name: '',
+    status_message: '',
+    if_show_dialog: false,
+    dialog_message: '',
     saving: false,
   }),
   computed: {
@@ -266,24 +224,20 @@ export default {
         .signOut()
         .then(function () {
           console.log('Sign-out successful.')
-          vm.sign_out_result = 'サインアウトしました。'
-          vm.if_show_dialog_2 = true
+          vm.dialog_message = 'サインアウトしました。'
+          vm.if_show_dialog = true
         })
         .catch(function (error) {
           console.log(error)
-          vm.sign_out_result = 'サインアウトに失敗しました。'
-          vm.if_show_dialog_2 = true
+          vm.dialog_message = 'サインアウトに失敗しました。'
+          vm.if_show_dialog = true
         })
     },
-    // confirmChangingPassword() {
-    //   this.if_show_dialog_1 = true
-    // },
-    // sendPasswordChangeEmail() {
-    //   this.if_show_dialog_1 = false
-    // },
     async saveNewValues() {
       console.log('saveNewValues()')
       this.saving = true
+      this.dialog_message = '送信中'
+      this.if_show_dialog = true
 
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/change_user_info'
       const params = {
@@ -294,7 +248,7 @@ export default {
       }
       const resp = await common.httpPost(url, params)
       if (resp.result === 'ok') {
-        console.log('設定変更成功')
+        this.dialog_message = '完了！'
         const new_display_name = this.display_name
         await firebase.auth().currentUser.updateProfile({
           displayName: new_display_name,
@@ -302,6 +256,7 @@ export default {
         this.$store.commit('user/setStatusMessage', this.status_message)
       } else {
         console.log(resp)
+        this.dialog_message = 'エラー。もう一度試してみてください。'
         this.display_name = this.firebase_display_name
         this.status_message = this.firebase_status_message
       }

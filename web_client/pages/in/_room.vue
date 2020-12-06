@@ -11,33 +11,16 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
 
-      <v-dialog
-        v-model="if_show_dialog"
-        width="500"
-      >
-        <v-card :loading="exiting">
-          <v-card-title>部屋を出ますか？</v-card-title>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              :disabled="exiting"
-              text
-              color="primary"
-              @click="exitRoom"
-            >
-              退室する
-            </v-btn>
-            <v-btn
-              :disabled="exiting"
-              text
-              @click="if_show_dialog=false"
-            >
-              キャンセル
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
+      <Dialog
+        :if-show-dialog="if_show_dialog"
+        :accept-needed="true"
+        :loading="exiting"
+        accept-option-string="退室する"
+        cancel-option-string="キャンセル"
+        card-title="部屋を出ますか？"
+        @accept="exitRoom"
+        @cancel="if_show_dialog=false"
+      />
 
       <v-layout justify-center>
         <v-toolbar-title>{{ room_name }} の部屋</v-toolbar-title>
@@ -102,9 +85,13 @@
 <script>
 import common from '~/plugins/common'
 import firebase from '@/plugins/firebase'
+import Dialog from '~/components/Dialog'
 
 export default {
   name: 'Room',
+  components: {
+    Dialog,
+  },
   beforeRouteLeave(to, from, next) {
     if (this.$store.state.room_id != null) {
       window.alert('退室する場合は退室ボタンを押してください。')
