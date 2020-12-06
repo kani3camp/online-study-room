@@ -17,7 +17,7 @@
         top: seatPositions[index].y+'%',
         width: seatShape.width+'%',
         height: seatShape.height+'%',
-        fontSize: defaultSeatFontSize+'px'
+        fontSize: seatFontSize
       }"
     >
       {{ seat.id + '\n' }}
@@ -50,7 +50,8 @@ export default {
   data() {
     return {
       emptySeatColor: '#e5b796',
-      defaultSeatFontSize: 0,
+      // seatFontSize: 80 + '%',
+      seatFontSize: 80 + '%',
       // layout: {
       //   room_id: 'mathematics-room',
       //   version: 1,
@@ -117,20 +118,39 @@ export default {
     }
   },
   computed: {
+    // seatFontSize: {
+    //   get() {
+    //     return this.roomShape.width + 'px'
+    //   },
+    //   set(value) {},
+    // },
     roomShape: {
       get() {
         if (this.isMounted) {
           console.log('再度')
           const roomLayoutWidth = this.$refs.roomLayout.clientWidth
-          return {
-            width: 100 + '%',
-            height:
-              (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
+          const roomLayoutHeight = this.$refs.roomLayout.clientHeight
+          if (roomLayoutWidth > roomLayoutHeight) {
+            // 横長画面
+            const widthPx =
+              (roomLayoutHeight * this.layout['room_shape'].width) / this.layout['room_shape'].height
+            return {
+              width: widthPx + 'px',
+              height: roomLayoutHeight + 'px',
+              seatFontSize: widthPx * this.layout['font_size_ratio'] + 'px',
+            }
+          } else {
+            // 縦長画面
+            return {
+              width: roomLayoutWidth + 'px',
+              height:
+                (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
+            }
           }
         } else {
           return {
-            width: 100 + '%',
-            height: this.layout['room_shape'].width + 'px',
+            width: 100 + 'vw',
+            height: 90 + 'vh',
           }
         }
       },
@@ -183,6 +203,11 @@ export default {
       })
     },
   },
+  watch: {
+    roomShape: function (newValue, oldValue) {
+      this.seatFontSize = newValue.seatFontSize
+    },
+  },
   created() {
     console.log(this.layout)
   },
@@ -197,7 +222,7 @@ export default {
       const roomLayoutHeight = this.$refs.roomLayout.clientHeight
       const vm = this
       console.log(roomLayoutWidth)
-      this.defaultSeatFontSize = Math.floor((roomLayoutWidth * 30) / 800)
+      this.seatFontSize = Math.floor((roomLayoutWidth * 30) / 800)
       this.seatShape = {
         width: Math.floor(
           (roomLayoutWidth * this.layout['seat_shape'].width) / this.layout['room_shape'].width
@@ -242,10 +267,16 @@ export default {
   position: relative;
   top: 0;
   left: 0;
-  box-sizing: border-box;
   background-color: azure;
   margin: auto;
-  /*border: solid 0.5rem black;*/
+  border: solid 0.5rem black;
+  max-width: 100vw;
+  max-height: 90vh;
+}
+#room-layout:before {
+  content: '';
+  display: block;
+  /*padding-top: todo ;*/
 }
 
 .seat {

@@ -1,7 +1,8 @@
 {
   "room_id": "mathematics-room",
-  "version": 1,
+  "version": 4,
   "num_seats": 23,
+  "font_size_ratio": 0.04,
   "room_shape": {
     "width": 1000,
     "height": 800
@@ -340,7 +341,7 @@
       "id": 132,
       "x": 870,
       "y": 290,
-      "shape_type": "horizontal=seat+margin"
+      "shape_type": "horizontal=seat+partition-width"
     },
     {
       "id": 133,
@@ -352,7 +353,7 @@
       "id": 134,
       "x": 870,
       "y": 490,
-      "shape_type": "horizontal=seat+margin"
+      "shape_type": "horizontal=seat+partition-width"
     },
     {
       "id": 135,

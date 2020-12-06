@@ -50,6 +50,7 @@ const Failed = "failed"
 
 const EnterActivity = "entering"
 const LeaveActivity = "leaving"
+const NewRoomLayoutActivity = "new-room-layout"
 
 type RoomStruct struct {
 	RoomId string         `json:"room_id"`
@@ -110,6 +111,7 @@ type RoomLayoutsInfoConfigStruct struct {
 type RoomLayoutStruct struct {
 	RoomId string `json:"room_id" firestore:"room-id"`
 	Version int `json:"version" firestore:"version"`
+	FontSizeRatio float32 `json:"font_size_ratio" firestore:"font-size-ratio"`
 	RoomShape struct {
 		Height int `json:"height" firestore:"height"`
 		Width int `json:"width" firestore:"width"`
@@ -798,10 +800,46 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 }
 
 func RetrieveRoomLayout(roomId string, client *firestore.Client, ctx context.Context) (RoomLayoutStruct, error) {
-	
-	return
+	var roomLayout RoomLayoutStruct
+	doc, err := client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx)
+	if err != nil {
+		log.Printf("failed to process client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx), %v", err)
+		return RoomLayoutStruct{}, err
+	}
+	_ = doc.DataTo(&roomLayout)
+	roomLayout.RoomId = roomId
+	return roomLayout, nil
 }
 
 func CurrentRoomLayoutVersion(roomId string, client *firestore.Client, ctx context.Context) (int, error) {
-	client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get()
+	doc, err := client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	var roomLayout RoomLayoutStruct
+	_ = doc.DataTo(&roomLayout)
+	return roomLayout.Version, nil
+}
+
+func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx context.Context) error {
+	log.Println("SaveRoomLayout()")
+	oldRoomLayout, err := RetrieveRoomLayout(roomLayout.RoomId, client, ctx)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	_ = RecordHistory(map[string]interface{}{
+		"activity": NewRoomLayoutActivity,
+		"old-room-layout": oldRoomLayout,
+		"new-room-layout": roomLayout,
+		"date": time.Now(),
+	}, client, ctx)
+
+	_, err = client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomLayout.RoomId).Set(ctx, roomLayout)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }

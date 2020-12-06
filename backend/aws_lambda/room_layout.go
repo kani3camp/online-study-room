@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
 )
 
 type RoomLayoutResponseStruct struct {
@@ -25,15 +24,11 @@ func RoomLayout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
 	} else {
-		var roomLayout RoomLayoutStruct
-		doc, err := client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx)
+		roomLayout, err := RetrieveRoomLayout(roomId, client, ctx)
 		if err != nil {
-			log.Printf("failed to process client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx), %v", err)
 			apiResp.Result = ERROR
 			apiResp.Message = "failed."
 		} else {
-			_ = doc.DataTo(&roomLayout)
-			roomLayout.RoomId = roomId
 			apiResp.Result = OK
 			apiResp.RoomLayoutData = roomLayout
 		}

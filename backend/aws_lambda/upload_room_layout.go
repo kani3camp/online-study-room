@@ -7,8 +7,8 @@ import (
 	"errors"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
 	"os"
+	"strconv"
 )
 
 type UploadRoomLayoutParams struct {
@@ -29,9 +29,10 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 		return errors.New("please specify a valid room id")
 	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); ! isExistRoom {
 		return errors.New("any room of that room id doesn't exist")
-	} else if roomLayoutData.Version < 0 {
-		return errors.New("please specify a valid version")
-	} else if roomLayoutData.Version == 1 +
+	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1 + currentVersion {
+		return errors.New("please specify a valid version. current version is " + strconv.Itoa(currentVersion))
+	} else if roomLayoutData.FontSizeRatio == 0.0 {
+		return errors.New("please specify a valid font size ratio")
 	} else if roomLayoutData.RoomShape.Height == 0 || roomLayoutData.RoomShape.Width == 0 {
 		return errors.New("please specify the room-shape correctly")
 	} else {
@@ -106,9 +107,8 @@ func UploadRoomLayout(request events.APIGatewayProxyRequest) (events.APIGatewayP
 			apiResp.Result = ERROR
 			apiResp.Message = err.Error()
 		} else {
-			_, err = client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomLayoutData.RoomId).Set(ctx, roomLayoutData)
+			err = SaveRoomLayout(roomLayoutData, client, ctx)
 			if err != nil {
-				log.Println(err)
 				apiResp.Result = ERROR
 				apiResp.Message = "failed"
 			} else {
