@@ -7,6 +7,22 @@
     <v-main>
       <v-container>
         <v-flex>
+          <h2 style="display: inline-block">
+            YouTubeライブ
+          </h2>
+        </v-flex>
+        <v-flex>
+          <v-row justify="center">
+            <a
+              target="_blank"
+              :href="youtubeLink"
+            ><h3>ライブ配信を見に行く</h3></a>
+          </v-row>
+        </v-flex>
+      </v-container>
+
+      <v-container>
+        <v-flex>
           <v-row>
             <v-flex>
               <v-col>
@@ -20,6 +36,7 @@
             <v-flex>
               <v-col class="d-flex flex-row-reverse">
                 <v-btn
+                  :disabled="loading"
                   outlined
                   @click="loadRooms"
                 >
@@ -79,22 +96,6 @@
         </v-container>
       </v-container>
 
-      <v-container>
-        <v-flex>
-          <h2 style="display: inline-block">
-            YouTubeライブ
-          </h2>
-        </v-flex>
-        <v-flex>
-          <v-row justify="center">
-            <a
-              target="_blank"
-              :href="youtubeLink"
-            ><h3>ライブ配信を見に行く</h3></a>
-          </v-row>
-        </v-flex>
-      </v-container>
-
       <Dialog
         :if-show-dialog="if_show_dialog"
         :card-title="dialog_message"
@@ -136,8 +137,6 @@ export default {
     if_show_dialog: false,
     if_show_dialog_2: false,
     dialog_message: '',
-    selected_index: -1,
-    selected_room_name: '',
     loading: false,
     youtubeLink: common.key.youtubeLink,
   }),
@@ -158,11 +157,15 @@ export default {
   },
   methods: {
     async enterRoom(roomIndex) {
-      this.selected_room_name = this.rooms[roomIndex]['room_body'].name
-      this.dialog_message = this.selected_room_name + 'の部屋 に入室しますか？'
+      const selected_room_id = this.rooms[roomIndex].room_id
+      const selected_room_name = this.rooms[roomIndex].room_body.name
+
+      this.dialog_message = selected_room_name + 'の部屋 に入室しますか？'
 
       if (this.$store.state.isSignedIn) {
         const vm = this
+        this.$store.commit('setRoomId', selected_room_id)
+        this.$store.commit('setRoomName', selected_room_name)
         await this.$router.push('/enter/' + vm.rooms[roomIndex].room_id)
       } else {
         this.dialog_message = 'サインインしてください。'

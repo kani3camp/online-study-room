@@ -12,9 +12,9 @@ type OnlineUsersResponse struct {
 }
 
 func OnlineUsers(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
-	
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
+
 	var apiResp OnlineUsersResponse
 	onlineUsers, _ := RetrieveOnlineUsers(client, ctx)
 	apiResp.Result = OK

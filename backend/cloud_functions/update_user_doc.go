@@ -47,11 +47,12 @@ type Values struct {
 	Values []StringValue `json:"values"`
 }
 
+// todo 要修正
 // ユーザーの入退室がトリガー
 func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	now := time.Now()
-	_, client := InitializeEventFunc()
-	defer client.Close()
+	_, client := InitializeEventFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	_, err := metadata.FromContext(ctx)
 	if err != nil {
@@ -109,9 +110,11 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 	if len(enteredUser) > 0 {
 		log.Printf("Entered! entered_user is %s\n", enteredUser[0])
 		userId := enteredUser[0]
+		seatId := 0 // todo
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
-			"online":      true,
-			"in":          doc,
+			"online": true,
+			"in":     doc,
+			"seat-id": seatId,
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Println("failed to update user info of " + userId + ".")
@@ -127,13 +130,14 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
 		user, _ := authClient.GetUser(ctx, userId)
-		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"の部屋に入室しました。", client, ctx)
+		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"ルームに入りました。", client, ctx)
 	} else if len(leftUser) > 0 {
 		log.Printf("Left! left_user is %s\n", leftUser[0])
 		userId := leftUser[0]
 		_, err = usersCollectionRef.Doc(userId).Set(ctx, map[string]interface{}{
 			"online":       false,
 			"in":           "",
+			"seat-id": 0,
 			"last-studied": now,
 		}, firestore.MergeAll)
 		if err != nil {
@@ -152,7 +156,7 @@ func UpdateUserDoc(ctx context.Context, e FirestoreEvent) error {
 		roomBody, _ := RetrieveRoomInfo(doc, client, ctx)
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
 		user, _ := authClient.GetUser(ctx, userId)
-		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"の部屋を退室しました。", client, ctx)
+		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"ルームを出ました。", client, ctx)
 	} else {
 		log.Println("no changes?")
 	}

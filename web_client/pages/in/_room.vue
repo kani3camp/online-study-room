@@ -13,17 +13,17 @@
 
       <Dialog
         :if-show-dialog="if_show_dialog"
-        :accept-needed="true"
+        :accept-needed="accept_needed"
         :loading="exiting"
-        accept-option-string="退室する"
-        cancel-option-string="キャンセル"
-        card-title="部屋を出ますか？"
-        @accept="exitRoom"
-        @cancel="if_show_dialog=false"
+        :accept-option-string="accept_string"
+        :cancel-option-string="cancel_string"
+        :card-title="dialog_message"
+        @accept="on_accept"
+        @cancel="on_cancel"
       />
 
       <v-layout justify-center>
-        <v-toolbar-title>{{ propRoomName }} の部屋</v-toolbar-title>
+        <v-toolbar-title>{{ room_name }} の部屋</v-toolbar-title>
       </v-layout>
     </v-app-bar>
 
@@ -40,42 +40,10 @@
         <v-subheader>同じ部屋の他のユーザー</v-subheader>
 
         <v-list-item>
-          <v-container>
-            <v-row>
-              <v-col
-                v-for="(user_info, index) in other_users_info"
-                :key="index"
-                cols="12"
-                sm="3"
-                md="2"
-                lg="2"
-                xl="2"
-                dense
-              >
-                <v-card
-                  class="ma-2 pa-4"
-                  outlined
-                >
-                  <v-layout justify-center>
-                    <v-icon
-                      x-large
-                      color="green"
-                    >
-                      mdi-account-circle-outline
-                    </v-icon>
-                  </v-layout>
-                  <v-layout justify-center>
-                    <v-card-title>
-                      {{ user_info.display_name }}
-                    </v-card-title>
-                  </v-layout>
-                  <v-layout justify-center>
-                    {{ user_info.time_study }}
-                  </v-layout>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-container>
+          <RoomLayout
+            :room-id="room_id"
+            :layout="room_layout"
+          />
         </v-list-item>
       </v-list>
     </v-main>
@@ -86,42 +54,56 @@
 import common from '~/plugins/common'
 import firebase from '@/plugins/firebase'
 import Dialog from '~/components/Dialog'
+import RoomLayout from '~/components/RoomLayout'
 
 export default {
   name: 'Room',
   components: {
     Dialog,
+    RoomLayout,
   },
   beforeRouteLeave(to, from, next) {
-    if (this.$store.state.room_id != null) {
-      window.alert('退室する場合は退室ボタンを押してください。')
+    console.log('beforeRouteLeave: to=', to.path, ',from=', from.path)
+    if (this.$store.state.room_id !== '') {
+      // todo
+      // window.alert('退室する場合は退室ボタンを押してください。')
     } else {
       window.onbeforeunload = null
       console.log('remove beforeunload')
-      console.log(window.onbeforeunload)
       next()
     }
   },
-  props: {
-    propRoomName: {
-      type: String,
-      required: true,
-    },
+  data() {
+    return {
+      room_id: '',
+      room_name: '',
+      room_layout: null,
+      entered_time: new Date().getHours() + '時' + new Date().getMinutes() + '分',
+      room_status: null,
+      if_show_dialog: false,
+      dialog_message: 'ルームを出ますか？',
+      accept_needed: true,
+      accept_string: '出る',
+      cancel_string: 'キャンセル',
+      on_accept: null,
+      on_cancel: null,
+      exiting: false,
+      other_users_info: [],
+      stay_awake_timeout: null,
+      user_timeout: null,
+      socket: null,
+      is_socket_open: false,
+      is_entered: false,
+    }
   },
-  data: () => ({
-    entered_time: new Date().getHours() + '時' + new Date().getMinutes() + '分',
-    room_status: null,
-    if_show_dialog: false,
-    exiting: false,
-    other_users_info: [],
-    stay_awake_timeout: null,
-    user_timeout: null,
-    socket: null,
-    is_socket_open: false,
-  }),
   async created() {
     const vm = this
+    // todo これ意味ある？↓
     common.onAuthStateChanged(vm)
+
+    this.room_name = this.$store.state.room_name
+    this.on_accept = vm.closeSocket()
+    this.on_cancel = vm.closeDialog()
 
     if (vm.$store.state.isSignedIn) {
       // 入室時刻を取得
@@ -129,9 +111,7 @@ export default {
         vm.updateUserData()
       }, 5000)
 
-      await vm.fetchRoomData()
       await vm.startStudying()
-      await vm.stayStudying()
     } else {
       await vm.$router.push('/')
     }
@@ -154,6 +134,7 @@ export default {
       e.returnValue = '退室する場合は退室ボタンを押してください。'
     },
     async startStudying() {
+      console.log('startStudying')
       // websocket
       const vm = this
       vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
@@ -165,13 +146,19 @@ export default {
           user_id: firebase.auth().currentUser.uid,
           id_token: await firebase.auth().currentUser.getIdToken(false),
           room_id: vm.$store.state.room_id,
-          device_type: '',
+          seat_id: vm.$store.state.seat_id,
         }
         vm.socket.send(JSON.stringify(params))
       }
       vm.socket.onmessage = async (event) => {
+        console.log('message received.')
         const resp = JSON.parse(event.data)
         if (resp['is_ok']) {
+          if (!vm.is_entered) {
+            console.log('入室成功！！')
+            vm.is_entered = true
+            await vm.stayStudying()
+          }
           let info = []
           let amIin = false
           for (const user of resp['users']) {
@@ -197,7 +184,11 @@ export default {
       }
       vm.socket.onclose = async () => {
         console.log('socket closed.')
-        // todo
+        vm.$store.commit('setRoomId', '')
+        vm.dialog_message = '切断されました！ トップページに戻ります。'
+        vm.accept_needed = false
+        vm.cancel_string = '閉じる'
+        vm.on_cancel = vm.exitRoom()
       }
       vm.socket.onerror = async () => {
         console.error('socket error.')
@@ -205,14 +196,15 @@ export default {
       }
     },
     async stayStudying() {
+      console.log('stayStudying')
       if (this.$store.state.isSignedIn) {
         const vm = this
         if (vm.is_socket_open) {
           const params = {
+            action: 'stay',
             user_id: firebase.auth().currentUser.uid,
             id_token: await firebase.auth().currentUser.getIdToken(false),
             room_id: vm.$store.state.room_id,
-            device_type: '',
           }
           vm.socket.send(JSON.stringify(params))
         }
@@ -224,54 +216,28 @@ export default {
         await this.$router.push('/')
       }
     },
-    async fetchRoomData() {
-      if (this.$store.state.isSignedIn) {
-        const vm = this
-        const room_name = vm.$store.state.room_id
-        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
-        let params = { room_id }
-        const resp = await common.httpGet(url, params)
-
-        if (resp.result === 'ok') {
-          this.room_status = resp.room_status
-        }
+    async updateUserData() {
+      // const date_time = this.$store.state.user.last_entered
+      // if (date_time) {
+      //   this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
+      // }
+    },
+    closeSocket() {
+      if (this.socket) {
+        this.exiting = true
+        this.socket.close()
       } else {
-        await this.$router.push('/')
+        // todo
       }
     },
-    async updateUserData() {
-      await common.getUserData(this)
-      const date_time = this.$store.state.user.last_entered
-      if (date_time) {
-        this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
-      }
+    closeDialog() {
+      this.if_show_dialog = false
     },
     async exitRoom() {
-      const vm = this
-
-      vm.exiting = true
-
-      const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/exit_room'
-      const params = {
-        user_id: firebase.auth().currentUser.uid,
-        room_id: vm.$store.state.room_id,
-        id_token: await firebase.auth().currentUser.getIdToken(false),
-      }
-      const resp = await common.httpPost(url, params)
-
-      if (resp.result === 'ok') {
-        vm.$store.commit('setRoomId', null)
-      } else {
-        console.log('Failed to exit room successfully.')
-        console.log(resp)
-      }
-      vm.exiting = false
-      vm.if_show_dialog = false
-      await vm.$router.push('/')
+      await this.$router.push('/')
     },
   },
 }
 </script>
-
 <style scoped></style>
 

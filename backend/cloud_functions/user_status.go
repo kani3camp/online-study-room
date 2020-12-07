@@ -13,8 +13,8 @@ type UserStatusResponseStruct struct {
 }
 
 func UserStatus(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	userId := r.FormValue(user_id)
 	var apiResp UserStatusResponseStruct

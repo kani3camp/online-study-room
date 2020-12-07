@@ -16,6 +16,7 @@ type StayingAwakeResponseStruct struct {
 	Users   []UserStruct `json:"users"`
 }
 
+// todo StayingAwake関数消す？
 func StayingAwake(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)

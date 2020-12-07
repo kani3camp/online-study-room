@@ -1,0 +1,100 @@
+{
+    "room_id": "mathematics-room",
+    "version": 1,
+    "num_seats": 23,
+    "room_shape": {
+        "width": 1000,
+        "height": 800
+    },
+    "seat_shape": {
+        "width": 120,
+        "height": 100
+    },
+    "partition_shapes": [
+        {
+            "name": "vertical=seat",
+            "width": 10,
+            "height": 100
+        },
+        {
+            "name": "horizontal=seat",
+            "width": 120,
+            "height": 10
+        },
+        {
+            "name": "vertical=seat+margin",
+            "width": 10,
+            "height": 100
+        },
+        {
+            "name": "horizontal=seat+margin",
+            "width": 120,
+            "height": 10
+        },
+        {
+            "name": "vertical=seat+partition-height",
+            "width": 10,
+            "height": 100
+        },
+        {
+            "name": "horizontal=seat+partition-width",
+            "width": 120,
+            "height": 10
+        }
+    ],
+    "seats": [
+        {
+            "id": 1,
+            "x": 0,
+            "y": 100
+        },
+        {
+            "id": 2,
+            "x": 0,
+            "y": 200
+        },
+        {
+            "id": 3,
+            "x": 500,
+            "y": 0
+        }
+    ],
+    "partitions": [
+        {
+            "id": 101,
+            "x": 120,
+            "y": 80,
+            "shape_type": "vertical=seat+margin"
+        },
+        {
+            "id": 102,
+            "x": 0,
+            "y": 200,
+            "shape_type": "horizontal=seat+partition-width"
+        },
+        {
+            "id": 103,
+            "x": 120,
+            "y": 280,
+            "shape_type": "horizontal=seat+partition-width"
+        },
+        {
+            "id": 104,
+            "x": 0,
+            "y": 400,
+            "shape_type": "vertical=seat+margin"
+        },
+        {
+            "id": 105,
+            "x": 120,
+            "y": 480,
+            "shape_type": "horizontal=seat+partition-width"
+        },
+        {
+            "id": 106,
+            "x": 0,
+            "y": 600,
+            "shape_type": "vertical=seat+margin"
+        }
+    ]
+}

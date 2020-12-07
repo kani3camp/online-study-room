@@ -12,8 +12,8 @@ type CreateNewRoomResponseStruct struct {
 }
 
 func CreateNewRoom(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	var apiResp ChangeUserInfoResponseStruct
 	roomId, roomName := r.PostFormValue(room_id), r.PostFormValue("room_name")
@@ -23,8 +23,7 @@ func CreateNewRoom(w http.ResponseWriter, r *http.Request) {
 	if roomId == "" || roomName == "" || roomType == "" || password == "" || themeColorHex == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
-	} else
-	if password != os.Getenv("password") {
+	} else if password != os.Getenv("password") {
 		apiResp.Result = ERROR
 		apiResp.Message = "Invalid password."
 	} else {

@@ -16,6 +16,7 @@ type AuthEvent struct {
 }
 
 func CreateNewUser(userId string, client *firestore.Client, ctx context.Context) error {
+	// todo interfaceじゃなくて構造体にいれてからsetしたい
 	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 		"registration-date": time.Now(),
 		"last-access":       time.Now(),

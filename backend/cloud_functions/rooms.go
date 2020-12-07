@@ -14,11 +14,9 @@ type RoomsResponseStruct struct {
 }
 
 func Rooms(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
-	
-	UpdateDatabase(client, ctx)
-	
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
+
 	var apiResp RoomsResponseStruct
 	
 	rooms, _ := RetrieveRooms(client, ctx)

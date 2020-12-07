@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type ApiResponseStruct struct {
@@ -11,14 +12,15 @@ type ApiResponseStruct struct {
 	Message string `json:"message"`
 }
 
+// todo websocketのConnectionIdを返す
 func EnterRoom(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	var apiResp ApiResponseStruct
-	roomId, userId, idToken := r.PostFormValue(room_id), r.PostFormValue(user_id), r.PostFormValue(id_token)
-	
-	if roomId == "" || userId == "" || idToken == "" {
+	roomId, userId, seatIdStr, idToken := r.PostFormValue(room_id), r.PostFormValue(user_id), r.PostFormValue("seat_id"), r.PostFormValue(id_token)
+	seatId, _ := strconv.Atoi(seatIdStr)
+	if roomId == "" || userId == "" || seatId == 0 || idToken == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
 	} else {
@@ -40,18 +42,28 @@ func EnterRoom(w http.ResponseWriter, r *http.Request) {
 				apiResp.Message = "you are already in the " + currentRoomId
 			} else {
 				_ = LeaveRoom(currentRoomId, userId, client, ctx)
-				client.Close()
-				
+				_ = client.Close()
+
 				client, _ = InitializeFirestoreClient(ctx)
-				_ = _EnterRoom(roomId, userId, client, ctx)
-				apiResp.Result = OK
-				apiResp.Message = "successfully entered " + roomId + "."
+				err := _EnterRoom(roomId, userId, seatId, client, ctx)
+				if err != nil {
+					apiResp.Result = ERROR
+					apiResp.Message = "failed to enter room"
+				} else {
+					apiResp.Result = OK
+					apiResp.Message = "successfully entered " + roomId + "."
+				}
 			}
 		} else {
 			// 入室処理
-			_ = _EnterRoom(roomId, userId, client, ctx)
-			apiResp.Result = OK
-			apiResp.Message = "successfully entered " + roomId + "."
+			err := _EnterRoom(roomId, userId, seatId, client, ctx)
+			if err != nil {
+				apiResp.Result = ERROR
+				apiResp.Message = "failed to enter room"
+			} else {
+				apiResp.Result = OK
+				apiResp.Message = "successfully entered " + roomId + "."
+			}
 		}
 	}
 	log.Println(apiResp)

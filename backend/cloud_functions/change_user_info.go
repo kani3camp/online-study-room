@@ -12,8 +12,8 @@ type ChangeUserInfoResponseStruct struct {
 }
 
 func ChangeUserInfo(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	var apiResp ChangeUserInfoResponseStruct
 	userId, idToken := r.FormValue(user_id), r.FormValue(id_token)

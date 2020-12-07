@@ -11,9 +11,10 @@ type StayingAwakeResponseStruct struct {
 	Users   []UserStruct `json:"users"`
 }
 
+// todo StayingAwake関数消す？
 func StayingAwake(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	userId, idToken := r.PostFormValue(user_id), r.PostFormValue(id_token)
 	var apiResp StayingAwakeResponseStruct

@@ -12,7 +12,7 @@
       </v-btn>
 
       <v-layout justify-center>
-        <v-toolbar-title>{{ propRoomName }} の部屋</v-toolbar-title>
+        <v-toolbar-title>{{ room_name }} の部屋</v-toolbar-title>
       </v-layout>
 
     </v-app-bar>
@@ -21,9 +21,33 @@
       <v-container>
         <h2>席を選ぼう。</h2>
 
+        <div id="seat-selector">
+          <v-form class="mx-auto">
+            <v-select
+              v-model="selected_seat_id"
+              :items="seats"
+              item-value="id"
+              item-text="id"
+              label="座席番号"
+              outlined
+            />
+            <div>
+              <v-btn
+                color="primary"
+                block
+                elevation="3"
+                :disabled="! selected_seat_id"
+                @click="enterRoom()"
+              >
+                決定
+              </v-btn>
+            </div>
+          </v-form>
+        </div>
+
         <RoomLayout
           :room-id="room_id"
-          @selected="enterRoom"
+          :layout="room_layout"
         />
 
         <Dialog
@@ -45,6 +69,7 @@ import RoomLayout from '~/components/RoomLayout'
 import firebase from '~/plugins/firebase'
 import common from '~/plugins/common'
 import Dialog from '~/components/Dialog'
+// import roomLayoutJson from 'assets/mathematics-rom-layout.json'
 
 export default {
   name: 'EnterRoom',
@@ -52,57 +77,59 @@ export default {
     RoomLayout,
     Dialog,
   },
-  props: {
-    propRoomName: {
-      type: String,
-      required: true,
-    },
-  },
   data: () => ({
     room_id: '',
+    room_name: '',
     room_layout: null,
+    seats: [],
     if_show_dialog: false,
     entering: false,
     dialog_message: '',
+    selected_seat_id: null,
   }),
-  created() {
+  watch: {
+    room_layout: function (newValue, oldValue) {
+      if (newValue) {
+        this.seats = newValue.seats
+      }
+    },
+  },
+  async created() {
+    // room_idは$storeからも読み込める
     this.room_id = this.$route.params.select_seat
-    console.log('渡されたroomIdは', this.room_id)
+    this.room_name = this.$store.state.room_name
+
+    // fetch layout
+    await this.fetchRoomLayout()
   },
   methods: {
-    async enterRoom(seatId) {
+    async fetchRoomLayout() {
       if (this.$store.state.isSignedIn) {
         const vm = this
+        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_layout'
+        let params = { room_id: vm.room_id }
+        const resp = await common.httpGet(url, params)
 
-        this.entering = true
-
-        const selected_room_id = this.rooms[this.selected_index].room_id
-        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/enter_room'
-        const params = {
-          user_id: firebase.auth().currentUser.uid,
-          id_token: await firebase.auth().currentUser.getIdToken(false),
-          room_id: selected_room_id,
-        }
-        const res = await common.httpPost(url, params).catch((e) => {
-          console.log(e)
-          vm.if_show_dialog = false
-          vm.dialog_message = '通信に失敗しました。もう一度試してください。'
-          vm.if_show_dialog_2 = true
-        })
-
-        if (res.result === 'ok') {
-          this.if_show_dialog = false
-          this.$store.commit('setRoomId', selected_room_id)
-          await this.$router.push('/in/' + selected_room_id)
+        if (resp.result === 'ok') {
+          this.room_layout = resp.room_layout_data
         } else {
-          console.log(res)
-          this.if_show_dialog = false
-          this.dialog_message = 'エラーが発生しました。'
-          this.if_show_dialog_2 = true
+          console.log(resp.message)
+          // todo top page へ戻る
         }
-
-        this.entering = false
       } else {
+        // todo dialog
+        await this.$router.push('/')
+      }
+    },
+    async enterRoom() {
+      if (this.$store.state.isSignedIn) {
+        const vm = this
+        const seatId = this.selected_seat_id
+        this.$store.commit('setSeatId', seatId)
+
+        await this.$router.push('/in/' + vm.$store.state.room_id)
+      } else {
+        // todo check
         this.if_show_dialog = false
         this.dialog_message = 'サインインしてください。'
         this.if_show_dialog_2 = true

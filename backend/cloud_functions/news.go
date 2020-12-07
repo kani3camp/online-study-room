@@ -15,9 +15,9 @@ type NewsResponseStruct struct {
 }
 
 func News(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
-	
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
+
 	var apiResp NewsResponseStruct
 	
 	_numNews := r.FormValue("num_news")

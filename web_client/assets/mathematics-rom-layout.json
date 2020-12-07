@@ -1,7 +1,6 @@
 {
   "room_name": "mathematics-room",
   "version": 4,
-  "num_seats": 23,
   "font_size_ratio": 0.04,
   "room_shape": {
     "width": 1000,

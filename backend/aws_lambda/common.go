@@ -5,6 +5,7 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"encoding/base64"
+	"errors"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"fmt"
@@ -15,7 +16,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -24,6 +28,7 @@ const USERS = "users"
 const HISTORY = "history"
 const CONFIG = "config"
 const API = "api"
+const API_GATEWAY = "api-gateway"
 const ROOM_LAYOUTS_INFO = "room-layouts-info"
 const ROOM_LAYOUTS = "room-layouts"
 const NEWS = "news"
@@ -60,12 +65,14 @@ type RoomStruct struct {
 type RoomBodyStruct struct {
 	Created       time.Time `firestore:"created" json:"created"`
 	Name          string    `firestore:"name" json:"name"`
-	Users         []struct {
-		SeatId int `firestore:"seat-id" json:"seat_id"`
-		UserId string `firestore:"user-id" json:"user_id"`
-	}  `firestore:"users" json:"users"`
+	Users         []UserSeatSetStruct `firestore:"users" json:"users"`
 	Type          string    `firestore:"type" json:"type"`
 	ThemeColorHex string    `firestore:"theme-color-hex" json:"theme_color_hex"`
+}
+
+type UserSeatSetStruct struct {
+	SeatId int `firestore:"seat-id" json:"seat_id"`
+	UserId string `firestore:"user-id" json:"user_id"`
 }
 
 type UserStruct struct {
@@ -76,6 +83,8 @@ type UserStruct struct {
 
 type UserBodyStruct struct {
 	In               string    `firestore:"in" json:"in"`
+	SeatId int `firestore:"seat-id" json:"seat_id"`
+	ConnectionId string `firestore:"connection-id" json:"connection_id"`
 	LastAccess       time.Time `firestore:"last-access" json:"last_access"`
 	LastEntered      time.Time `firestore:"last-entered" json:"last_entered"`
 	LastExited       time.Time `firestore:"last-exited" json:"last_exited"`
@@ -139,6 +148,11 @@ type RoomLayoutStruct struct {
 		Y int `json:"y" firestore:"y"`
 		ShapeType string `json:"shape_type" firestore:"shape-type"`
 	} `json:"partitions" firestore:"partitions"`
+}
+
+type ApiGatewayConfigStruct struct {
+	// https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-how-to-call-websocket-api-connections.html
+	WebsocketConnectionBaseUrl string `json:"websocket_connection_base_url" firestore:"websocket-connection-base-url"`
 }
 
 func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
@@ -228,7 +242,6 @@ func CloseFirestoreClient(client *firestore.Client) {
 	if err != nil {
 		log.Println("failed to close firestore client.")
 	} else {
-		log.Println("firestore client closed.")
 	}
 }
 
@@ -237,7 +250,6 @@ func CloseCloudStorageClient(client *storage.Client) {
 	if err != nil {
 		log.Println("failed to close cloud storage client.")
 	} else {
-		log.Println("cloud storage client closed.")
 	}
 }
 
@@ -437,23 +449,82 @@ func IsOnline(userId string, client *firestore.Client, ctx context.Context) (boo
 }
 
 func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
-	log.Println("LeaveRoom() is running. roomId : " + roomId + ". userId : " + userId + ".")
-	var err error
+	log.Println("[LeaveRoom()] roomId : " + roomId + ". user : " + userId + ".")
 	if isExistRoom, _ := IsExistRoom(roomId, client, ctx); !isExistRoom {
 		log.Println(RoomDoesNotExist)
+		// todo そもそも存在しない部屋を指定した場合
+		return nil
 	} else if isInRoom, _ := IsInRoom(roomId, userId, client, ctx); !isInRoom {
 		log.Println("you are not in the room.")
+		return nil
 	} else {
+		userBody, err := RetrieveUserInfo(userId, client, ctx)
+		if err != nil {
+			return err
+		}
+		// userのconnection idを削除
+		_ = SetConnectionId(userId, "", client, ctx)
+
 		// 退室処理
+		userSeatSet := UserSeatSetStruct{
+			UserId: userId,
+			SeatId: userBody.SeatId,
+		}
 		_, err = client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
-			"users": firestore.ArrayRemove(userId),
+			"users": firestore.ArrayRemove(userSeatSet),
 		}, firestore.MergeAll)
 		if err != nil {
 			log.Println("failed to remove user from room.")
-		} else {
 		}
 	}
-	return err
+	return nil
+}
+
+func SetConnectionId(userId string, connectionId string, client *firestore.Client, ctx context.Context) error {
+	// inやonlineはいじらない
+	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+		"connection-id": connectionId,
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
+func RetrieveConnectionId(userId string, client *firestore.Client, ctx context.Context) (string, error) {
+	var userBody UserBodyStruct
+	doc, err := client.Collection(USERS).Doc(userId).Get(ctx)
+	if err != nil {
+		log.Println(err)
+		return "", err
+	}
+	_ = doc.DataTo(&userBody)
+	return userBody.ConnectionId, nil
+}
+
+func RetrieveCurrentSeatId(userId string, client *firestore.Client, ctx context.Context) (int, error) {
+	userInfo, err := RetrieveUserInfo(userId, client, ctx)
+	if err != nil {
+		return 0, err
+	}
+	roomId := userInfo.In
+	if roomId == "" {
+		errString := "the user is not in any room now"
+		return 0, errors.New(errString)
+	}
+	roomStatus, err := RetrieveRoomInfo(roomId, client, ctx)
+	if err != nil {
+		return 0, err
+	}
+	for _, user := range roomStatus.Users {
+		if user.UserId == userId {
+			return user.SeatId, nil
+		}
+	}
+	errString := "the user is not in " + roomId
+	log.Println(errString)
+	return 0, errors.New(errString)
 }
 
 func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
@@ -478,10 +549,7 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 			Body:   _room,
 		}
 		if room.Body.Users == nil {
-			room.Body.Users = []struct{
-				SeatId int `firestore:"seat-id" json:"seat_id"`
-				UserId string `firestore:"user-id" json:"user_id"`
-			}{}
+			room.Body.Users = []UserSeatSetStruct{}
 		}
 		rooms = append(rooms, room)
 	}
@@ -568,10 +636,7 @@ func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Conte
 	} else {
 		_ = room.DataTo(&roomBodyStruct)
 		if roomBodyStruct.Users == nil {
-			roomBodyStruct.Users = []struct{
-				SeatId int `firestore:"seat-id" json:"seat_id"`
-				UserId string `firestore:"user-id" json:"user_id"`
-			}{} // jsonにした時、中身がない場合にnullではなく[]にする
+			roomBodyStruct.Users = []UserSeatSetStruct{} // jsonにした時、中身がない場合にnullではなく[]にする
 		}
 		return roomBodyStruct, nil
 	}
@@ -691,7 +756,7 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorH
 	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
 		"name":            roomName,
 		"type":            roomType,
-		"users":           []string{},
+		"users":           []UserSeatSetStruct{},
 		"created":         time.Now(),
 		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
@@ -735,9 +800,54 @@ func Response(jsonBytes []byte) (events.APIGatewayProxyResponse, error) {
 	}, nil
 }
 
-func _EnterRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
-	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
-		"users": firestore.ArrayUnion(userId),
+func CheckIfSeatAvailable(roomId string, seatId int, client *firestore.Client, ctx context.Context) (bool, error) {
+	// そのIDの席が存在するか
+	roomLayout, err := RetrieveRoomLayout(roomId, client, ctx)
+	if err != nil {
+		return false, err
+	}
+	seatDetected := false
+	for _, seat := range roomLayout.Seats {
+		if seat.Id == seatId {
+			seatDetected = true
+		}
+	}
+	if !seatDetected {
+		return false, nil
+	}
+
+	// その席が空いているか
+	var roomBody RoomBodyStruct
+	roomDoc, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+	_ = roomDoc.DataTo(&roomBody)
+	for _, userSeat := range roomBody.Users {
+		if userSeat.SeatId == seatId {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Client, ctx context.Context) error {
+	isSeatAvailable, err := CheckIfSeatAvailable(roomId, seatId, client, ctx)
+	if err != nil {
+		return err
+	}
+	if !isSeatAvailable {
+		errString := "that seat is not available now (room id: " + roomId + ", seat id: " + strconv.Itoa(seatId) + ")"
+		log.Println(errString)
+		return errors.New(errString)
+	}
+	userSeatSet := UserSeatSetStruct{
+		UserId: userId,
+		SeatId: seatId,
+	}
+	_, err = client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
+		"users": firestore.ArrayUnion(userSeatSet),
 	}, firestore.MergeAll)
 	if err != nil {
 		log.Println("failed _EnterRoom().")
@@ -833,6 +943,8 @@ func CurrentRoomLayoutVersion(roomId string, client *firestore.Client, ctx conte
 
 func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx context.Context) error {
 	log.Println("SaveRoomLayout()")
+
+	// 履歴を保存
 	oldRoomLayout, err := RetrieveRoomLayout(roomLayout.RoomId, client, ctx)
 	if err != nil {
 		log.Println(err)
@@ -845,10 +957,41 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 		"date": time.Now(),
 	}, client, ctx)
 
+	// 保存
 	_, err = client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomLayout.RoomId).Set(ctx, roomLayout)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 	return nil
+}
+
+func Disconnect(connectionId string, client *firestore.Client, ctx context.Context) error {
+	var apiGatewayConfig ApiGatewayConfigStruct
+	configDoc, _ := client.Collection(CONFIG).Doc(API_GATEWAY).Get(ctx)
+	_ = configDoc.DataTo(&apiGatewayConfig)
+	websocketConnectionBaseUrl := apiGatewayConfig.WebsocketConnectionBaseUrl
+	url := websocketConnectionBaseUrl + connectionId
+
+	req, _ := http.NewRequest("DELETE", url, nil)
+	httpClient := new(http.Client)
+	resp, _ := httpClient.Do(req)
+	defer resp.Body.Close()
+
+	byteArray, _ := ioutil.ReadAll(resp.Body)
+	responseString := string(byteArray)
+	log.Println(responseString)
+	// todo まずPostmanで試す
+
+	return nil
+}
+
+func FindUserWithConnectionId(connectionId string, client *firestore.Client, ctx context.Context) (UserStruct, error) {
+	onlineUsers, _ := RetrieveOnlineUsers(client, ctx)
+	for _, user := range onlineUsers {
+		if user.Body.ConnectionId == connectionId {
+			return user, nil
+		}
+	}
+	return UserStruct{}, errors.New("no such user exists")
 }

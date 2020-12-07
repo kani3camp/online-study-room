@@ -36,10 +36,15 @@ func ExitRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResp
 		apiResp.Message = UserAuthFailed
 	} else if isInRoom, _ := IsInRoom(roomId, userId, client, ctx); !isInRoom {
 		apiResp.Result = ERROR
-		apiResp.Message = "you are not in the room."
+		apiResp.Message = "you are not in the room"
 	} else {
-		_ = LeaveRoom(roomId, userId, client, ctx)
-		apiResp.Result = OK
+		err := LeaveRoom(roomId, userId, client, ctx)
+		if err != nil {
+			apiResp.Result = ERROR
+			apiResp.Message = "failed to leave successfully"
+		} else {
+			apiResp.Result = OK
+		}
 	}
 
 	bytes, _ := json.Marshal(apiResp)

@@ -10,6 +10,7 @@ type RoomStatusResponseStruct struct {
 	Result     string       `json:"result"`
 	Message    string       `json:"message"`
 	RoomStatus RoomStruct   `json:"room_status"`
+	RoomLayout RoomLayoutStruct `json:"room_layout"`
 	Users      []UserStruct `json:"users"`
 }
 
@@ -27,15 +28,23 @@ func RoomStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 		apiResp.Result = ERROR
 		apiResp.Message = RoomDoesNotExist
 	} else {
-		roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
-		apiResp.RoomStatus = RoomStruct{
-			RoomId: roomId,
-			Body:   roomInfo,
-		}
+		roomLayout, err := RetrieveRoomLayout(roomId, client, ctx)
+		if err != nil {
+			apiResp.Result = ERROR
+			apiResp.Message = "failed to retrieve room layout"
+		} else {
+			apiResp.RoomLayout = roomLayout
 
-		users, _ := RetrieveRoomUsers(roomId, client, ctx)
-		apiResp.Users = users
-		apiResp.Result = OK
+			roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
+			apiResp.RoomStatus = RoomStruct{
+				RoomId: roomId,
+				Body:   roomInfo,
+			}
+
+			users, _ := RetrieveRoomUsers(roomId, client, ctx)
+			apiResp.Users = users
+			apiResp.Result = OK
+		}
 	}
 	bytes, _ := json.Marshal(apiResp)
 	return Response(bytes)

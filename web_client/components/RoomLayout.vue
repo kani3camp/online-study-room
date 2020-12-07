@@ -1,30 +1,5 @@
 <template>
   <div>
-
-    <div id="seat-selector">
-      <v-form class="mx-auto">
-        <v-select
-          v-model="selected_seat_id"
-          :items="layout.seats"
-          item-value="id"
-          item-text="id"
-          label="座席番号"
-          outlined
-        />
-        <div>
-          <v-btn
-            color="primary"
-            block
-            elevation="3"
-            :disabled="! selected_seat_id"
-            @click="select"
-          >
-            決定
-          </v-btn>
-        </div>
-      </v-form>
-    </div>
-
     <v-card
       class="mt-3"
     >
@@ -38,7 +13,7 @@
         }"
       >
         <div
-          v-for="(seat, index) in layout.seats"
+          v-for="(seat, index) in seats"
           :key="seat.id"
           class="seat"
           :style="{
@@ -54,7 +29,7 @@
         </div>
 
         <div
-          v-for="(partition, index) in layout.partitions"
+          v-for="(partition, index) in partitions"
           :key="partition.id"
           class="partition"
           :style="{
@@ -71,8 +46,7 @@
 
 <script>
 import Seat from '@/components/Seat'
-import roomLayoutJson from 'assets/mathematics-rom-layout.json'
-
+// todo コード整理
 export default {
   name: 'RoomLayout',
   comments: {
@@ -83,56 +57,38 @@ export default {
       type: String,
       required: true,
     },
+    layout: {
+      type: Object,
+      default: null,
+    },
   },
   data() {
     return {
       emptySeatColor: '#e5b796',
       seatFontSize: 80 + '%',
-      layout: roomLayoutJson,
       isMounted: false,
-      selected_seat_id: null,
+      // isLayoutLoaded: false,
+      seats: [],
+      partitions: [],
     }
   },
   computed: {
-    roomShape: {
-      // get() {
-      //   if (this.isMounted) {
-      //     console.log('再度')
-      //     const roomLayoutWidth = this.$refs.roomLayout.clientWidth
-      //     const roomLayoutHeight = this.$refs.roomLayout.clientHeight
-      //     if (roomLayoutWidth > roomLayoutHeight) {
-      //       // 横長画面
-      //       const widthPx =
-      //         (roomLayoutHeight * this.layout['room_shape'].width) / this.layout['room_shape'].height
-      //       return {
-      //         width: widthPx + 'px',
-      //         height: roomLayoutHeight + 'px',
-      //         seatFontSize: widthPx * this.layout['font_size_ratio'] + 'px',
-      //       }
-      //     } else {
-      //       // 縦長画面
-      //       return {
-      //         width: roomLayoutWidth + 'px',
-      //         height:
-      //           (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
-      //       }
-      //     }
-      //   } else {
-      //     return {
-      //       width: 100 + 'vw',
-      //       height: 90 + 'vh',
-      //     }
-      //   }
-      // },
+    roomLayout: {
       get() {
-        if (this.isMounted) {
-          console.log('再度roomShape')
+        return this.layout
+      },
+      set() {},
+    },
+    roomShape: {
+      get() {
+        if (this.isMounted && this.roomLayout && this.$refs.roomLayout) {
           const roomLayoutWidth = this.$refs.roomLayout.clientWidth
           return {
             width: 100 + '%',
             height:
-              (roomLayoutWidth * this.layout['room_shape'].height) / this.layout['room_shape'].width + 'px',
-            seatFontSize: roomLayoutWidth * this.layout['font_size_ratio'] + 'px',
+              (roomLayoutWidth * this.roomLayout['room_shape'].height) / this.roomLayout['room_shape'].width +
+              'px',
+            seatFontSize: roomLayoutWidth * this.roomLayout['font_size_ratio'] + 'px',
           }
         } else {
           return {
@@ -145,76 +101,116 @@ export default {
     },
     seatShape: {
       get() {
-        const vm = this
-        return {
-          width: (100 * vm.layout['seat_shape'].width) / vm.layout['room_shape'].width,
-          height: (100 * vm.layout['seat_shape'].height) / vm.layout['room_shape'].height,
+        if (this.roomLayout) {
+          const vm = this
+          return {
+            width: (100 * vm.roomLayout['seat_shape'].width) / vm.roomLayout['room_shape'].width,
+            height: (100 * vm.roomLayout['seat_shape'].height) / vm.roomLayout['room_shape'].height,
+          }
+        } else {
+          return {
+            width: 0,
+            height: 0,
+          }
         }
       },
       set() {},
     },
     seatPositions: {
       get() {
-        const vm = this
-        return this.layout.seats.map(function (seat) {
-          return vm.seatPosition(seat.x, seat.y)
-        })
+        if (this.roomLayout) {
+          const vm = this
+          return this.roomLayout.seats.map(function (seat) {
+            return vm.seatPosition(seat.x, seat.y)
+          })
+        } else {
+          return []
+        }
       },
       set() {},
     },
     partitionShapes: {
       get() {
-        const vm = this
-        return vm.layout.partitions.map(function (partition, index) {
-          const shapeType = vm.layout.partitions[index]['shape_type']
-          let width
-          let height
-          for (let i = 0; i < vm.layout['partition_shapes'].length; i++) {
-            if (vm.layout['partition_shapes'][i].name === shapeType) {
-              width = (100 * vm.layout['partition_shapes'][i].width) / vm.layout['room_shape'].width
-              height = (100 * vm.layout['partition_shapes'][i].height) / vm.layout['room_shape'].height
+        if (this.roomLayout) {
+          const vm = this
+          return vm.layout.partitions.map(function (partition, index) {
+            const shapeType = vm.layout.partitions[index]['shape_type']
+            let width
+            let height
+            for (let i = 0; i < vm.layout['partition_shapes'].length; i++) {
+              if (vm.layout['partition_shapes'][i].name === shapeType) {
+                width = (100 * vm.layout['partition_shapes'][i].width) / vm.layout['room_shape'].width
+                height = (100 * vm.layout['partition_shapes'][i].height) / vm.layout['room_shape'].height
+              }
             }
-          }
+            return {
+              width: width,
+              height: height,
+            }
+          })
+        } else {
           return {
-            width: width,
-            height: height,
+            width: 0,
+            height: 0,
           }
-        })
+        }
       },
       set() {},
     },
     partitionPositions: function () {
-      const vm = this
-      return this.layout.partitions.map(function (partition) {
-        return vm.seatPosition(partition.x, partition.y)
-      })
+      if (this.roomLayout) {
+        const vm = this
+        return this.layout.partitions.map(function (partition) {
+          return vm.seatPosition(partition.x, partition.y)
+        })
+      } else {
+        return []
+      }
+    },
+    roomSize: function () {
+      if (this.$refs.roomLayout) {
+        const roomLayoutWidth = this.$refs.roomLayout.clientWidth
+        const roomLayoutHeight = this.$refs.roomLayout.clientHeight
+        return {
+          width: roomLayoutWidth,
+          height: roomLayoutHeight,
+        }
+      }
+      return {
+        width: 0,
+        height: 0,
+      }
     },
   },
   watch: {
+    roomLayout: function (newValue, oldValue) {
+      if (newValue !== {}) {
+        this.initializeLayoutData()
+        this.determineFontSize()
+      }
+    },
     roomShape: function (newValue, oldValue) {
-      this.seatFontSize = newValue.seatFontSize
+      if (this.roomLayout) {
+        this.seatFontSize = newValue.seatFontSize
+      }
     },
-    created() {
-      console.log(this.layout)
-    },
-    async mounted() {
-      console.log('mounted()')
-      this.isMounted = true
-      this.determineFontSize()
+    roomSize: function (newValue, oldValue) {
+      if (newValue.width !== 0) {
+      }
     },
   },
-  mounted() {
+  async mounted() {
     this.isMounted = true
   },
   methods: {
-    select() {
-      this.$emit('selected', this.selected_seat_id)
+    initializeLayoutData() {
+      this.seats = this.roomLayout.seats
+      this.partitions = this.roomLayout.partitions
     },
     determineFontSize() {
       const roomLayoutWidth = this.$refs.roomLayout.clientWidth
       const roomLayoutHeight = this.$refs.roomLayout.clientHeight
       const vm = this
-      console.log(roomLayoutWidth)
       this.seatFontSize = Math.floor((roomLayoutWidth * 30) / 800)
       this.seatShape = {
         width: Math.floor(

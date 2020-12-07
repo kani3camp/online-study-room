@@ -15,8 +15,8 @@ type SendContactFormResponseStruct struct {
 
 // 環境変数はコンソールの関数の編集から設定してる
 func SendContactForm(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	var apiResp SendContactFormResponseStruct
 	userId, idToken, mailAddress := r.FormValue(user_id), r.FormValue(id_token), r.FormValue("mail_address")

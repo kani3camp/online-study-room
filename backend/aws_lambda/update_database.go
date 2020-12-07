@@ -11,6 +11,7 @@ type UpdateDatabaseResponseStruct struct {
 	Message string `json:"message"`
 }
 
+// todo connection idも考慮に入れる
 func UpdateDatabase(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)

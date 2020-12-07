@@ -9,12 +9,13 @@ type RoomStatusResponseStruct struct {
 	Result     string       `json:"result"`
 	Message    string       `json:"message"`
 	RoomStatus RoomStruct   `json:"room_status"`
+	RoomLayout RoomLayoutStruct `json:"room_layout"`
 	Users      []UserStruct `json:"users"`
 }
 
 func RoomStatus(w http.ResponseWriter, r *http.Request) {
-	ctx, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 	
 	var apiResp RoomStatusResponseStruct
 	roomId := r.FormValue(room_id)
@@ -26,15 +27,23 @@ func RoomStatus(w http.ResponseWriter, r *http.Request) {
 		apiResp.Result = ERROR
 		apiResp.Message = RoomDoesNotExist
 	} else {
-		roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
-		apiResp.RoomStatus = RoomStruct{
-			RoomId: roomId,
-			Body:   roomInfo,
+		roomLayout, err := RetrieveRoomLayout(roomId, client, ctx)
+		if err != nil {
+			apiResp.Result = ERROR
+			apiResp.Message = "failed to retrieve room layout"
+		} else {
+			apiResp.RoomLayout = roomLayout
+
+			roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
+			apiResp.RoomStatus = RoomStruct{
+				RoomId: roomId,
+				Body:   roomInfo,
+			}
+
+			users, _ := RetrieveRoomUsers(roomId, client, ctx)
+			apiResp.Users = users
+			apiResp.Result = OK
 		}
-		
-		users, _ := RetrieveRoomUsers(roomId, client, ctx)
-		apiResp.Users = users
-		apiResp.Result = OK
 	}
 	bytes, _ := json.Marshal(apiResp)
 	_, _ = w.Write(bytes)

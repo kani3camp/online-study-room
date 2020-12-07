@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"log"
 )
 
 type EnterRoomParams struct {
 	RoomId  string `json:"room_id"`
 	UserId  string `json:"user_id"`
+	SeatId int `json:"seat_id"`
 	IdToken string `json:"id_token"`
 }
 
@@ -18,6 +18,7 @@ type EnterRoomResponseStruct struct {
 	Message string `json:"message"`
 }
 
+// todo EnterRoom関数いる？いるなら席も指定できるよう修正
 func EnterRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
@@ -27,9 +28,9 @@ func EnterRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRes
 	params := EnterRoomParams{}
 	_ = json.Unmarshal([]byte(body), &params)
 
-	roomId, userId, idToken := params.RoomId, params.UserId, params.IdToken
+	roomId, userId, seatId, idToken := params.RoomId, params.UserId, params.SeatId, params.IdToken
 
-	if roomId == "" || userId == "" || idToken == "" {
+	if roomId == "" || userId == "" || seatId == 0 || idToken == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
 	} else {
@@ -54,18 +55,28 @@ func EnterRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRes
 				_ = client.Close()
 
 				client, _ = InitializeFirestoreClient(ctx)
-				_ = _EnterRoom(roomId, userId, client, ctx)
-				apiResp.Result = OK
-				apiResp.Message = "successfully entered " + roomId + "."
+				err := _EnterRoom(roomId, userId, seatId, client, ctx)
+				if err != nil {
+					apiResp.Result = ERROR
+					apiResp.Message = "failed to enter room"
+				} else {
+					apiResp.Result = OK
+					apiResp.Message = "successfully entered " + roomId + "."
+				}
 			}
 		} else {
 			// 入室処理
-			_ = _EnterRoom(roomId, userId, client, ctx)
-			apiResp.Result = OK
-			apiResp.Message = "successfully entered " + roomId + "."
+			err := _EnterRoom(roomId, userId, seatId, client, ctx)
+			if err != nil {
+				apiResp.Result = ERROR
+				apiResp.Message = "failed to enter room"
+			} else {
+				apiResp.Result = OK
+				apiResp.Message = "successfully entered " + roomId + "."
+			}
 		}
 	}
-	log.Println(apiResp)
+
 	bytes, _ := json.Marshal(apiResp)
 	return Response(bytes)
 }

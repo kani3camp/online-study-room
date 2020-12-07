@@ -68,7 +68,7 @@ export default {
       get() {
         return this.ifShowDialog
       },
-      set(value) {},
+      set() {},
     },
     ifAccept: {
       get() {

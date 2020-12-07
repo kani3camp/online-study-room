@@ -11,8 +11,8 @@ type TestResponse struct {
 }
 
 func Test(w http.ResponseWriter, r *http.Request)  {
-	_, client := InitializeHttpFunc(&w)
-	defer client.Close()
+	_, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 
 	var apiResp TestResponse
 	apiResp.Result = OK
