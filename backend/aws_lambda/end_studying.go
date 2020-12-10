@@ -19,7 +19,7 @@ func EndStudying(ctx context.Context, request events.APIGatewayWebsocketProxyReq
 	if err.Body != nil {
 		log.Println(err)
 		return err
-	} else if isInRoom, _ := IsInRoom(userInfo.Body.In, userInfo.UserId, client, ctx); !isInRoom {
+	} else if isInRoom, _, _ := IsInRoom(userInfo.Body.In, userInfo.UserId, client, ctx); !isInRoom {
 		errString := "this user(" + userInfo.UserId + ") is not in any room"
 		return UserNotInAnyRoom.New(errString)
 	}

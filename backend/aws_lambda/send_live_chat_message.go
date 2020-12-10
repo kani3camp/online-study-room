@@ -118,10 +118,10 @@ func RefreshLiveChatId(config *ApiConfigStruct, client *firestore.Client, ctx co
 				"live-chat-id": config.LiveChatId,
 			}, firestore.MergeAll)
 			if err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 		} else {
-			log.Fatalln("No live streaming now.")
+			log.Println("No live streaming now.")
 		}
 		return err
 	} else {
@@ -178,7 +178,7 @@ func RefreshAccessToken(config *ApiConfigStruct, client *firestore.Client, ctx c
 			"expire-date":  config.ExpireDate,
 		}, firestore.MergeAll)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 
 		return err

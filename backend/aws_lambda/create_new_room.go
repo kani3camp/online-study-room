@@ -9,7 +9,7 @@ import (
 )
 
 type CreateNewRoomParams struct {
-	RoomId        string `json:"RoomId"`
+	RoomId        string `json:"room_id"`
 	RoomName      string `json:"room_name"`
 	RoomType      string `json:"room_type"`
 	Password      string `json:"password"`

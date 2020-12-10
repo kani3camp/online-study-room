@@ -10,9 +10,9 @@ import (
 )
 
 type StayStudyingRequest struct {
-	UserId     string `json:"UserId"`
-	IdToken    string `json:"IdToken"`
-	RoomId     string `json:"RoomId"`
+	UserId     string `json:"user_id"`
+	IdToken    string `json:"id_token"`
+	RoomId     string `json:"room_id"`
 	//SeatId int `json:"seat_id"` 部屋にいることが確認できればいいや
 }
 
@@ -49,7 +49,7 @@ func StayStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRe
 		if connectionId != currentConnectionId {
 			response.IsOk = false
 			response.Message = "this connection id is invalid"
-		} else if isInRoom, _ := IsInRoom(requestData.RoomId, requestData.UserId, client, ctx); !isInRoom {
+		} else if isInRoom, _, _ := IsInRoom(requestData.RoomId, requestData.UserId, client, ctx); !isInRoom {
 			response.IsOk = false
 			response.Message = "you are not in the room."
 		} else {

@@ -10,8 +10,8 @@ import (
 )
 
 type SendContactFormParams struct {
-	UserId      string `json:"UserId"`
-	IdToken     string `json:"IdToken"`
+	UserId      string `json:"user_id"`
+	IdToken     string `json:"id_token"`
 	MailAddress string `json:"mail_address"`
 	Message     string `json:"message"`
 	ContactType string `json:"contact_type"`
