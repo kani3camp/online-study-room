@@ -1232,5 +1232,5 @@ func FindUserWithConnectionId(connectionId string, client *firestore.Client, ctx
 			return user, CustomError{Body: nil}
 		}
 	}
-	return UserStruct{}, NoSuchUserExists.New("no such user exists")
+	return UserStruct{}, NoSuchUserExists.New("no such user exists, searched by connection id:" + connectionId)
 }

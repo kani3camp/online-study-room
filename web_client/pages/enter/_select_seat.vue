@@ -18,17 +18,19 @@
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <v-container style="max-width: 700px">
         <h2>席を選ぼう。</h2>
 
         <div id="seat-selector">
-          <v-form class="mx-auto">
+          <v-form
+            class="mx-auto"
+          >
             <v-select
               v-model="selected_seat_id"
               :items="seats"
               item-value="id"
               item-text="id"
-              label="座席番号"
+              label="座席番号を選んでください"
               outlined
             />
             <div>

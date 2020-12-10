@@ -52,8 +52,9 @@ func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyR
 		response.Message = InvalidUser
 	} else if isOnline, _ := IsOnline(userId, client, ctx); isOnline {
 		currentRoomId, _ := InWhichRoom(userId, client, ctx)
-		// すでにその部屋にいた場合
-		if currentRoomId == roomId {
+		currentSeatId, _ := RetrieveCurrentSeatId(userId, client, ctx)
+		// すでにその部屋のその席にいた場合
+		if currentRoomId == roomId && currentSeatId == seatId {
 			// 他のconnection idがすでに設定されている場合、強制的に書き換える
 			response.IsOk = true
 			response.Message = "you are already in the " + currentRoomId

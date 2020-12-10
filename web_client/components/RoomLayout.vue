@@ -17,7 +17,7 @@
           :key="seat.id"
           class="seat"
           :style="{
-            backgroundColor: emptySeatColor,
+            backgroundColor: seats_if_filled[seat.id] ? filledSeatColor : emptySeatColor,
             left: seatPositions[index].x+'%',
             top: seatPositions[index].y+'%',
             width: seatShape.width+'%',
@@ -61,13 +61,19 @@ export default {
       type: Object,
       default: null,
     },
+    seatsDataArray: {
+      type: Array,
+      default: null,
+    },
   },
   data() {
     return {
-      emptySeatColor: '#e5b796',
+      emptySeatColor: '#eaccb6',
+      filledSeatColor: '#431e03',
       seatFontSize: 80 + '%',
       isMounted: false,
       // isLayoutLoaded: false,
+      seats_if_filled: null,
       seats: [],
       partitions: [],
     }
@@ -76,6 +82,12 @@ export default {
     roomLayout: {
       get() {
         return this.layout
+      },
+      set() {},
+    },
+    seatsData: {
+      get() {
+        return this.seatsDataArray
       },
       set() {},
     },
@@ -189,6 +201,16 @@ export default {
         this.determineFontSize()
       }
     },
+    seatsData: function (newValue, oldValue) {
+      if (newValue && this.seats) {
+        for (let seat in this.seats) {
+          // this.seats_if_filled[seat.id] = false
+        }
+        for (let filled_seat in newValue) {
+          // this.seats_if_filled[filled_seat.seat_id] = true
+        }
+      }
+    },
     roomShape: function (newValue, oldValue) {
       if (this.roomLayout) {
         this.seatFontSize = newValue.seatFontSize
@@ -205,6 +227,10 @@ export default {
   methods: {
     initializeLayoutData() {
       this.seats = this.roomLayout.seats
+      for (let seat of this.seats) {
+        console.log(seat)
+        this.seats_if_filled[seat.id] = false
+      }
       this.partitions = this.roomLayout.partitions
     },
     determineFontSize() {
@@ -233,20 +259,6 @@ export default {
         y: (100 * y) / this.layout['room_shape'].height,
       }
     },
-    window: (onload = function () {
-      const numSeats = 23
-
-      for (let n = 0; n < numSeats; n++) {
-        const seatNum = n + 1
-        const seatElement = document.getElementById('seat-' + seatNum.toString())
-        if (seatElement) {
-          seatElement.innerText = seatNum.toString() + '\n'
-          // document.getElementById(elementId).style.backgroundColor = emptySeatColor
-
-          seatElement.onclick = function () {}
-        }
-      }
-    }),
   },
 }
 </script>

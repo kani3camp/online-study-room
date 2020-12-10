@@ -13,13 +13,22 @@
 
       <Dialog
         :if-show-dialog="if_show_dialog"
-        :accept-needed="accept_needed"
+        :accept-needed="true"
         :loading="exiting"
-        :accept-option-string="accept_string"
-        :cancel-option-string="cancel_string"
-        :card-title="dialog_message"
-        @accept="on_accept"
-        @cancel="on_cancel"
+        accept-option-string="出る"
+        cancel-option-string="キャンセル"
+        card-title="ルームを出ますか？"
+        @accept="closeSocket"
+        @cancel="if_show_dialog=false"
+      />
+
+      <Dialog
+        :if-show-dialog="if_show_result"
+        :accept-needed="false"
+        :loading="exiting"
+        cancel-option-string="閉じる"
+        card-title="切断されました！ トップページに戻ります。"
+        @cancel="exitRoom"
       />
 
       <v-layout justify-center>
@@ -27,8 +36,10 @@
       </v-layout>
     </v-app-bar>
 
-    <v-main>
-      <v-list subheader>
+    <v-main v-show="is_entered">
+      <v-list
+        subheader
+      >
         <v-list-item>
           <v-layout justify-center>
             入室時刻：{{ entered_time }}
@@ -39,14 +50,40 @@
 
         <v-subheader>同じ部屋の他のユーザー</v-subheader>
 
-        <v-list-item>
-          <RoomLayout
-            :room-id="room_id"
-            :layout="room_layout"
-          />
-        </v-list-item>
       </v-list>
+
+      <v-container
+        style="max-width: 800px"
+      >
+        <RoomLayout
+          :room-id="room_id"
+          :layout="room_layout"
+          style="max-width: 800px"
+        />
+      </v-container>
+
     </v-main>
+
+    <v-main v-show="!is_entered">
+      <v-container
+        v-show="!is_entered"
+        class="fill-height"
+        fluid
+      >
+        <v-row
+          align="center"
+          justify="center"
+        >
+          <v-col class="text-center">
+            <div class="big-char">
+              ルームに入室中...
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+
+    </v-main>
+
   </v-app>
 </template>
 
@@ -64,6 +101,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     console.log('beforeRouteLeave: to=', to.path, ',from=', from.path)
+    window.onbeforeunload = null
     if (this.$store.state.room_id !== '') {
       // todo
       // window.alert('退室する場合は退室ボタンを押してください。')
@@ -78,16 +116,14 @@ export default {
     return {
       room_id: '',
       room_name: '',
+      // room_layoutの初期値はnull
       room_layout: null,
+      // seats_dataの初期値はnull
+      seats_data: null,
       entered_time: new Date().getHours() + '時' + new Date().getMinutes() + '分',
       room_status: null,
       if_show_dialog: false,
-      dialog_message: 'ルームを出ますか？',
-      accept_needed: true,
-      accept_string: '出る',
-      cancel_string: 'キャンセル',
-      on_accept: null,
-      on_cancel: null,
+      if_show_result: false,
       exiting: false,
       other_users_info: [],
       stay_awake_timeout: null,
@@ -102,9 +138,8 @@ export default {
     // todo これ意味ある？↓
     common.onAuthStateChanged(vm)
 
+    this.room_id = this.$store.state.room_id
     this.room_name = this.$store.state.room_name
-    this.on_accept = vm.closeSocket()
-    this.on_cancel = vm.closeDialog()
 
     if (vm.$store.state.isSignedIn) {
       // 入室時刻を取得
@@ -141,7 +176,6 @@ export default {
       vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/production')
       vm.socket.onopen = async () => {
         console.log('socket opened.')
-        vm.is_socket_open = true
         const params = {
           action: 'connect',
           user_id: firebase.auth().currentUser.uid,
@@ -159,23 +193,20 @@ export default {
             console.log('入室成功！！')
             vm.is_entered = true
             await vm.stayStudying()
+            vm.room_layout = resp['room_layout']
           }
           let info = []
           let amIin = false
           for (const user of resp['users']) {
             if (user.user_id !== firebase.auth().currentUser.uid) {
-              const study_seconds = new Date().getTime() - new Date(user['user_body'].last_entered).getTime()
-              info.push({
-                display_name: user.display_name.substr(0, 3),
-                time_study: Math.floor(study_seconds / (1000 * 60)).toString() + '分',
-              })
+              // todo
             } else {
               amIin = true
             }
           }
           if (!amIin) {
             console.log('部屋に自分がいないので退室処理')
-            await this.$router.push('/')
+            await vm.closeSocket()
           }
           this.other_users_info = info
         } else {
@@ -185,11 +216,9 @@ export default {
       }
       vm.socket.onclose = async () => {
         console.log('socket closed.')
+        vm.exiting = false
         vm.$store.commit('setRoomId', '')
-        vm.dialog_message = '切断されました！ トップページに戻ります。'
-        vm.accept_needed = false
-        vm.cancel_string = '閉じる'
-        vm.on_cancel = vm.exitRoom()
+        vm.if_show_result = true
       }
       vm.socket.onerror = async () => {
         console.error('socket error.')
@@ -224,15 +253,12 @@ export default {
       // }
     },
     closeSocket() {
-      if (this.socket) {
+      if (this.is_socket_open) {
         this.exiting = true
         this.socket.close()
       } else {
-        // todo
+        this.exitRoom()
       }
-    },
-    closeDialog() {
-      this.if_show_dialog = false
     },
     async exitRoom() {
       await this.$router.push('/')
