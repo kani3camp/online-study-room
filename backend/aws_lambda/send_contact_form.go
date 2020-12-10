@@ -10,8 +10,8 @@ import (
 )
 
 type SendContactFormParams struct {
-	UserId      string `json:"user_id"`
-	IdToken     string `json:"id_token"`
+	UserId      string `json:"UserId"`
+	IdToken     string `json:"IdToken"`
 	MailAddress string `json:"mail_address"`
 	Message     string `json:"message"`
 	ContactType string `json:"contact_type"`
@@ -23,6 +23,7 @@ type SendContactFormResponseStruct struct {
 
 // 環境変数はコンソールの関数の編集から設定してる
 func SendContactForm(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("SendContactForm()")
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 

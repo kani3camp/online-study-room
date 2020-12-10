@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 	"os"
 	"strconv"
 )
@@ -87,6 +88,7 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 }
 
 func UploadRoomLayout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("UploadRoomLayout()")
 	ctx, client := InitializeEventFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 	

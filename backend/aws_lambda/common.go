@@ -5,7 +5,6 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"encoding/base64"
-	"errors"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"fmt"
@@ -14,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"io/ioutil"
@@ -23,42 +23,97 @@ import (
 	"time"
 )
 
-const ROOMS = "rooms"
-const USERS = "users"
-const HISTORY = "history"
-const CONFIG = "config"
-const API = "api"
-const API_GATEWAY = "api-gateway"
-const ROOM_LAYOUTS_INFO = "room-layouts-info"
-const ROOM_LAYOUTS = "room-layouts"
-const NEWS = "news"
 
-const ProjectId = "online-study-space"
+const (
+	ROOMS = "rooms"
+	USERS = "users"
+	HISTORY = "history"
+	CONFIG = "config"
+	API = "api"
+	ApiGateway = "api-gateway"
+	RoomLayoutsInfo = "room-layouts-info"
+	RoomLayouts = "room-layouts"
+	NEWS = "news"
 
-//var ProjectId = os.Getenv("GOOGLE_CLOUD_PROJECT")	// なんか代入されない
+	ProjectId = "online-study-space"
+	TimeLimit = 180 // 秒
 
-const TimeLimit = 180 // 秒
+	UserId = "UserId"
+	RoomId = "RoomId"
+	IdToken = "IdToken"
 
-const user_id = "user_id"
-const room_id = "room_id"
-const id_token = "id_token"
+	RoomDoesNotExist = "room does not exist"
+	InvalidParams = "invalid parameters"
+	InvalidUser = "invalid user"
+	InvalidValue = "invalid value"
+	OK = "ok"
+	ERROR = "error"
+	UserAuthFailed = "user authentication failed"
+	UserDoesNotExist = "user does not exist"
+	Failed = "failed"
 
-const RoomDoesNotExist = "room does not exist."
-const InvalidParams = "invalid parameters."
-const InvalidUser = "invalid user."
-const InvalidValue = "invalid value."
-const OK = "ok"
-const ERROR = "error"
-const UserAuthFailed = "user authentication failed."
-const UserDoesNotExist = "user does not exist."
-const Failed = "failed"
+	EnterActivity = "entering"
+	LeaveActivity = "leaving"
+	NewRoomLayoutActivity = "new-room-layout"
 
-const EnterActivity = "entering"
-const LeaveActivity = "leaving"
-const NewRoomLayoutActivity = "new-room-layout"
+)
+
+
+type ErrorType uint
+const (
+	Unknown ErrorType = iota
+	SeatNotAvailable
+	UserNotInTheRoom
+	UserNotInAnyRoom
+	NoSuchUserExists
+	RoomNotExist
+	// todo
+)
+
+// ErrorTypeを取得すること(Type()関数が使えること)に特化した型であり、ここではCustomError型の構造体をこの型として代入（もしくは型アサーション）できる
+// ただ、今回はこのTypeGetterを使う型アサーションは、CustomErrorにすればよさげ？？わざわざこれを定義しなくてもよさそうだが...
+//type TypeGetter interface {
+//	Type() ErrorType
+//}
+type CustomError struct {
+	ErrorType ErrorType
+	Body      error
+}
+func (et ErrorType) New(message string) CustomError {
+	return CustomError{ErrorType: et, Body: errors.New(message)}
+}
+func (et ErrorType) Wrap(err error, message string) CustomError {
+	return CustomError{ErrorType: et, Body: errors.Wrap(err, message)}
+}
+//func (e CustomError) Error() string {
+//	return e.Body.Error()
+//}
+//func (e CustomError) Type() ErrorType {
+//	return e.ErrorType
+//}
+//func Wrap(err error, message string) CustomError {
+//	we := errors.Wrap(err, message)
+//	if customError, ok := err.(TypeGetter); ok {
+//		return CustomError{ErrorType: customError.Type(), Body: we}
+//	}
+//	return CustomError{ErrorType: Unknown, Body: we}
+//}
+//func Cause(err error) error {
+//	return errors.Cause(err)
+//}
+//func GetErrorType(err error) ErrorType {
+//	for {
+//		if e, ok := err.(TypeGetter); ok {
+//			return e.Type()
+//		}
+//		break
+//	}
+//	return Unknown
+//}
+
 
 type RoomStruct struct {
-	RoomId string         `json:"room_id"`
+	RoomId string         `json:"RoomId"`
 	Body   RoomBodyStruct `json:"room_body"`
 }
 
@@ -72,11 +127,11 @@ type RoomBodyStruct struct {
 
 type UserSeatSetStruct struct {
 	SeatId int `firestore:"seat-id" json:"seat_id"`
-	UserId string `firestore:"user-id" json:"user_id"`
+	UserId string `firestore:"user-id" json:"UserId"`
 }
 
 type UserStruct struct {
-	UserId      string         `json:"user_id"`
+	UserId      string         `json:"UserId"`
 	DisplayName string         `json:"display_name"`
 	Body        UserBodyStruct `json:"user_body"`
 }
@@ -121,7 +176,7 @@ type RoomLayoutsInfoConfigStruct struct {
 }
 
 type RoomLayoutStruct struct {
-	RoomId string `json:"room_id" firestore:"room-id"`
+	RoomId string `json:"RoomId" firestore:"room-id"`
 	Version int `json:"version" firestore:"version"`
 	FontSizeRatio float32 `json:"font_size_ratio" firestore:"font-size-ratio"`
 	RoomShape struct {
@@ -155,27 +210,40 @@ type ApiGatewayConfigStruct struct {
 	WebsocketConnectionBaseUrl string `json:"websocket_connection_base_url" firestore:"websocket-connection-base-url"`
 }
 
+type EnterLeaveHistory struct {
+	Activity string `firestore:"activity"`
+	RoomId string `firestore:"room-id"`
+	UserId string `firestore:"user-id"`
+	Date time.Time `firestore:"date"`
+}
+
+
 func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
+	log.Println("InitializeHttpFuncWithFirestore()")
 	return InitializeEventFuncWithFirestore()
 }
 
 func InitializeEventFuncWithFirestore() (context.Context, *firestore.Client) {
+	log.Println("InitializeEventFuncWithFirestore()")
 	ctx := context.Background()
 	client, _ := InitializeFirestoreClient(ctx)
 	return ctx, client
 }
 
 func InitializeHttpFuncWithCloudStorage() (context.Context, *storage.Client) {
+	log.Println("InitializeHttpFuncWithCloudStorage()")
 	return InitializeEventFuncWithCloudStorage()
 }
 
 func InitializeEventFuncWithCloudStorage() (context.Context, *storage.Client) {
+	log.Println("InitializeEventFuncWithCloudStorage()")
 	ctx := context.Background()
 	client, _ := InitializeCloudStorageClient(ctx)
 	return ctx, client
 }
 
 func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
+	log.Println("InitializeFirestoreClient()")
 	var client *firestore.Client
 	var err1, err2 error
 	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
@@ -193,6 +261,7 @@ func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 }
 
 func InitializeCloudStorageClient(ctx context.Context) (*storage.Client, error) {
+	log.Println("InitializeCloudStorageClient()")
 	var client *storage.Client
 	var err1, err2 error
 	awsCredential, err1 := RetrieveCloudStorageCredentialInBytes()
@@ -210,6 +279,7 @@ func InitializeCloudStorageClient(ctx context.Context) (*storage.Client, error) 
 }
 
 func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
+	log.Println("InitializeFirebaseApp()")
 	var app *firebase.App
 	var err1, err2 error
 	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
@@ -228,6 +298,7 @@ func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
 }
 
 func InitializeFirebaseAuthClient(ctx context.Context) (*auth.Client, error) {
+	log.Println("InitializeFirebaseAuthClient()")
 	app, _ := InitializeFirebaseApp(ctx)
 	authClient, err := app.Auth(ctx)
 	if err != nil {
@@ -238,6 +309,7 @@ func InitializeFirebaseAuthClient(ctx context.Context) (*auth.Client, error) {
 }
 
 func CloseFirestoreClient(client *firestore.Client) {
+	log.Println("CloseFirestoreClient()")
 	err := client.Close()
 	if err != nil {
 		log.Println("failed to close firestore client.")
@@ -246,6 +318,7 @@ func CloseFirestoreClient(client *firestore.Client) {
 }
 
 func CloseCloudStorageClient(client *storage.Client) {
+	log.Println("CloseCloudStorageClient()")
 	err := client.Close()
 	if err != nil {
 		log.Println("failed to close cloud storage client.")
@@ -254,6 +327,7 @@ func CloseCloudStorageClient(client *storage.Client) {
 }
 
 func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
+	log.Println("RetrieveFirebaseCredentialInBytes()")
 	secretName := "firestore-service-account"
 	region := "ap-northeast-1"
 
@@ -319,6 +393,7 @@ func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
 }
 
 func RetrieveCloudStorageCredentialInBytes() ([]byte, error) {
+	log.Println("RetrieveCloudStorageCredentialInBytes()")
 	secretName := "cloudstorage-service-account"
 	region := "ap-northeast-1"
 
@@ -383,6 +458,7 @@ func RetrieveCloudStorageCredentialInBytes() ([]byte, error) {
 }
 
 func IsUserVerified(userId string, idToken string, client *firestore.Client, ctx context.Context) (bool, error) {
+	log.Println("IsUserVerified()")
 	authClient, _ := InitializeFirebaseAuthClient(ctx)
 	token, err := authClient.VerifyIDToken(ctx, idToken)
 	if err != nil {
@@ -397,6 +473,7 @@ func IsUserVerified(userId string, idToken string, client *firestore.Client, ctx
 }
 
 func IsExistRoom(roomId string, client *firestore.Client, ctx context.Context) (bool, error) {
+	log.Println("IsExistRoom()")
 	log.Println("IsExistRoom() is running. roomId : " + roomId + ".")
 	roomDoc, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
 	if err != nil {
@@ -407,6 +484,7 @@ func IsExistRoom(roomId string, client *firestore.Client, ctx context.Context) (
 }
 
 func IsInRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) (bool, error) {
+	log.Println("IsInRoom()")
 	log.Println("IsInRoom() is running. roomId : " + roomId + ". userId : " + userId + ".")
 	roomDoc, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
 	if err != nil {
@@ -429,7 +507,8 @@ func IsInRoom(roomId string, userId string, client *firestore.Client, ctx contex
 }
 
 func IsInUsers(userId string, client *firestore.Client, ctx context.Context) (bool, error) {
-	log.Println("IsInUsers() is running. userId : " + userId + ".")
+	log.Println("IsInUsers()")
+	log.Println("\t userId : " + userId + ".")
 	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
 	if err != nil {
 		return false, err
@@ -438,6 +517,7 @@ func IsInUsers(userId string, client *firestore.Client, ctx context.Context) (bo
 }
 
 func IsOnline(userId string, client *firestore.Client, ctx context.Context) (bool, error) {
+	log.Println("IsOnline()")
 	log.Println("IsOnline() is running. userId : " + userId + ".")
 	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
 	if err != nil {
@@ -448,19 +528,20 @@ func IsOnline(userId string, client *firestore.Client, ctx context.Context) (boo
 	}
 }
 
-func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) error {
-	log.Println("[LeaveRoom()] roomId : " + roomId + ". user : " + userId + ".")
+func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx context.Context) CustomError {
+	log.Println("LeaveRoom()")
+	log.Println("roomId : " + roomId + ". user : " + userId + ".")
 	if isExistRoom, _ := IsExistRoom(roomId, client, ctx); !isExistRoom {
-		log.Println(RoomDoesNotExist)
-		// todo そもそも存在しない部屋を指定した場合
-		return nil
+		errString := RoomDoesNotExist
+		log.Println(errString)
+		return RoomNotExist.New(errString)
 	} else if isInRoom, _ := IsInRoom(roomId, userId, client, ctx); !isInRoom {
 		log.Println("you are not in the room.")
-		return nil
+		return CustomError{Body: nil}
 	} else {
 		userBody, err := RetrieveUserInfo(userId, client, ctx)
 		if err != nil {
-			return err
+			return CustomError{ErrorType: Unknown, Body: err}
 		}
 		// userのconnection idを削除
 		_ = SetConnectionId(userId, "", client, ctx)
@@ -474,13 +555,39 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 			"users": firestore.ArrayRemove(userSeatSet),
 		}, firestore.MergeAll)
 		if err != nil {
-			log.Println("failed to remove user from room.")
+			log.Println("failed to remove user from room")
 		}
+
+		// user status を更新
+		_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+			"online":       false,
+			"in":           "",
+			"seat-id": 0,
+			"last-studied": time.Now(),
+		}, firestore.MergeAll)
+		if err != nil {
+			log.Fatalln("Failed to update user info of " + userId)
+		}
+		_ = RecordLastAccess(userId, client, ctx)
+		_ = RecordExitedTime(userId, client, ctx)
+		_ = RecordHistory(EnterLeaveHistory{
+			Activity: LeaveActivity,
+			RoomId:   roomId,
+			UserId:  userId,
+			Date:    time.Now(),
+		}, client, ctx)
+		defer UpdateTotalTime(userId, roomId, time.Now(), client, ctx)
+
+		roomBody, _ := RetrieveRoomInfo(roomId, client, ctx)
+		authClient, _ := InitializeFirebaseAuthClient(ctx)
+		user, _ := authClient.GetUser(ctx, userId)
+		defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"ルームを出ました。", client, ctx)
 	}
-	return nil
+	return CustomError{Body: nil}
 }
 
 func SetConnectionId(userId string, connectionId string, client *firestore.Client, ctx context.Context) error {
+	log.Println("SetConnectionId()")
 	// inやonlineはいじらない
 	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 		"connection-id": connectionId,
@@ -493,6 +600,7 @@ func SetConnectionId(userId string, connectionId string, client *firestore.Clien
 }
 
 func RetrieveConnectionId(userId string, client *firestore.Client, ctx context.Context) (string, error) {
+	log.Println("RetrieveConnectionId()")
 	var userBody UserBodyStruct
 	doc, err := client.Collection(USERS).Doc(userId).Get(ctx)
 	if err != nil {
@@ -503,31 +611,33 @@ func RetrieveConnectionId(userId string, client *firestore.Client, ctx context.C
 	return userBody.ConnectionId, nil
 }
 
-func RetrieveCurrentSeatId(userId string, client *firestore.Client, ctx context.Context) (int, error) {
+func RetrieveCurrentSeatId(userId string, client *firestore.Client, ctx context.Context) (int, CustomError) {
+	log.Println("RetrieveCurrentSeatId()")
 	userInfo, err := RetrieveUserInfo(userId, client, ctx)
 	if err != nil {
-		return 0, err
+		return 0, CustomError{ErrorType: Unknown, Body: err}
 	}
 	roomId := userInfo.In
 	if roomId == "" {
 		errString := "the user is not in any room now"
-		return 0, errors.New(errString)
+		return 0, UserNotInTheRoom.New(errString)
 	}
 	roomStatus, err := RetrieveRoomInfo(roomId, client, ctx)
 	if err != nil {
-		return 0, err
+		return 0, CustomError{ErrorType: Unknown, Body: err}
 	}
 	for _, user := range roomStatus.Users {
 		if user.UserId == userId {
-			return user.SeatId, nil
+			return user.SeatId, CustomError{Body: nil}
 		}
 	}
 	errString := "the user is not in " + roomId
 	log.Println(errString)
-	return 0, errors.New(errString)
+	return 0, UserNotInAnyRoom.New(errString)
 }
 
 func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct, error) {
+	log.Println("RetrieveRooms()")
 	var rooms []RoomStruct
 
 	// roomsのコレクションを取得
@@ -556,7 +666,9 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 	return rooms, nil
 }
 
-func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
+// user statusのonlineフラグから判断
+func RetrieveOnlineUsersAsStatus(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
+	log.Println("RetrieveOnlineUsersAsStatus()")
 	userDocs, err := client.Collection(USERS).Documents(ctx).GetAll()
 	if err != nil {
 		log.Println(err)
@@ -598,7 +710,56 @@ func RetrieveOnlineUsers(client *firestore.Client, ctx context.Context) ([]UserS
 	}
 }
 
+// 実際のroomsのusersから判断
+func RetrieveOnlineUsersInRooms(client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
+	log.Println("RetrieveOnlineUsersAsStatus()")
+	roomDocs, err := client.Collection(ROOMS).Documents(ctx).GetAll()
+	if err != nil {
+		log.Println(err)
+		return []UserStruct{}, err
+	}
+
+	app, _ := InitializeFirebaseApp(ctx)
+	authClient, _ := app.Auth(ctx)
+
+	if len(roomDocs) <= 0 {
+		log.Println("there is no room.")
+		return []UserStruct{}, nil
+	} else {
+		var userList []UserStruct
+		for _, roomDoc := range roomDocs {
+			var _room RoomBodyStruct
+			_ = roomDoc.DataTo(&_room)
+			for _, userSeat := range _room.Users {
+				userId := userSeat.UserId
+				userInfo, _ := RetrieveUserInfo(userId, client, ctx)
+				if userInfo.Online {
+					var displayName string
+					user, err := authClient.GetUser(ctx, userId)
+					if err != nil {
+						// これはfirebase authに登録されてないテストユーザーの場合、例外として起こりうる。
+						log.Println("failed authClient.GetUser().")
+						displayName = ""
+					} else {
+						displayName = user.DisplayName
+					}
+					userList = append(userList, UserStruct{
+						UserId:      userId,
+						DisplayName: displayName,
+						Body:        userInfo,
+					})
+				}
+			}
+		}
+		if userList == nil {
+			userList = []UserStruct{}
+		}
+		return userList, nil
+	}
+}
+
 func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Context) ([]UserStruct, error) {
+	log.Println("RetrieveRoomUsers()")
 	var err error
 	var users []UserStruct
 
@@ -627,6 +788,7 @@ func RetrieveRoomUsers(roomId string, client *firestore.Client, ctx context.Cont
 }
 
 func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Context) (RoomBodyStruct, error) {
+	log.Println("RetrieveRoomInfo()")
 	var roomBodyStruct RoomBodyStruct
 
 	room, err := client.Collection(ROOMS).Doc(roomId).Get(ctx)
@@ -643,6 +805,7 @@ func RetrieveRoomInfo(roomId string, client *firestore.Client, ctx context.Conte
 }
 
 func RetrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([]NewsStruct, error) {
+	log.Println("RetrieveNews()")
 	var newsList []NewsStruct
 	var err error
 
@@ -673,6 +836,7 @@ func RetrieveNews(numNews int, client *firestore.Client, ctx context.Context) ([
 }
 
 func RetrieveUserInfo(userId string, client *firestore.Client, ctx context.Context) (UserBodyStruct, error) {
+	log.Println("RetrieveUserInfo()")
 	var userBodyStruct UserBodyStruct
 	userDoc, err := client.Collection(USERS).Doc(userId).Get(ctx)
 	if err != nil {
@@ -684,6 +848,7 @@ func RetrieveUserInfo(userId string, client *firestore.Client, ctx context.Conte
 }
 
 func RecordHistory(details interface{}, client *firestore.Client, ctx context.Context) error {
+	log.Println("RecordHistory()")
 	_, _, err := client.Collection(HISTORY).Add(ctx,
 		details,
 	)
@@ -694,6 +859,7 @@ func RecordHistory(details interface{}, client *firestore.Client, ctx context.Co
 }
 
 func RecordLastAccess(userId string, client *firestore.Client, ctx context.Context) error {
+	log.Println("RecordLastAccess()")
 	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 		"last-access": time.Now(),
 	}, firestore.MergeAll)
@@ -704,6 +870,7 @@ func RecordLastAccess(userId string, client *firestore.Client, ctx context.Conte
 }
 
 func RecordEnteredTime(userId string, client *firestore.Client, ctx context.Context) error {
+	log.Println("RecordEnteredTime()")
 	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 		"last-entered": time.Now(),
 	}, firestore.MergeAll)
@@ -714,6 +881,7 @@ func RecordEnteredTime(userId string, client *firestore.Client, ctx context.Cont
 }
 
 func RecordExitedTime(userId string, client *firestore.Client, ctx context.Context) error {
+	log.Println("RecordExitedTime()")
 	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 		"last-exited": time.Now(),
 	}, firestore.MergeAll)
@@ -724,6 +892,7 @@ func RecordExitedTime(userId string, client *firestore.Client, ctx context.Conte
 }
 
 func UpdateStatusMessage(userId string, statusMessage string, client *firestore.Client, ctx context.Context) error {
+	log.Println("UpdateStatusMessage()")
 	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 		"last-access": time.Now(),
 		"status":      statusMessage,
@@ -735,6 +904,7 @@ func UpdateStatusMessage(userId string, statusMessage string, client *firestore.
 }
 
 func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (string, error) {
+	log.Println("InWhichRoom()")
 	println("InWhichRoom() running.")
 	rooms, err := RetrieveRooms(client, ctx)
 	if err != nil {
@@ -753,6 +923,7 @@ func InWhichRoom(userId string, client *firestore.Client, ctx context.Context) (
 }
 
 func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorHex string, client *firestore.Client, ctx context.Context) error {
+	log.Println("_CreateNewRoom()")
 	_, err := client.Collection(ROOMS).Doc(roomId).Set(ctx, map[string]interface{}{
 		"name":            roomName,
 		"type":            roomType,
@@ -766,16 +937,29 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorH
 	return err
 }
 
+// todo connection idも考慮に入れる
 // 全オンラインユーザーの最終アクセス時間を調べ、タイムアウトを判断して処理
-func _UpdateDatabase(client *firestore.Client, ctx context.Context) {
-	log.Println("updating database...")
+func _UpdateDatabase(client *firestore.Client, ctx context.Context) error {
+	log.Println("_UpdateDatabase()")
 
-	users, err := RetrieveOnlineUsers(client, ctx)
+	// onlineとなっているユーザー
+	onlineUsersAsStatus, err := RetrieveOnlineUsersAsStatus(client, ctx)
 	if err != nil {
-		log.Println("RetrieveOnlineUsers() failed.")
+		log.Println("RetrieveOnlineUsersAsStatus() failed.")
+		return err
 	}
-	if len(users) > 0 {
-		for _, u := range users {
+	if len(onlineUsersAsStatus) > 0 {
+		for _, u := range onlineUsersAsStatus {
+			// User statusがonlineなのにルームにいないことがないか
+			if isInRoom, _ := IsInRoom(u.Body.In, u.UserId, client, ctx); !isInRoom {
+				log.Printf("%s is not in the room though online is true.\n", u.UserId)
+				_, _ = client.Collection(USERS).Doc(u.UserId).Set(ctx, map[string]interface{}{
+					"online": false,
+					"connection-id": "",
+				}, firestore.MergeAll)
+			}
+			
+			// LastAccessから時間が経ってるのにルームに残ってないか
 			lastAccess := u.Body.LastAccess
 			timeElapsed := time.Now().Sub(lastAccess)
 			if timeElapsed.Seconds() > TimeLimit {
@@ -783,11 +967,34 @@ func _UpdateDatabase(client *firestore.Client, ctx context.Context) {
 				currentRoom := u.Body.In
 				_ = LeaveRoom(currentRoom, u.UserId, client, ctx)
 			}
+			
+			// connection idが設定されているか
+			if u.Body.ConnectionId == "" {
+				log.Printf("%s has no connection id though online is true.\n", u.UserId)
+			}
+			
+			// inが設定されているか
+			if u.Body.In == "" {
+				log.Printf("%s's In is not given though online is true.\n", u.UserId)
+			}
 		}
 	}
+	
+	// roomsに実際にいるユーザー
+	onlineUsersInRooms, _ := RetrieveOnlineUsersInRooms(client, ctx)
+	if len(onlineUsersAsStatus) != len(onlineUsersInRooms) {
+		log.Println("len(onlineUsersAsStatus) != len(onlineUsersInRooms)")
+	}
+	
+	// todo
+	// offlineとなっているユーザー
+	// user statusがofflineなのにルームにいないか
+	// offlineなのにconnection idが設定されていないか
+	return nil
 }
 
 func Response(jsonBytes []byte) (events.APIGatewayProxyResponse, error) {
+	log.Println("Response()")
 	return events.APIGatewayProxyResponse{
 		Body:       string(jsonBytes),
 		StatusCode: 200, // これないとInternal Server Errorになる
@@ -801,6 +1008,7 @@ func Response(jsonBytes []byte) (events.APIGatewayProxyResponse, error) {
 }
 
 func CheckIfSeatAvailable(roomId string, seatId int, client *firestore.Client, ctx context.Context) (bool, error) {
+	log.Println("CheckIfSeatAvailable()")
 	// そのIDの席が存在するか
 	roomLayout, err := RetrieveRoomLayout(roomId, client, ctx)
 	if err != nil {
@@ -832,15 +1040,16 @@ func CheckIfSeatAvailable(roomId string, seatId int, client *firestore.Client, c
 	return true, nil
 }
 
-func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Client, ctx context.Context) error {
+func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Client, ctx context.Context) CustomError {
+	log.Println("_EnterRoom()")
 	isSeatAvailable, err := CheckIfSeatAvailable(roomId, seatId, client, ctx)
 	if err != nil {
-		return err
+		return CustomError{ErrorType: Unknown, Body: err}
 	}
 	if !isSeatAvailable {
 		errString := "that seat is not available now (room id: " + roomId + ", seat id: " + strconv.Itoa(seatId) + ")"
 		log.Println(errString)
-		return errors.New(errString)
+		return SeatNotAvailable.New(errString)
 	}
 	userSeatSet := UserSeatSetStruct{
 		UserId: userId,
@@ -852,8 +1061,33 @@ func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Clie
 	if err != nil {
 		log.Println("failed _EnterRoom().")
 		log.Println(err)
+		return CustomError{Body: err}
 	}
-	return err
+	//user statusを更新
+	_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
+		"online": true,
+		"in":     roomId,
+		"seat-id": seatId,
+	}, firestore.MergeAll)
+	if err != nil {
+		log.Println("failed to update user info of " + userId + ".")
+		log.Println(err)
+		return CustomError{Body: err}
+	}
+	_ = RecordLastAccess(userId, client, ctx)
+	_ = RecordEnteredTime(userId, client, ctx)
+	_ = RecordHistory(EnterLeaveHistory{
+		Activity: EnterActivity,
+		RoomId:     roomId,
+		UserId:  userId,
+		Date:     time.Now(),
+	}, client, ctx)
+	roomBody, _ := RetrieveRoomInfo(roomId, client, ctx)
+	authClient, _ := InitializeFirebaseAuthClient(ctx)
+	user, _ := authClient.GetUser(ctx, userId)
+	defer SendLiveChatMessage(user.DisplayName+"さんが"+roomBody.Name+"ルームに入りました。", client, ctx)
+
+	return CustomError{ErrorType: Unknown, Body: nil}
 }
 
 // todo 定期実行
@@ -880,6 +1114,7 @@ func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Clie
 //}
 
 func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *firestore.Client, ctx context.Context) {
+	log.Println("UpdateTotalTime()")
 	var historyData EnteringAndLeavingHistoryStruct
 
 	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room", "==", roomId).Where("activity", "==", EnterActivity).OrderBy("date", firestore.Desc).Limit(1).Documents(ctx).GetAll()
@@ -919,8 +1154,9 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 }
 
 func RetrieveRoomLayout(roomId string, client *firestore.Client, ctx context.Context) (RoomLayoutStruct, error) {
+	log.Println("RetrieveRoomLayout()")
 	var roomLayout RoomLayoutStruct
-	doc, err := client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx)
+	doc, err := client.Collection(CONFIG).Doc(RoomLayoutsInfo).Collection(RoomLayouts).Doc(roomId).Get(ctx)
 	if err != nil {
 		log.Printf("failed to process client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx), %v", err)
 		return RoomLayoutStruct{}, err
@@ -931,7 +1167,8 @@ func RetrieveRoomLayout(roomId string, client *firestore.Client, ctx context.Con
 }
 
 func CurrentRoomLayoutVersion(roomId string, client *firestore.Client, ctx context.Context) (int, error) {
-	doc, err := client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomId).Get(ctx)
+	log.Println("CurrentRoomLayoutVersion()")
+	doc, err := client.Collection(CONFIG).Doc(RoomLayoutsInfo).Collection(RoomLayouts).Doc(roomId).Get(ctx)
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -958,7 +1195,7 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 	}, client, ctx)
 
 	// 保存
-	_, err = client.Collection(CONFIG).Doc(ROOM_LAYOUTS_INFO).Collection(ROOM_LAYOUTS).Doc(roomLayout.RoomId).Set(ctx, roomLayout)
+	_, err = client.Collection(CONFIG).Doc(RoomLayoutsInfo).Collection(RoomLayouts).Doc(roomLayout.RoomId).Set(ctx, roomLayout)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -967,8 +1204,9 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 }
 
 func Disconnect(connectionId string, client *firestore.Client, ctx context.Context) error {
+	log.Println("Disconnect()")
 	var apiGatewayConfig ApiGatewayConfigStruct
-	configDoc, _ := client.Collection(CONFIG).Doc(API_GATEWAY).Get(ctx)
+	configDoc, _ := client.Collection(CONFIG).Doc(ApiGateway).Get(ctx)
 	_ = configDoc.DataTo(&apiGatewayConfig)
 	websocketConnectionBaseUrl := apiGatewayConfig.WebsocketConnectionBaseUrl
 	url := websocketConnectionBaseUrl + connectionId
@@ -986,12 +1224,13 @@ func Disconnect(connectionId string, client *firestore.Client, ctx context.Conte
 	return nil
 }
 
-func FindUserWithConnectionId(connectionId string, client *firestore.Client, ctx context.Context) (UserStruct, error) {
-	onlineUsers, _ := RetrieveOnlineUsers(client, ctx)
+func FindUserWithConnectionId(connectionId string, client *firestore.Client, ctx context.Context) (UserStruct, CustomError) {
+	log.Println("FindUserWithConnectionId()")
+	onlineUsers, _ := RetrieveOnlineUsersAsStatus(client, ctx)
 	for _, user := range onlineUsers {
 		if user.Body.ConnectionId == connectionId {
-			return user, nil
+			return user, CustomError{Body: nil}
 		}
 	}
-	return UserStruct{}, errors.New("no such user exists")
+	return UserStruct{}, NoSuchUserExists.New("no such user exists")
 }

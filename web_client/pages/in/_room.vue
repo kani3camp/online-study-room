@@ -67,6 +67,7 @@ export default {
     if (this.$store.state.room_id !== '') {
       // todo
       // window.alert('退室する場合は退室ボタンを押してください。')
+      next()
     } else {
       window.onbeforeunload = null
       console.log('remove beforeunload')
@@ -179,7 +180,7 @@ export default {
           this.other_users_info = info
         } else {
           console.error(resp.message)
-          await vm.$router.push('/')
+          await vm.exitRoom()
         }
       }
       vm.socket.onclose = async () => {

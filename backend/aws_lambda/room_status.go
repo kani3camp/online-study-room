@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 )
 
 type RoomStatusResponseStruct struct {
@@ -15,11 +16,12 @@ type RoomStatusResponseStruct struct {
 }
 
 func RoomStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("RoomStatus()")
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	var apiResp RoomStatusResponseStruct
-	roomId := request.QueryStringParameters[room_id]
+	roomId := request.QueryStringParameters[RoomId]
 
 	if roomId == "" {
 		apiResp.Result = ERROR

@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 	"os"
 )
 
 type CreateNewRoomParams struct {
-	RoomId        string `json:"room_id"`
+	RoomId        string `json:"RoomId"`
 	RoomName      string `json:"room_name"`
 	RoomType      string `json:"room_type"`
 	Password      string `json:"password"`
@@ -21,6 +22,7 @@ type CreateNewRoomResponseStruct struct {
 }
 
 func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("CreateNewRoom()")
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 

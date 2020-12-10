@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 )
 
 type UpdateDatabaseResponseStruct struct {
@@ -11,14 +12,14 @@ type UpdateDatabaseResponseStruct struct {
 	Message string `json:"message"`
 }
 
-// todo connection idも考慮に入れる
 func UpdateDatabase(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("UpdateDatabase()")
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
 	var apiResp UpdateDatabaseResponseStruct
 
-	_UpdateDatabase(client, ctx)
+	_ = _UpdateDatabase(client, ctx)
 
 	apiResp.Result = OK
 

@@ -25,7 +25,7 @@ type StartStudyingResponse struct {
 }
 
 func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
-	log.Println("StartStudying")
+	log.Println("StartStudying()")
 	_, client := InitializeEventFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
@@ -64,9 +64,14 @@ func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyR
 
 			client, _ = InitializeFirestoreClient(ctx)
 			err := _EnterRoom(roomId, userId, seatId, client, ctx)
-			if err != nil {
+			if err.Body != nil {
 				response.IsOk = false
-				response.Message = "failed to enter room"
+				switch err.ErrorType {
+				case Unknown:
+					response.Message = "failed to enter room"
+				default:
+					response.Message = err.Body.Error()
+				}
 			} else {
 				response.IsOk = true
 				response.Message = "successfully entered " + roomId + "."
@@ -75,9 +80,15 @@ func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyR
 	} else {
 		// 入室処理
 		err := _EnterRoom(roomId, userId, seatId, client, ctx)
-		if err != nil {
+		if err.Body != nil {
+			log.Println(err.ErrorType)
 			response.IsOk = false
-			response.Message = "failed to enter room"
+			switch err.ErrorType {
+			case Unknown:
+				response.Message = "failed to enter room"
+			default:
+				response.Message = err.Body.Error()
+			}
 		} else {
 			response.IsOk = true
 			response.Message = "successfully entered " + roomId + "."

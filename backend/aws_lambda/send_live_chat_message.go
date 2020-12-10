@@ -236,6 +236,7 @@ func PostMessage(message string, config *ApiConfigStruct) (int, error) {
 }
 
 func SendLiveChatMessage(message string, client *firestore.Client, ctx context.Context) {
+	log.Println("SendLiveChatMessage()")
 	var config ApiConfigStruct
 	configDoc, err := client.Collection(CONFIG).Doc(API).Get(ctx)
 	if err != nil {

@@ -10,9 +10,9 @@ import (
 )
 
 type StayStudyingRequest struct {
-	UserId     string `json:"user_id"`
-	IdToken    string `json:"id_token"`
-	RoomId     string `json:"room_id"`
+	UserId     string `json:"UserId"`
+	IdToken    string `json:"IdToken"`
+	RoomId     string `json:"RoomId"`
 	//SeatId int `json:"seat_id"` 部屋にいることが確認できればいいや
 }
 
@@ -24,6 +24,7 @@ type StayStudyingResponse struct {
 }
 
 func StayStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("StayStudying()")
 	_, client := InitializeEventFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 

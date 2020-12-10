@@ -14,36 +14,32 @@ type UserStatusResponseStruct struct {
 }
 
 func UserStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("UserStatus()")
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 
-	userId := request.QueryStringParameters[user_id]
+	userId := request.QueryStringParameters[UserId]
 	var apiResp UserStatusResponseStruct
 
 	if userId == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
 	} else if isInUsers, _ := IsInUsers(userId, client, ctx); !isInUsers {
-		log.Println("p1")
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidUser
 	} else {
-		log.Println("p2")
 		authClient, _ := InitializeFirebaseAuthClient(ctx)
-		log.Println("p3")
 		var displayName string
 		user, err := authClient.GetUser(ctx, userId)
 		if err != nil {
 			// テストユーザーだとauthに登録されてないかもなので起こりうる
-			log.Println("faield authClient.GetUser(ctx, userId).")
+			log.Println("failed authClient.GetUser(ctx, userId).")
 			displayName = ""
 		} else {
 			displayName = user.DisplayName
 		}
 
-		log.Println("p4")
 		userInfo, _ := RetrieveUserInfo(userId, client, ctx)
-		log.Println("p5")
 		apiResp.UserStatus = UserStruct{
 			UserId:      userId,
 			DisplayName: displayName,
