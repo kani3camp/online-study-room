@@ -17,7 +17,7 @@
           :key="seat.id"
           class="seat"
           :style="{
-            backgroundColor: seats_if_filled[seat.id] ? filledSeatColor : emptySeatColor,
+            backgroundColor: seat.is_vacant ? emptySeatColor : filledSeatColor,
             left: seatPositions[index].x+'%',
             top: seatPositions[index].y+'%',
             width: seatShape.width+'%',
@@ -61,15 +61,11 @@ export default {
       type: Object,
       default: null,
     },
-    seatsDataArray: {
-      type: Array,
-      default: null,
-    },
   },
   data() {
     return {
       emptySeatColor: '#eaccb6',
-      filledSeatColor: '#431e03',
+      filledSeatColor: '#430308',
       seatFontSize: 80 + '%',
       isMounted: false,
       // isLayoutLoaded: false,
@@ -82,12 +78,6 @@ export default {
     roomLayout: {
       get() {
         return this.layout
-      },
-      set() {},
-    },
-    seatsData: {
-      get() {
-        return this.seatsDataArray
       },
       set() {},
     },
@@ -201,16 +191,6 @@ export default {
         this.determineFontSize()
       }
     },
-    seatsData: function (newValue, oldValue) {
-      if (newValue && this.seats) {
-        for (let seat in this.seats) {
-          // this.seats_if_filled[seat.id] = false
-        }
-        for (let filled_seat in newValue) {
-          // this.seats_if_filled[filled_seat.seat_id] = true
-        }
-      }
-    },
     roomShape: function (newValue, oldValue) {
       if (this.roomLayout) {
         this.seatFontSize = newValue.seatFontSize
@@ -227,10 +207,6 @@ export default {
   methods: {
     initializeLayoutData() {
       this.seats = this.roomLayout.seats
-      for (let seat of this.seats) {
-        console.log(seat)
-        this.seats_if_filled[seat.id] = false
-      }
       this.partitions = this.roomLayout.partitions
     },
     determineFontSize() {
@@ -271,7 +247,7 @@ export default {
   background-color: azure;
   margin: auto;
   border: solid 0.5rem black;
-  max-width: 100vw;
+  max-width: 800px;
   max-height: 90vh;
 }
 #room-layout:before {

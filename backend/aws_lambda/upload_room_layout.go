@@ -109,6 +109,7 @@ func UploadRoomLayout(request events.APIGatewayProxyRequest) (events.APIGatewayP
 			apiResp.Result = ERROR
 			apiResp.Message = err.Error()
 		} else {
+			// todo 前後で座席に変更があった場合、現在そのルームにいる人を強制的に退室させる
 			err = SaveRoomLayout(roomLayoutData, client, ctx)
 			if err != nil {
 				apiResp.Result = ERROR

@@ -38,9 +38,9 @@ const (
 	ProjectId = "online-study-space"
 	TimeLimit = 180 // 秒
 
-	UserId = "UserId"
-	RoomId = "RoomId"
-	IdToken = "IdToken"
+	UserId = "user_id"
+	RoomId = "room_id"
+	IdToken = "id_token"
 
 	RoomDoesNotExist = "room does not exist"
 	InvalidParams = "invalid parameters"
@@ -195,6 +195,7 @@ type RoomLayoutStruct struct {
 		Id int `json:"id" firestore:"id"`
 		X int `json:"x" firestore:"x"`
 		Y int `json:"y" firestore:"y"`
+		IsVacant bool `json:"is_vacant"`	// これはfirestoreには保存したくない
 	} `json:"seats" firestore:"seats"`
 	Partitions []struct {
 		Id int `json:"id" firestore:"id"`
@@ -984,6 +985,8 @@ func _UpdateDatabase(client *firestore.Client, ctx context.Context) error {
 			roomId, _ := InWhichRoom(userInRoom.UserId, client, ctx)
 			_ = LeaveRoom(roomId, userInRoom.UserId, client, ctx)
 		}
+		// todo room_layout的に有効な席に座っているかどうか
+
 	}
 	
 	// todo
@@ -1234,3 +1237,18 @@ func FindUserWithConnectionId(connectionId string, client *firestore.Client, ctx
 	}
 	return UserStruct{}, NoSuchUserExists.New("no such user exists, searched by connection id:" + connectionId)
 }
+
+func (roomLayout RoomLayoutStruct) SetIsVacant(client *firestore.Client, ctx context.Context) RoomLayoutStruct {
+	for i, seat := range roomLayout.Seats {
+		roomLayout.Seats[i].IsVacant = true
+		roomStatus, _ := RetrieveRoomInfo(roomLayout.RoomId, client, ctx)
+		for _, usedSeat := range roomStatus.Users {
+			if usedSeat.SeatId == seat.Id {
+				roomLayout.Seats[i].IsVacant = false
+				break
+			}
+		}
+	}
+	return roomLayout
+}
+

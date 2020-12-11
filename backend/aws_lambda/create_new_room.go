@@ -21,6 +21,7 @@ type CreateNewRoomResponseStruct struct {
 	Message string `json:"message"`
 }
 
+// todo room layoutも要求する
 func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	log.Println("CreateNewRoom()")
 	ctx, client := InitializeHttpFuncWithFirestore()

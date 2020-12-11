@@ -21,7 +21,7 @@ type StartStudyingResponse struct {
 	Message string       `json:"message"`
 	Users   []UserStruct `json:"users"`
 	RoomInfo RoomBodyStruct `json:"room_info"`
-	RoomLayout RoomLayoutStruct `json:"room_layout"`	// 最初だけレイアウト返す
+	RoomLayout RoomLayoutStruct `json:"room_layout"`
 }
 
 func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -108,7 +108,7 @@ func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyR
 			roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
 			response.RoomInfo = roomInfo
 			roomLayout, _ := RetrieveRoomLayout(roomId, client, ctx)
-			response.RoomLayout = roomLayout
+			response.RoomLayout = roomLayout.SetIsVacant(client, ctx)
 		}
 	} else {
 		// 切断

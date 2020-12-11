@@ -47,7 +47,7 @@
       "height": 10
     }
   ],
-  "seats": [
+  "vacant_seats": [
     {
       "id": 1,
       "x": 0,

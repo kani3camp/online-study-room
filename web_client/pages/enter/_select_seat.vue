@@ -17,7 +17,7 @@
 
     </v-app-bar>
 
-    <v-main>
+    <v-main v-show="!loading">
       <v-container style="max-width: 700px">
         <h2>席を選ぼう。</h2>
 
@@ -27,7 +27,7 @@
           >
             <v-select
               v-model="selected_seat_id"
-              :items="seats"
+              :items="vacant_seats"
               item-value="id"
               item-text="id"
               label="座席番号を選んでください"
@@ -52,18 +52,28 @@
           :layout="room_layout"
         />
 
-        <Dialog
-          :if-show-dialog="if_show_dialog"
-          :loading="entering"
-          :card-title="dialog_message"
-          :accept-needed="true"
-          accept-option-string="入室する"
-          cancel-option-string="キャンセル"
-          @accept="enterRoom"
-          @cancel="if_show_dialog = false"
-        />
       </v-container>
     </v-main>
+
+    <v-main v-show="loading">
+      <v-container
+        v-show="loading"
+        class="fill-height"
+        fluid
+      >
+        <v-row
+          align="center"
+          justify="center"
+        >
+          <v-col class="text-center">
+            <div class="big-char">
+              ロード中...
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+
   </v-app>
 </template>
 <script>
@@ -77,43 +87,40 @@ export default {
   name: 'EnterRoom',
   components: {
     RoomLayout,
-    Dialog,
   },
   data: () => ({
     room_id: '',
     room_name: '',
     room_layout: null,
-    seats: [],
+    loading: true,
+    vacant_seats: [],
     if_show_dialog: false,
-    entering: false,
     dialog_message: '',
     selected_seat_id: null,
   }),
-  watch: {
-    room_layout: function (newValue, oldValue) {
-      if (newValue) {
-        this.seats = newValue.seats
-      }
-    },
-  },
   async created() {
     // room_idは$storeからも読み込める
     this.room_id = this.$route.params.select_seat
     this.room_name = this.$store.state.room_name
 
     // fetch layout
-    await this.fetchRoomLayout()
+    await this.fetchRoomInfo()
   },
   methods: {
-    async fetchRoomLayout() {
+    async fetchRoomInfo() {
       if (this.$store.state.isSignedIn) {
         const vm = this
-        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_layout'
+        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
         let params = { room_id: vm.room_id }
         const resp = await common.httpGet(url, params)
 
         if (resp.result === 'ok') {
-          this.room_layout = resp.room_layout_data
+          this.room_layout = resp.room_layout
+          this.vacant_seats = this.room_layout.seats.filter((item) => {
+            console.log(item.is_vacant)
+            return item.is_vacant
+          })
+          this.loading = false
         } else {
           console.log(resp.message)
           // todo top page へ戻る

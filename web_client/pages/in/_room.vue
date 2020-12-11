@@ -58,7 +58,6 @@
         <RoomLayout
           :room-id="room_id"
           :layout="room_layout"
-          style="max-width: 800px"
         />
       </v-container>
 
@@ -81,7 +80,6 @@
           </v-col>
         </v-row>
       </v-container>
-
     </v-main>
 
   </v-app>
@@ -118,8 +116,6 @@ export default {
       room_name: '',
       // room_layoutの初期値はnull
       room_layout: null,
-      // seats_dataの初期値はnull
-      seats_data: null,
       entered_time: new Date().getHours() + '時' + new Date().getMinutes() + '分',
       room_status: null,
       if_show_dialog: false,
@@ -142,11 +138,6 @@ export default {
     this.room_name = this.$store.state.room_name
 
     if (vm.$store.state.isSignedIn) {
-      // 入室時刻を取得
-      vm.user_timeout = setTimeout(() => {
-        vm.updateUserData()
-      }, 5000)
-
       await vm.startStudying()
     } else {
       await vm.$router.push('/')
@@ -199,7 +190,6 @@ export default {
           let amIin = false
           for (const user of resp['users']) {
             if (user.user_id !== firebase.auth().currentUser.uid) {
-              // todo
             } else {
               amIin = true
             }
@@ -245,12 +235,6 @@ export default {
       } else {
         await this.$router.push('/')
       }
-    },
-    async updateUserData() {
-      // const date_time = this.$store.state.user.last_entered
-      // if (date_time) {
-      //   this.entered_time = date_time.getHours() + '時' + date_time.getMinutes() + '分'
-      // }
     },
     closeSocket() {
       if (this.is_socket_open) {

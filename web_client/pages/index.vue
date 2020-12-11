@@ -59,7 +59,7 @@
           >
             <v-col class="text-center">
               <div class="big-char">
-                Loading...
+                ロード中...
               </div>
             </v-col>
           </v-row>
@@ -155,6 +155,9 @@ export default {
 
     await this.loadRooms()
   },
+  async mounted() {
+    // await this.loadRooms()
+  },
   methods: {
     async enterRoom(roomIndex) {
       const selected_room_id = this.rooms[roomIndex].room_id
@@ -173,6 +176,7 @@ export default {
       }
     },
     async loadRooms() {
+      console.log('loading rooms...')
       this.loading = true
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
       const resp = await common.httpGet(url, {})

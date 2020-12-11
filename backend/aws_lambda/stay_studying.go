@@ -21,6 +21,7 @@ type StayStudyingResponse struct {
 	Message string       `json:"message"`
 	Users   []UserStruct `json:"users"`
 	RoomInfo RoomBodyStruct `json:"room_info"`
+	RoomLayout RoomLayoutStruct `json:"room_layout"`
 }
 
 func StayStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -63,6 +64,8 @@ func StayStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRe
 		response.Users = users
 		roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
 		response.RoomInfo = roomInfo
+		roomLayout, _ := RetrieveRoomLayout(roomId, client, ctx)
+		response.RoomLayout = roomLayout.SetIsVacant(client, ctx)
 	} else {
 		// 切断
 		_ = Disconnect(connectionId, client, ctx)
