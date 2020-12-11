@@ -162,12 +162,12 @@ type NewsBodyStruct struct {
 	TextBody string    `firestore:"text-body" json:"text_body"`
 }
 
-type EnteringAndLeavingHistoryStruct struct {
-	Activity string    `firestore:"activity"`
-	Room     string    `firestore:"room"`
-	Date     time.Time `firestore:"date"`
-	UserId   string    `firestore:"user-id"`
-}
+//type EnteringAndLeavingHistoryStruct struct {
+//	Activity string    `firestore:"activity"`
+//	Room     string    `firestore:"room"`
+//	Date     time.Time `firestore:"date"`
+//	UserId   string    `firestore:"user-id"`
+//}
 
 type RoomLayoutsInfoConfigStruct struct {
 	BucketName  string            `firestore:"bucket-name"`
@@ -562,7 +562,7 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 			"last-studied": time.Now(),
 		}, firestore.MergeAll)
 		if err != nil {
-			log.Fatalln("Failed to update user info of " + userId)
+			log.Println("Failed to update user info of " + userId)
 		}
 		_ = RecordLastAccess(userId, client, ctx)
 		_ = RecordExitedTime(userId, client, ctx)
@@ -1118,11 +1118,11 @@ func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Clie
 
 func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *firestore.Client, ctx context.Context) {
 	log.Println("UpdateTotalTime()")
-	var historyData EnteringAndLeavingHistoryStruct
+	var historyData EnterLeaveHistory
 
-	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room", "==", roomId).Where("activity", "==", EnterActivity).OrderBy("date", firestore.Desc).Limit(1).Documents(ctx).GetAll()
+	docs, err := client.Collection(HISTORY).Where("user-id", "==", userId).Where("room-id", "==", roomId).Where("activity", "==", EnterActivity).OrderBy("date", firestore.Desc).Limit(1).Documents(ctx).GetAll()
 	if err != nil {
-		log.Fatalln("could not fetch entering history: " + err.Error())
+		log.Println("could not fetch entering history: " + err.Error())
 	}
 	_ = docs[0].DataTo(&historyData)
 	enteredDate := historyData.Date
@@ -1143,7 +1143,7 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 			"total-study-time": int(totalStudyTime.Seconds()),
 		}, firestore.MergeAll)
 		if err != nil {
-			log.Fatalln("Failed to update user info of " + userId)
+			log.Println("Failed to update total-study-time of " + userId)
 		}
 	} else if roomType == "break" {
 		totalBreakTime = totalBreakTime + duration
@@ -1151,7 +1151,7 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 			"total-break-time": int(totalBreakTime.Seconds()),
 		}, firestore.MergeAll)
 		if err != nil {
-			log.Fatalln("Failed to update user info of " + userId)
+			log.Println("Failed to update total-break-time of " + userId)
 		}
 	}
 }

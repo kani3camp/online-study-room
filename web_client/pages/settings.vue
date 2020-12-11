@@ -179,7 +179,7 @@ export default {
     },
     total_study_time: function () {
       const total_seconds = this.$store.state.user.total_study_time
-      if (total_seconds) {
+      if (total_seconds !== null) {
         const hours = Math.floor(total_seconds / 3600)
         const total_minutes = Math.floor(total_seconds / 60)
         const minutes = total_minutes % 60
