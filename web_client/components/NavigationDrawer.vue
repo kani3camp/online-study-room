@@ -21,18 +21,6 @@
 
       <v-list-item
         link
-        @click="goToAllRoomsPage"
-      >
-        <v-list-item-action>
-          <v-icon>mdi-door-open</v-icon>
-        </v-list-item-action>
-        <v-list-item-content>
-          <v-list-item-title>ルーム一覧</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item
-        link
         @click="goToAboutServicePage"
       >
         <v-list-item-action>
@@ -130,10 +118,6 @@ export default {
     },
     goToTopPage() {
       this.$router.push('/')
-      this.CloseDrawer()
-    },
-    goToAllRoomsPage() {
-      this.$router.push('/all_rooms')
       this.CloseDrawer()
     },
     goToAboutServicePage() {

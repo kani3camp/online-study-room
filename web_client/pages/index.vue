@@ -8,16 +8,19 @@
       <v-container>
         <v-flex>
           <h2 style="display: inline-block">
+            <v-icon>mdi-youtube</v-icon>
             YouTubeライブ
           </h2>
         </v-flex>
         <v-flex>
-          <v-row justify="center">
-            <a
-              target="_blank"
-              :href="youtubeLink"
-            ><h3>ライブ配信を見に行く</h3></a>
-          </v-row>
+          <v-col>
+            <v-row justify="center">
+              <a
+                target="_blank"
+                :href="youtubeLink"
+              ><h3>ライブ配信を見に行く</h3></a>
+            </v-row>
+          </v-col>
         </v-flex>
       </v-container>
 
@@ -27,12 +30,12 @@
             <v-flex>
               <v-col>
                 <h2 style="display: inline-block">
+                  <v-icon>mdi-door-open</v-icon>
                   ルーム
                 </h2>
                 に入室して作業開始！
               </v-col>
             </v-flex>
-            <v-spacer />
             <v-flex>
               <v-col class="d-flex flex-row-reverse">
                 <v-btn
@@ -155,9 +158,6 @@ export default {
 
     await this.loadRooms()
   },
-  async mounted() {
-    // await this.loadRooms()
-  },
   methods: {
     async enterRoom(roomIndex) {
       const selected_room_id = this.rooms[roomIndex].room_id
@@ -176,7 +176,6 @@ export default {
       }
     },
     async loadRooms() {
-      console.log('loading rooms...')
       this.loading = true
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
       const resp = await common.httpGet(url, {})
@@ -192,10 +191,6 @@ export default {
 </script>
 
 <style>
-main {
-  /*background-color: #dffaf6;*/
-}
-
 h2 {
   color: #36479f;
 }

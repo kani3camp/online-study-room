@@ -25,9 +25,16 @@
       <Dialog
         :if-show-dialog="if_show_result"
         :accept-needed="false"
-        :loading="exiting"
         cancel-option-string="閉じる"
         card-title="切断されました！ トップページに戻ります。"
+        @cancel="exitRoom"
+      />
+
+      <Dialog
+        :if-show-dialog="if_show_error_dialog"
+        :accept-needed="false"
+        cancel-option-string="閉じる"
+        card-title="エラーがおきました(泣) トップページに戻ります。"
         @cancel="exitRoom"
       />
 
@@ -98,17 +105,8 @@ export default {
     RoomLayout,
   },
   beforeRouteLeave(to, from, next) {
-    console.log('beforeRouteLeave: to=', to.path, ',from=', from.path)
     window.onbeforeunload = null
-    if (this.$store.state.room_id !== '') {
-      // todo
-      // window.alert('退室する場合は退室ボタンを押してください。')
-      next()
-    } else {
-      window.onbeforeunload = null
-      console.log('remove beforeunload')
-      next()
-    }
+    next()
   },
   data() {
     return {
@@ -120,10 +118,9 @@ export default {
       room_status: null,
       if_show_dialog: false,
       if_show_result: false,
+      if_show_error_dialog: false,
       exiting: false,
-      other_users_info: [],
       stay_awake_timeout: null,
-      user_timeout: null,
       socket: null,
       is_socket_open: false,
       is_entered: false,
@@ -131,7 +128,7 @@ export default {
   },
   async created() {
     const vm = this
-    // todo これ意味ある？↓
+    // これ意味ある？↓
     common.onAuthStateChanged(vm)
 
     this.room_id = this.$store.state.room_id
@@ -145,12 +142,9 @@ export default {
   },
   mounted() {
     window.onbeforeunload = (e) => this.showAlert(e)
-    console.log('add beforeunload')
-    console.log(window.onbeforeunload)
   },
   beforeDestroy() {
     clearTimeout(this.stay_awake_timeout)
-    clearTimeout(this.user_timeout)
     this.socket.close()
     if (this.$store.state.room_id != null) {
       this.exitRoom()
@@ -183,10 +177,10 @@ export default {
           if (!vm.is_entered) {
             console.log('入室成功！！')
             vm.is_entered = true
+            vm.is_socket_open = true
             await vm.stayStudying()
-            vm.room_layout = resp['room_layout']
           }
-          let info = []
+          vm.room_layout = resp['room_layout']
           let amIin = false
           for (const user of resp['users']) {
             if (user.user_id !== firebase.auth().currentUser.uid) {
@@ -195,13 +189,12 @@ export default {
             }
           }
           if (!amIin) {
-            console.log('部屋に自分がいないので退室処理')
-            await vm.closeSocket()
+            console.log('部屋に自分がいないので退室')
+            this.if_show_error_dialog = true
           }
-          this.other_users_info = info
         } else {
           console.error(resp.message)
-          await vm.exitRoom()
+          this.if_show_error_dialog = true
         }
       }
       vm.socket.onclose = async () => {
@@ -209,10 +202,11 @@ export default {
         vm.exiting = false
         vm.$store.commit('setRoomId', '')
         vm.if_show_result = true
+        vm.is_socket_open = false
       }
       vm.socket.onerror = async () => {
         console.error('socket error.')
-        // todo
+        this.if_show_error_dialog = true
       }
     },
     async stayStudying() {

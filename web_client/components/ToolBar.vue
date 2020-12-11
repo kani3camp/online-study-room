@@ -36,11 +36,6 @@
         class="tool-menu"
       >
         <div class="tool-content">
-          <nuxt-link to="/all_rooms">
-            ルーム一覧
-          </nuxt-link>
-        </div>
-        <div class="tool-content">
           <nuxt-link to="/about_service">
             はじめての方
           </nuxt-link>
