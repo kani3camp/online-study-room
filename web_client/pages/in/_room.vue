@@ -171,7 +171,6 @@ export default {
         vm.socket.send(JSON.stringify(params))
       }
       vm.socket.onmessage = async (event) => {
-        console.log('message received.')
         const resp = JSON.parse(event.data)
         if (resp['is_ok']) {
           if (!vm.is_entered) {
@@ -210,7 +209,6 @@ export default {
       }
     },
     async stayStudying() {
-      console.log('stayStudying')
       if (this.$store.state.isSignedIn) {
         const vm = this
         if (vm.is_socket_open) {
