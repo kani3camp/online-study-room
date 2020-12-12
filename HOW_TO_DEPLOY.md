@@ -8,10 +8,10 @@
 
 ## デプロイ方法
 ### AWS Lambda
-開発用のLambda関数名にはprefixとして`test_`をつける。
+開発用のLambda関数名にはprefixとして`test_`をつける。ソースコード自体は開発用と本番用で分けない。デプロイ時に関数名と一部の定数の値を変える。
 1. コード内で、Firestoreの認証情報（common.goのSecretManagerSecretNameという定数）が開発用のプロジェクトのものか確認する
 1. コード内で、ProjectIdが開発用のプロジェクトのものか確認する
-1. AWS CLIで関数をデプロイする
+1. AWS CLIで関数をデプロイする（`test_`をつける）
 
 
 ### AWS API Gateway
