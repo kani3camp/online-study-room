@@ -1,4 +1,4 @@
-# 開発中
+# 開発
 ## デプロイ先
 - AWS Lambda（API）
 - AWS API Gateway（API）
@@ -33,7 +33,7 @@ FirebaseAuthNewUserListener関数だけはAWSではなくCloud Functionsにデ�
 
 
 
-# リリース
+# 本番
 - AWS Lambda（API）
 - AWS API Gateway（API）
 - Cloud Functions（API）
