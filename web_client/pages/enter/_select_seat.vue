@@ -17,6 +17,14 @@
 
     </v-app-bar>
 
+    <Dialog
+      :if-show-dialog="if_show_dialog"
+      :accept-needed="false"
+      :card-title="dialog_message"
+      cancel-option-string="戻る"
+      @cancel="$router.push('/')"
+    />
+
     <v-main v-show="!loading">
       <v-container style="max-width: 700px">
         <h2>席を選ぼう。</h2>
@@ -81,12 +89,12 @@ import RoomLayout from '~/components/RoomLayout'
 import firebase from '~/plugins/firebase'
 import common from '~/plugins/common'
 import Dialog from '~/components/Dialog'
-// import roomLayoutJson from 'assets/mathematics-rom-layout.json'
 
 export default {
   name: 'EnterRoom',
   components: {
     RoomLayout,
+    Dialog,
   },
   data: () => ({
     room_id: '',
@@ -123,11 +131,12 @@ export default {
           this.loading = false
         } else {
           console.log(resp.message)
-          // todo top page へ戻る
+          this.dialog_message = 'エラーなりました（泣）'
+          this.if_show_dialog = true
         }
       } else {
-        // todo dialog
-        await this.$router.push('/')
+        this.dialog_message = 'サインインしてください。'
+        this.if_show_dialog = false
       }
     },
     async enterRoom() {
@@ -138,10 +147,8 @@ export default {
 
         await this.$router.push('/in/' + vm.$store.state.room_id)
       } else {
-        // todo check
-        this.if_show_dialog = false
         this.dialog_message = 'サインインしてください。'
-        this.if_show_dialog_2 = true
+        this.if_show_dialog = false
       }
     },
     goToTopPage() {

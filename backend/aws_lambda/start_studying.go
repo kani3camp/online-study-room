@@ -108,7 +108,7 @@ func StartStudying(ctx context.Context, request events.APIGatewayWebsocketProxyR
 			roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
 			response.RoomInfo = roomInfo
 			roomLayout, _ := RetrieveRoomLayout(roomId, client, ctx)
-			response.RoomLayout = roomLayout.SetIsVacant(client, ctx)
+			response.RoomLayout = roomLayout.SetIsVacant(client, ctx).SetUserName(client, ctx)
 		}
 	} else {
 		// 切断

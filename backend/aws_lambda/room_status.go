@@ -35,7 +35,7 @@ func RoomStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 			apiResp.Result = ERROR
 			apiResp.Message = "failed to retrieve room layout"
 		} else {
-			apiResp.RoomLayout = roomLayout.SetIsVacant(client, ctx)
+			apiResp.RoomLayout = roomLayout.SetIsVacant(client, ctx).SetUserName(client, ctx)
 
 			roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
 			apiResp.RoomStatus = RoomStruct{

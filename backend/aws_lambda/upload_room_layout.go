@@ -36,6 +36,11 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 	} else if roomLayoutData.RoomShape.Height == 0 || roomLayoutData.RoomShape.Width == 0 {
 		return InvalidRoomLayout.New("please specify the room-shape correctly")
 	}
+	// 横長のレイアウトのみ可
+	if roomLayoutData.RoomShape.Width < roomLayoutData.RoomShape.Height {
+		return InvalidRoomLayout.New("please make room width larger than room height")
+	}
+
 	if len(roomLayoutData.PartitionShapes) > 0 {
 		// PartitionのShapeTypeの重複がないか
 		for _, p := range roomLayoutData.PartitionShapes {

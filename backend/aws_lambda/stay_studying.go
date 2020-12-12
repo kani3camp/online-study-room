@@ -65,7 +65,7 @@ func StayStudying(ctx context.Context, request events.APIGatewayWebsocketProxyRe
 		roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
 		response.RoomInfo = roomInfo
 		roomLayout, _ := RetrieveRoomLayout(roomId, client, ctx)
-		response.RoomLayout = roomLayout.SetIsVacant(client, ctx)
+		response.RoomLayout = roomLayout.SetIsVacant(client, ctx).SetUserName(client, ctx)
 	} else {
 		// 切断
 		_ = Disconnect(connectionId, client, ctx)

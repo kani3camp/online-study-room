@@ -202,7 +202,8 @@ type RoomLayoutStruct struct {
 		Id int `json:"id" firestore:"id"`
 		X int `json:"x" firestore:"x"`
 		Y int `json:"y" firestore:"y"`
-		IsVacant bool `json:"is_vacant"`	// これはfirestoreには保存したくない
+		IsVacant bool `json:"is_vacant" firestore:"is-vacant"`	// これはfirestoreには保存したくないけど保存される
+		UserName string `json:"user_name" firestore:"user-name"`	// これはfirestoreには保存したくないけど保存される
 	} `json:"seats" firestore:"seats"`
 	Partitions []struct {
 		Id int `json:"id" firestore:"id"`
@@ -1259,6 +1260,22 @@ func (roomLayout RoomLayoutStruct) SetIsVacant(client *firestore.Client, ctx con
 			if usedSeat.SeatId == seat.Id {
 				roomLayout.Seats[i].IsVacant = false
 				break
+			}
+		}
+	}
+	return roomLayout
+}
+
+func (roomLayout RoomLayoutStruct) SetUserName(client *firestore.Client, ctx context.Context) RoomLayoutStruct {
+	for i, seat := range roomLayout.Seats {
+		roomLayout.Seats[i].UserName = ""
+		roomStatus, _ := RetrieveRoomInfo(roomLayout.RoomId, client, ctx)
+		for _, usedSeat := range roomStatus.Users {
+			if usedSeat.SeatId == seat.Id {
+				userId := usedSeat.UserId
+				authClient, _ := InitializeFirebaseAuthClient(ctx)
+				user, _ := authClient.GetUser(ctx, userId)
+				roomLayout.Seats[i].UserName = user.DisplayName
 			}
 		}
 	}

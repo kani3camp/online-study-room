@@ -45,18 +45,9 @@
 </template>
 
 <script>
-import Seat from '@/components/Seat'
-// todo コード整理
 export default {
   name: 'RoomLayout',
-  comments: {
-    Seat,
-  },
   props: {
-    roomId: {
-      type: String,
-      required: true,
-    },
     layout: {
       type: Object,
       default: null,
@@ -64,11 +55,9 @@ export default {
   },
   data() {
     return {
-      emptySeatColor: '#eaccb6',
+      emptySeatColor: '#fce7d2',
       filledSeatColor: '#430308',
-      seatFontSize: 80 + '%',
       isMounted: false,
-      // isLayoutLoaded: false,
       seats_if_filled: null,
       seats: [],
       partitions: [],
@@ -81,6 +70,17 @@ export default {
       },
       set() {},
     },
+    seatFontSize: {
+      get() {
+        if (this.isMounted && this.roomLayout && this.$refs.roomLayout) {
+          const roomLayoutWidth = this.$refs.roomLayout.clientWidth
+          return roomLayoutWidth * this.roomLayout['font_size_ratio'] + 'px'
+        } else {
+          return 20 + 'px'
+        }
+      },
+      set() {},
+    },
     roomShape: {
       get() {
         if (this.isMounted && this.roomLayout && this.$refs.roomLayout) {
@@ -90,12 +90,12 @@ export default {
             height:
               (roomLayoutWidth * this.roomLayout['room_shape'].height) / this.roomLayout['room_shape'].width +
               'px',
-            seatFontSize: roomLayoutWidth * this.roomLayout['font_size_ratio'] + 'px',
           }
         } else {
+          // そもそもlayoutが読み込めてないときは親のコンポーネントで"Loading..."とか表示しておくのでどうでもいい
           return {
             width: 100 + '%',
-            height: 100 + 'vh',
+            height: 100 + '%',
           }
         }
       },
@@ -105,6 +105,7 @@ export default {
       get() {
         if (this.roomLayout) {
           const vm = this
+          // 別なところでこれらの値+'%'で使う？
           return {
             width: (100 * vm.roomLayout['seat_shape'].width) / vm.roomLayout['room_shape'].width,
             height: (100 * vm.roomLayout['seat_shape'].height) / vm.roomLayout['room_shape'].height,
@@ -123,7 +124,10 @@ export default {
         if (this.roomLayout) {
           const vm = this
           return this.roomLayout.seats.map(function (seat) {
-            return vm.seatPosition(seat.x, seat.y)
+            return {
+              x: (100 * seat.x) / vm.layout['room_shape'].width,
+              y: (100 * seat.y) / vm.layout['room_shape'].height,
+            }
           })
         } else {
           return []
@@ -135,26 +139,24 @@ export default {
       get() {
         if (this.roomLayout) {
           const vm = this
-          return vm.layout.partitions.map(function (partition, index) {
-            const shapeType = vm.layout.partitions[index]['shape_type']
+          return vm.roomLayout.partitions.map(function (partition, index) {
+            const partitionShapes = vm.roomLayout['partition_shapes']
+            const shapeType = partition['shape_type']
             let width
             let height
-            for (let i = 0; i < vm.layout['partition_shapes'].length; i++) {
-              if (vm.layout['partition_shapes'][i].name === shapeType) {
-                width = (100 * vm.layout['partition_shapes'][i].width) / vm.layout['room_shape'].width
-                height = (100 * vm.layout['partition_shapes'][i].height) / vm.layout['room_shape'].height
+            for (let i = 0; i < partitionShapes.length; i++) {
+              if (partitionShapes[i].name === shapeType) {
+                width = (100 * partitionShapes[i].width) / vm.roomLayout['room_shape'].width
+                height = (100 * partitionShapes[i].height) / vm.roomLayout['room_shape'].height
               }
             }
             return {
-              width: width,
-              height: height,
+              width,
+              height,
             }
           })
         } else {
-          return {
-            width: 0,
-            height: 0,
-          }
+          return []
         }
       },
       set() {},
@@ -162,25 +164,14 @@ export default {
     partitionPositions: function () {
       if (this.roomLayout) {
         const vm = this
-        return this.layout.partitions.map(function (partition) {
-          return vm.seatPosition(partition.x, partition.y)
+        return this.roomLayout.partitions.map(function (partition) {
+          return {
+            x: (100 * partition.x) / vm.layout['room_shape'].width,
+            y: (100 * partition.y) / vm.layout['room_shape'].height,
+          }
         })
       } else {
         return []
-      }
-    },
-    roomSize: function () {
-      if (this.$refs.roomLayout) {
-        const roomLayoutWidth = this.$refs.roomLayout.clientWidth
-        const roomLayoutHeight = this.$refs.roomLayout.clientHeight
-        return {
-          width: roomLayoutWidth,
-          height: roomLayoutHeight,
-        }
-      }
-      return {
-        width: 0,
-        height: 0,
       }
     },
   },
@@ -188,52 +179,18 @@ export default {
     roomLayout: function (newValue, oldValue) {
       if (newValue !== {}) {
         this.initializeLayoutData()
-        this.determineFontSize()
-      }
-    },
-    roomShape: function (newValue, oldValue) {
-      if (this.roomLayout) {
-        this.seatFontSize = newValue.seatFontSize
-      }
-    },
-    roomSize: function (newValue, oldValue) {
-      if (newValue.width !== 0) {
       }
     },
   },
-  async mounted() {
+  mounted() {
     this.isMounted = true
   },
   methods: {
     initializeLayoutData() {
+      // template内で使うときにroomLayout.seatsとして使うと最初はroomLayout = nullなのでエラーになる
+      // そのため、個別に変数として扱って、初期値として[]をいれておく
       this.seats = this.roomLayout.seats
       this.partitions = this.roomLayout.partitions
-    },
-    determineFontSize() {
-      const roomLayoutWidth = this.$refs.roomLayout.clientWidth
-      const roomLayoutHeight = this.$refs.roomLayout.clientHeight
-      const vm = this
-      this.seatFontSize = Math.floor((roomLayoutWidth * 30) / 800)
-      this.seatShape = {
-        width: Math.floor(
-          (roomLayoutWidth * this.layout['seat_shape'].width) / this.layout['room_shape'].width
-        ),
-        height: Math.floor(
-          (roomLayoutHeight * this.layout['seat_shape'].height) / this.layout['room_shape'].height
-        ),
-      }
-      this.seatPositions = this.layout.seats.map(function (seat) {
-        return {
-          x: (roomLayoutWidth * seat.x) / vm.layout['room_shape'].width,
-          y: (roomLayoutWidth * seat.y) / vm.layout['room_shape'].height,
-        }
-      })
-    },
-    seatPosition(x, y) {
-      return {
-        x: (100 * x) / this.layout['room_shape'].width,
-        y: (100 * y) / this.layout['room_shape'].height,
-      }
     },
   },
 }
@@ -253,7 +210,6 @@ export default {
 #room-layout:before {
   content: '';
   display: block;
-  /*padding-top: todo ;*/
 }
 
 .seat {
