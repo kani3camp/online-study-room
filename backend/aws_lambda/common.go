@@ -73,6 +73,7 @@ const (
 	UserNotInAnyRoom
 	NoSuchUserExists
 	RoomNotExist
+	InvalidRoomLayout
 )
 
 // ErrorTypeを取得すること(Type()関数が使えること)に特化した型であり、ここではCustomError型の構造体をこの型として代入（もしくは型アサーション）できる
@@ -1191,10 +1192,16 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 	log.Println("SaveRoomLayout()")
 
 	// 履歴を保存
-	oldRoomLayout, err := RetrieveRoomLayout(roomLayout.RoomId, client, ctx)
-	if err != nil {
-		log.Println(err)
-		return err
+	var oldRoomLayout RoomLayoutStruct
+	var err error
+	if roomLayout.Version == 1 {	// 最初のアップロードだと既存のレイアウトデータは存在しない
+		oldRoomLayout = RoomLayoutStruct{}
+	} else {
+		oldRoomLayout, err = RetrieveRoomLayout(roomLayout.RoomId, client, ctx)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
 	}
 	_ = RecordHistory(map[string]interface{}{
 		"activity": NewRoomLayoutActivity,

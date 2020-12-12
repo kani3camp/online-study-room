@@ -37,7 +37,7 @@
       >
         <div class="tool-content">
           <nuxt-link to="/about_service">
-            はじめての方
+            このサイトについて
           </nuxt-link>
         </div>
         <div class="tool-content">
