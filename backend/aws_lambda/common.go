@@ -24,6 +24,13 @@ import (
 )
 
 
+// リリース時は変更
+const ProjectId = "online-study-space"
+//const ProjectId = "test-online-study-space"
+const SecretManagerSecretName = "firestore-service-account"
+// todo test用を追加
+
+
 const (
 	ROOMS = "rooms"
 	USERS = "users"
@@ -35,7 +42,6 @@ const (
 	RoomLayouts = "room-layouts"
 	NEWS = "news"
 
-	ProjectId = "online-study-space"
 	TimeLimit = 180 // 秒
 
 	UserId = "user_id"
@@ -328,7 +334,7 @@ func CloseCloudStorageClient(client *storage.Client) {
 
 func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
 	log.Println("RetrieveFirebaseCredentialInBytes()")
-	secretName := "firestore-service-account"
+	secretName := SecretManagerSecretName
 	region := "ap-northeast-1"
 
 	//Create a Secrets Manager client
