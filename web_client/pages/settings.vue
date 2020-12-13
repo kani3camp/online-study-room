@@ -236,7 +236,7 @@ export default {
     async saveNewValues() {
       console.log('saveNewValues()')
       this.saving = true
-      this.dialog_message = '送信中'
+      this.dialog_message = '保存中'
       this.if_show_dialog = true
 
       const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/change_user_info'

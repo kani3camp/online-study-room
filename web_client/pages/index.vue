@@ -200,7 +200,7 @@ iframe {
 }
 
 .big-char {
-  font-size: 3rem;
+  font-size: 2rem;
   color: #7f828b;
 }
 </style>
