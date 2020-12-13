@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 	"strconv"
 )
 
@@ -16,6 +17,7 @@ type NewsResponseStruct struct {
 }
 
 func News(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println("News()")
 	ctx, client := InitializeHttpFuncWithFirestore()
 	defer CloseFirestoreClient(client)
 

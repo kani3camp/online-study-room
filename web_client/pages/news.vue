@@ -28,7 +28,10 @@
         </v-row>
       </v-container>
 
-      <v-container v-show="! loading">
+      <v-container
+        v-show="! loading"
+        style="max-width: 800px"
+      >
         <v-row dense>
           <v-col
             v-for="news in newsList"
@@ -36,7 +39,7 @@
             cols="12"
             dense
           >
-            <v-card>
+            <v-card outlined>
               <v-card-title v-text="news['news_body'].title" />
               <v-card-subtitle v-text="formatDateString(news['news_body'].updated)" />
               <v-card-text v-text="news['news_body']['text_body']" />
