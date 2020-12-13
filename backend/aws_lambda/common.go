@@ -21,15 +21,16 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"reflect"
 )
 
 
-// リリース時は変更
+// リリース時は変更 ==================================================================
 const ProjectId = "online-study-space"
 //const ProjectId = "test-online-study-space"
 const SecretManagerSecretName = "firestore-service-account"
-// todo test用を追加
-
+//const SecretManagerSecretName = "test-firestore-service-account"
+// ================================================================================
 
 const (
 	ROOMS = "rooms"
@@ -994,10 +995,9 @@ func _UpdateDatabase(client *firestore.Client, ctx context.Context) error {
 			_ = LeaveRoom(roomId, userInRoom.UserId, client, ctx)
 		}
 		// todo room_layout的に有効な席に座っているかどうか
-
 	}
 	
-	// todo
+	// todo offlineとなっているユーザーのチェック
 	// offlineとなっているユーザー
 	// user statusがofflineなのにルームにいないか
 	// offlineなのにconnection idが設定されていないか
@@ -1211,6 +1211,25 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 		"date": time.Now(),
 	}, client, ctx)
 
+	// 前後で座席に変更があった場合、現在そのルームにいる人を強制的に退室させる
+	// 現在の座席idリスト
+	var oldSeatIds []int
+	for _, oldSeat := range oldRoomLayout.Seats {
+		oldSeatIds = append(oldSeatIds, oldSeat.Id)
+	}
+	// 新レイアウトの座席idリスト
+	var newSeatIds []int
+	for _, newSeat := range roomLayout.Seats {
+		newSeatIds = append(newSeatIds, newSeat.Id)
+	}
+	if !reflect.DeepEqual(oldSeatIds, newSeatIds) {
+		log.Println("oldSeatIds != newSeatIds. so all users in the room will forcibly be left")
+		users, _ := RetrieveRoomUsers(roomLayout.RoomId, client, ctx)
+		for _, user := range users {
+			_ = LeaveRoom(roomLayout.RoomId, user.UserId, client, ctx)
+		}
+	}
+
 	// 保存
 	_, err = client.Collection(CONFIG).Doc(RoomLayoutsInfo).Collection(RoomLayouts).Doc(roomLayout.RoomId).Set(ctx, roomLayout)
 	if err != nil {
@@ -1236,7 +1255,7 @@ func Disconnect(connectionId string, client *firestore.Client, ctx context.Conte
 	byteArray, _ := ioutil.ReadAll(resp.Body)
 	responseString := string(byteArray)
 	log.Println(responseString)
-	// todo まずPostmanで試す
+	// まだPostmanで確認してない
 
 	return nil
 }
@@ -1282,3 +1301,67 @@ func (roomLayout RoomLayoutStruct) SetUserName(client *firestore.Client, ctx con
 	return roomLayout
 }
 
+func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Client, ctx context.Context) CustomError {
+	var idList []int
+	var partitionShapeTypeList []string
+
+	if roomLayoutData.RoomId == "" {
+		return InvalidRoomLayout.New("please specify a valid room id")
+	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); ! isExistRoom {
+		return InvalidRoomLayout.New("any room of that room id doesn't exist")
+	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1 + currentVersion {
+		return InvalidRoomLayout.New("please specify a incremented version. latest version is " + strconv.Itoa(currentVersion))
+	} else if roomLayoutData.FontSizeRatio == 0.0 {
+		return InvalidRoomLayout.New("please specify a valid font size ratio")
+	} else if roomLayoutData.RoomShape.Height == 0 || roomLayoutData.RoomShape.Width == 0 {
+		return InvalidRoomLayout.New("please specify the room-shape correctly")
+	}
+	// 横長のレイアウトのみ可
+	if roomLayoutData.RoomShape.Width < roomLayoutData.RoomShape.Height {
+		return InvalidRoomLayout.New("please make room width larger than room height")
+	}
+
+	if len(roomLayoutData.PartitionShapes) > 0 {
+		// PartitionのShapeTypeの重複がないか
+		for _, p := range roomLayoutData.PartitionShapes {
+			if p.Name == "" || p.Width == 0 || p.Height == 0 {
+				return InvalidRoomLayout.New("please specify partition shapes correctly")
+			}	// ここから正常にifを抜けることがある
+			for _, other := range partitionShapeTypeList {
+				if other == p.Name {
+					return InvalidRoomLayout.New("some partition shape types are duplicated")
+				}
+			}
+			partitionShapeTypeList = append(partitionShapeTypeList, p.Name)
+		}
+	}
+	if len(roomLayoutData.Seats) == 0 {
+		return InvalidRoomLayout.New("please specify at least one seat")
+	}
+	// SeatのIdの重複がないか
+	for _, s := range roomLayoutData.Seats {
+		for _, other := range idList {
+			if other == s.Id {
+				return InvalidRoomLayout.New("some seat ids are duplicated")
+			}
+		}
+		idList = append(idList, s.Id)
+	}
+	// 仕切り
+	for _, p := range roomLayoutData.Partitions {
+		if p.ShapeType == "" {
+			return InvalidRoomLayout.New("please specify valid shape-type to all shapes")
+		}
+		// 仕切りのShapeTypeに有効なものが指定されているか
+		isContained := false
+		for _, other := range partitionShapeTypeList {
+			if other == p.ShapeType {
+				isContained = true
+			}
+		}
+		if ! isContained {
+			return InvalidRoomLayout.New("please specify valid shape type, at partition id = " + strconv.Itoa(p.Id))
+		}
+	}
+	return CustomError{Body: nil}
+}
