@@ -4,8 +4,8 @@
       id="room-layout"
       ref="roomLayout"
       :style="{
-        width: roomShape.width,
-        height: roomShape.height
+        width: roomShape.widthPx+'px',
+        height: roomShape.heightPx+'px'
       }"
     >
       <div
@@ -18,12 +18,15 @@
           top: seatPositions[index].y+'%',
           width: seatShape.width+'%',
           height: seatShape.height+'%',
-          fontSize: seatFontSize
+          fontSize: seatFontSizePx+'px'
         }"
       >
-        <!--        {{ seat.id + '\n' + seat.user_name }}-->
-        <!--        {{ seat.user_name === '' ? 'true' : 'false' }}-->
-        {{ seat.id }}
+        <p style="font-weight: bold">
+          {{ seat.id }}
+        </p>
+        <p style="overflow: hidden;">
+          {{ seat.user_name.substr(0, 4) }}
+        </p>
       </div>
 
       <div
@@ -33,8 +36,8 @@
         :style="{
           left: partitionPositions[index].x+'%',
           top: partitionPositions[index].y+'%',
-          width: partitionShapes[index].width+'%',
-          height: partitionShapes[index].height+'%'
+          width: partitionShapes[index].widthPercent+'%',
+          height: partitionShapes[index].heightPercent+'%'
         }"
       />
     </div>
@@ -75,31 +78,29 @@ export default {
       },
       set () {},
     },
-    seatFontSize: {
+    seatFontSizePx: {
       get () {
-        if (this.isMounted && this.roomLayout && this.$refs.roomLayout) {
-          const roomLayoutWidth = this.$refs.roomLayout.clientWidth
-          return `${roomLayoutWidth * this.roomLayout.font_size_ratio}px`
+        if (this.isMounted && this.roomLayout && this.roomShape) {
+          const roomLayoutWidth = this.roomShape.width
+          return roomLayoutWidth * this.roomLayout.font_size_ratio
         } else {
-          return `${20}px`
+          return 30
         }
       },
       set () {},
     },
     roomShape: {
       get () {
-        if (this.isMounted && this.roomLayout && this.$refs.roomLayout) {
-          console.log('どうでもよくない')
+        if (this.isMounted && this.roomLayout) {
           return {
-            width: `${800 * this.roomLayout.room_shape.width / this.roomLayout.room_shape.height}px`,
-            height: '800px',
+            widthPx: 800 * this.roomLayout.room_shape.width / this.roomLayout.room_shape.height,
+            heightPx: 800,
           }
         } else {
           // そもそもlayoutが読み込めてないときは親のコンポーネントで"Loading..."とか表示しておくのでどうでもいい
-          console.log('どうでもいい')
           return {
-            width: '1100px',
-            height: '800px',
+            widthPx: 1100,
+            heightPx: 800,
           }
         }
       },
@@ -144,17 +145,17 @@ export default {
           return vm.roomLayout.partitions.map((partition, index) => {
             const partitionShapes = vm.roomLayout.partition_shapes
             const shapeType = partition.shape_type
-            let width
-            let height
+            let widthPercent
+            let heightPercent
             for (let i = 0; i < partitionShapes.length; i++) {
               if (partitionShapes[i].name === shapeType) {
-                width = (100 * partitionShapes[i].width) / vm.roomLayout.room_shape.width
-                height = (100 * partitionShapes[i].height) / vm.roomLayout.room_shape.height
+                widthPercent = (100 * partitionShapes[i].width) / vm.roomLayout.room_shape.width
+                heightPercent = (100 * partitionShapes[i].height) / vm.roomLayout.room_shape.height
               }
             }
             return {
-              width,
-              height,
+              widthPercent,
+              heightPercent,
             }
           })
         } else {
@@ -215,6 +216,7 @@ export default {
 .seat {
   position: absolute;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }

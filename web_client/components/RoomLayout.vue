@@ -215,6 +215,7 @@ export default {
 .seat {
   position: absolute;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }

@@ -116,7 +116,7 @@ body {
 
 #footer {
   width: 1920px;
-  /*height: 100px;*/
+  /*heightPx: 100px;*/
 }
 
 .block {

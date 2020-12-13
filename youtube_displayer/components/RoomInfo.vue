@@ -27,7 +27,7 @@ export default {
     room_layout: null,
     users: [],
     show: true,
-    switchRoomInterval: 3 * 1000,
+    switchRoomInterval: 6 * 1000,
   }),
   created () {
     this.switchRoom()
