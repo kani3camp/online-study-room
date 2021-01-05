@@ -1,2 +1,6 @@
 # 入室はこちら
-[オンライン作業部屋](https://online-study-space.web.app){:target="_blank"}
+[オンライン作業部屋](https://online-study-space.web.app)
+
+# オンライン作業部屋とは？
+- オンラインで座席を選んで作業しよう
+- 作業中の人はYouTubeのライブ配信に映れるよ！（ニックネームが）
