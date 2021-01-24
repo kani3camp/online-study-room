@@ -1182,7 +1182,7 @@ func CurrentRoomLayoutVersion(roomId string, client *firestore.Client, ctx conte
 	doc, err := client.Collection(CONFIG).Doc(RoomLayoutsInfo).Collection(RoomLayouts).Doc(roomId).Get(ctx)
 	if err != nil {
 		log.Println(err)
-		return 0, err
+		return 0, err	// room layout データが存在しなければ?、current versionを0として返す
 	}
 	var roomLayout RoomLayoutStruct
 	_ = doc.DataTo(&roomLayout)
@@ -1307,10 +1307,10 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 
 	if roomLayoutData.RoomId == "" {
 		return InvalidRoomLayout.New("please specify a valid room id")
-	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); ! isExistRoom {
-		return InvalidRoomLayout.New("any room of that room id doesn't exist")
 	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1 + currentVersion {
 		return InvalidRoomLayout.New("please specify a incremented version. latest version is " + strconv.Itoa(currentVersion))
+	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); (! isExistRoom) && (currentVersion > 0) {
+		return InvalidRoomLayout.New("any room of that room id doesn't exist")
 	} else if roomLayoutData.FontSizeRatio == 0.0 {
 		return InvalidRoomLayout.New("please specify a valid font size ratio")
 	} else if roomLayoutData.RoomShape.Height == 0 || roomLayoutData.RoomShape.Width == 0 {
