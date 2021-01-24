@@ -59,6 +59,7 @@ func CreateNewRoom(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 				apiResp.Result = ERROR
 				apiResp.Message = "room layout's room id is not the same as what you specified"
 			} else {
+				// todo この辺のroomLayoutの処理は部屋が存在していることが前提になってるので要修正
 				customErr := CheckRoomLayoutData(roomLayout, client, ctx)
 				if customErr.Body != nil {
 					apiResp.Result = ERROR
