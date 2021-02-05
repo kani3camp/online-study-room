@@ -9,8 +9,8 @@ import (
 )
 
 type ChangeUserInfoParams struct {
-	UserId        string `json:"UserId"`
-	IdToken       string `json:"IdToken"`
+	UserId        string `json:"user_id"`
+	IdToken       string `json:"id_token"`
 	DisplayName   string `json:"display_name"`
 	StatusMessage string `json:"status_message"`
 }
