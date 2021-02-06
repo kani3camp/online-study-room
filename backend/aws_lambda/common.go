@@ -4,32 +4,31 @@ import (
 	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/storage"
 	"context"
-	"encoding/base64"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
-	"reflect"
 )
 
 
 // リリース時は変更 ==================================================================
-const ProjectId = "online-study-space"
-//const ProjectId = "test-online-study-space"
-const SecretManagerSecretName = "firestore-service-account"
-//const SecretManagerSecretName = "test-firestore-service-account"
+//const ProjectId = "online-study-space"
+//const SecretNameFirestore = "firestore-service-account"
+
+const ProjectId = "test-online-study-space"
+const SecretNameFirestore = "test-firestore-service-account"
 // ================================================================================
 
 const (
@@ -337,133 +336,70 @@ func CloseCloudStorageClient(client *storage.Client) {
 
 func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
 	log.Println("RetrieveFirebaseCredentialInBytes()")
-	secretName := SecretManagerSecretName
 	region := "ap-northeast-1"
+	sess := session.Must(session.NewSession())
+	db := dynamodb.New(sess, aws.NewConfig().WithRegion(region))
 
-	//Create a Secrets Manager client
-	svc := secretsmanager.New(session.New(),
-		aws.NewConfig().WithRegion(region))
-	input := &secretsmanager.GetSecretValueInput{
-		SecretId:     aws.String(secretName),
-		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
+	params := &dynamodb.GetItemInput{
+		TableName: aws.String("secrets"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"secret_name": {
+				S: aws.String(SecretNameFirestore),
+			},
+		},
 	}
 
-	// In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
-	// See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+	// データstruct
+	type SecretData struct {
+		SecretData string `dynamodbav:"secret_data"`
+	}
 
-	result, err := svc.GetSecretValue(input)
+	result, err := db.GetItem(params)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case secretsmanager.ErrCodeDecryptionFailure:
-				// Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-				fmt.Println(secretsmanager.ErrCodeDecryptionFailure, aerr.Error())
-
-			case secretsmanager.ErrCodeInternalServiceError:
-				// An error occurred on the server side.
-				fmt.Println(secretsmanager.ErrCodeInternalServiceError, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidParameterException:
-				// You provided an invalid value for a parameter.
-				fmt.Println(secretsmanager.ErrCodeInvalidParameterException, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidRequestException:
-				// You provided a parameter value that is not valid for the current state of the resource.
-				fmt.Println(secretsmanager.ErrCodeInvalidRequestException, aerr.Error())
-
-			case secretsmanager.ErrCodeResourceNotFoundException:
-				// We can't find the resource that you asked for.
-				fmt.Println(secretsmanager.ErrCodeResourceNotFoundException, aerr.Error())
-			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
-		}
+		log.Println(err)
 		return nil, err
 	}
-
-	// Decrypts secret using the associated KMS CMK.
-	// Depending on whether the secret is a string or binary, one of these fields will be populated.
-	var secretString, decodedBinarySecret string
-	if result.SecretString != nil {
-		secretString = *result.SecretString
-		return []byte(secretString), nil
-	} else {
-		decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
-		_len, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
-		if err != nil {
-			fmt.Println("Base64 Decode Error:", err)
-			//return
-		}
-		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
-		return []byte(decodedBinarySecret), nil
+	secretData := SecretData{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &secretData)
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
+	return []byte(secretData.SecretData), nil
 }
 
 func RetrieveCloudStorageCredentialInBytes() ([]byte, error) {
 	log.Println("RetrieveCloudStorageCredentialInBytes()")
-	secretName := "cloudstorage-service-account"
 	region := "ap-northeast-1"
+	sess := session.Must(session.NewSession())
+	db := dynamodb.New(sess, aws.NewConfig().WithRegion(region))
 
-	//Create a Secrets Manager client
-	svc := secretsmanager.New(session.New(),
-		aws.NewConfig().WithRegion(region))
-	input := &secretsmanager.GetSecretValueInput{
-		SecretId:     aws.String(secretName),
-		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
+	params := &dynamodb.GetItemInput{
+		TableName: aws.String("secrets"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"secret_name": {
+				S: aws.String("cloudstorage-service-account"),
+			},
+		},
 	}
 
-	result, err := svc.GetSecretValue(input)
+	// データstruct
+	type SecretData struct {
+		SecretData string `dynamodbav:"secret_data"`
+	}
+
+	result, err := db.GetItem(params)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case secretsmanager.ErrCodeDecryptionFailure:
-				// Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-				fmt.Println(secretsmanager.ErrCodeDecryptionFailure, aerr.Error())
-
-			case secretsmanager.ErrCodeInternalServiceError:
-				// An error occurred on the server side.
-				fmt.Println(secretsmanager.ErrCodeInternalServiceError, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidParameterException:
-				// You provided an invalid value for a parameter.
-				fmt.Println(secretsmanager.ErrCodeInvalidParameterException, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidRequestException:
-				// You provided a parameter value that is not valid for the current state of the resource.
-				fmt.Println(secretsmanager.ErrCodeInvalidRequestException, aerr.Error())
-
-			case secretsmanager.ErrCodeResourceNotFoundException:
-				// We can't find the resource that you asked for.
-				fmt.Println(secretsmanager.ErrCodeResourceNotFoundException, aerr.Error())
-			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
-		}
+		log.Println(err)
 		return nil, err
 	}
-
-	// Decrypts secret using the associated KMS CMK.
-	// Depending on whether the secret is a string or binary, one of these fields will be populated.
-	var secretString, decodedBinarySecret string
-	if result.SecretString != nil {
-		secretString = *result.SecretString
-		return []byte(secretString), nil
-	} else {
-		decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
-		_len, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
-		if err != nil {
-			fmt.Println("Base64 Decode Error:", err)
-			return nil, err
-		}
-		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
-		return []byte(decodedBinarySecret), nil
+	secretData := SecretData{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &secretData)
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
-
-	// Your code goes here.
+	return []byte(secretData.SecretData), nil
 }
 
 func IsUserVerified(userId string, idToken string, client *firestore.Client, ctx context.Context) (bool, error) {
