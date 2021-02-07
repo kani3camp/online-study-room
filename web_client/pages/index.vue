@@ -177,7 +177,7 @@ export default {
     },
     async loadRooms() {
       this.loading = true
-      const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms'
+      const url = common.apiLink.rooms
       const resp = await common.httpGet(url, {})
       if (resp.result === 'ok') {
         this.rooms = resp.rooms

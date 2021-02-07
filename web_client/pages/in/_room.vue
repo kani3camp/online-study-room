@@ -158,7 +158,7 @@ export default {
       console.log('startStudying')
       // websocket
       const vm = this
-      vm.socket = new WebSocket('wss://0ieer51ju9.execute-api.ap-northeast-1.amazonaws.com/release')
+      vm.socket = new WebSocket(common.apiLink.websocket)
       vm.socket.onopen = async () => {
         console.log('socket opened.')
         const params = {

@@ -129,7 +129,7 @@ export default {
         this.dialog_message = '送信中'
         this.submitting = true
 
-        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
+        const url = common.apiLink.send_contact_form
         const params = {
           mail_address: this.mail_address.toString(),
           user_id: firebase.auth().currentUser.uid,

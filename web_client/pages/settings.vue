@@ -239,7 +239,7 @@ export default {
       this.dialog_message = '保存中'
       this.if_show_dialog = true
 
-      const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/change_user_info'
+      const url = common.apiLink.change_user_info
       const params = {
         user_id: firebase.auth().currentUser.uid,
         id_token: await firebase.auth().currentUser.getIdToken(false),

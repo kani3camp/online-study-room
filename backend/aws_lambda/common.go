@@ -234,7 +234,11 @@ func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
 func InitializeEventFuncWithFirestore() (context.Context, *firestore.Client) {
 	log.Println("InitializeEventFuncWithFirestore()")
 	ctx := context.Background()
-	client, _ := InitializeFirestoreClient(ctx)
+	client, err := InitializeFirestoreClient(ctx)
+	if err != nil {
+		log.Println("Failed InitializeFirestoreClient()")
+		log.Println(err)
+	}
 	return ctx, client
 }
 
@@ -256,12 +260,15 @@ func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 	var err1, err2 error
 	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
 	if err1 != nil {
+		log.Println("should be on google cloud")
 		client, err2 = firestore.NewClient(ctx, ProjectId)
 	} else {
+		log.Println("should be on aws")
 		sa := option.WithCredentialsJSON(awsCredential)
 		client, err2 = firestore.NewClient(ctx, ProjectId, sa)
 	}
 	if err2 != nil {
+		log.Println("failed firestore.NewClient()")
 		log.Println(err2)
 		return nil, err2
 	}
@@ -292,8 +299,10 @@ func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
 	var err1, err2 error
 	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
 	if err1 != nil {
+		log.Println("should be on google cloud")
 		app, err2 = firebase.NewApp(ctx, nil)
 	} else {
+		log.Println("should be on aws")
 		sa := option.WithCredentialsJSON(awsCredential)
 		app, err2 = firebase.NewApp(ctx, nil, sa)
 	}
@@ -590,6 +599,7 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 			break
 		}
 		if err != nil {
+			// todo ルームがないとエラーになる
 			log.Printf("Failed to iterate: %v", err)
 			return []RoomStruct{}, err
 		}
@@ -870,6 +880,8 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorH
 		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
 	if err != nil {
+		log.Println("_createできんかった。")
+		log.Println(roomId, roomName, roomType, themeColorHex)
 		log.Println(err)
 	}
 	return err
@@ -1097,6 +1109,8 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 		if err != nil {
 			log.Println("Failed to update total-break-time of " + userId)
 		}
+	} else {
+		log.Println("unknown room type: ", roomType)
 	}
 }
 
@@ -1238,12 +1252,14 @@ func (roomLayout RoomLayoutStruct) SetUserName(client *firestore.Client, ctx con
 }
 
 func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Client, ctx context.Context) CustomError {
+	log.Println("CheckRoomLayoutData()")
 	var idList []int
 	var partitionShapeTypeList []string
 
+	// ルーム作成時の roomLayoutData.Version は 1
 	if roomLayoutData.RoomId == "" {
 		return InvalidRoomLayout.New("please specify a valid room id")
-	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); ! isExistRoom {
+	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version > 1 && (! isExistRoom) {
 		return InvalidRoomLayout.New("any room of that room id doesn't exist")
 	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1 + currentVersion {
 		return InvalidRoomLayout.New("please specify a incremented version. latest version is " + strconv.Itoa(currentVersion))
