@@ -71,7 +71,7 @@ export default {
   }),
   async created() {
     this.loading = true
-    const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/news'
+    const url = common.apiLink.news
     const params = {
       num_news: 10,
     }

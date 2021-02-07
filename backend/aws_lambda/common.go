@@ -4,32 +4,31 @@ import (
 	"cloud.google.com/go/firestore"
 	"cloud.google.com/go/storage"
 	"context"
-	"encoding/base64"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
-	"reflect"
 )
 
 
 // リリース時は変更 ==================================================================
-const ProjectId = "online-study-space"
-//const ProjectId = "test-online-study-space"
-const SecretManagerSecretName = "firestore-service-account"
-//const SecretManagerSecretName = "test-firestore-service-account"
+//const ProjectId = "online-study-space"
+//const SecretNameFirestore = "firestore-service-account"
+
+const ProjectId = "test-online-study-space"
+const SecretNameFirestore = "test-firestore-service-account"
 // ================================================================================
 
 const (
@@ -235,7 +234,11 @@ func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
 func InitializeEventFuncWithFirestore() (context.Context, *firestore.Client) {
 	log.Println("InitializeEventFuncWithFirestore()")
 	ctx := context.Background()
-	client, _ := InitializeFirestoreClient(ctx)
+	client, err := InitializeFirestoreClient(ctx)
+	if err != nil {
+		log.Println("Failed InitializeFirestoreClient()")
+		log.Println(err)
+	}
 	return ctx, client
 }
 
@@ -257,12 +260,15 @@ func InitializeFirestoreClient(ctx context.Context) (*firestore.Client, error) {
 	var err1, err2 error
 	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
 	if err1 != nil {
+		log.Println("should be on google cloud")
 		client, err2 = firestore.NewClient(ctx, ProjectId)
 	} else {
+		log.Println("should be on aws")
 		sa := option.WithCredentialsJSON(awsCredential)
 		client, err2 = firestore.NewClient(ctx, ProjectId, sa)
 	}
 	if err2 != nil {
+		log.Println("failed firestore.NewClient()")
 		log.Println(err2)
 		return nil, err2
 	}
@@ -293,8 +299,10 @@ func InitializeFirebaseApp(ctx context.Context) (*firebase.App, error) {
 	var err1, err2 error
 	awsCredential, err1 := RetrieveFirebaseCredentialInBytes()
 	if err1 != nil {
+		log.Println("should be on google cloud")
 		app, err2 = firebase.NewApp(ctx, nil)
 	} else {
+		log.Println("should be on aws")
 		sa := option.WithCredentialsJSON(awsCredential)
 		app, err2 = firebase.NewApp(ctx, nil, sa)
 	}
@@ -337,133 +345,70 @@ func CloseCloudStorageClient(client *storage.Client) {
 
 func RetrieveFirebaseCredentialInBytes() ([]byte, error) {
 	log.Println("RetrieveFirebaseCredentialInBytes()")
-	secretName := SecretManagerSecretName
 	region := "ap-northeast-1"
+	sess := session.Must(session.NewSession())
+	db := dynamodb.New(sess, aws.NewConfig().WithRegion(region))
 
-	//Create a Secrets Manager client
-	svc := secretsmanager.New(session.New(),
-		aws.NewConfig().WithRegion(region))
-	input := &secretsmanager.GetSecretValueInput{
-		SecretId:     aws.String(secretName),
-		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
+	params := &dynamodb.GetItemInput{
+		TableName: aws.String("secrets"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"secret_name": {
+				S: aws.String(SecretNameFirestore),
+			},
+		},
 	}
 
-	// In this sample we only handle the specific exceptions for the 'GetSecretValue' API.
-	// See https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+	// データstruct
+	type SecretData struct {
+		SecretData string `dynamodbav:"secret_data"`
+	}
 
-	result, err := svc.GetSecretValue(input)
+	result, err := db.GetItem(params)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case secretsmanager.ErrCodeDecryptionFailure:
-				// Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-				fmt.Println(secretsmanager.ErrCodeDecryptionFailure, aerr.Error())
-
-			case secretsmanager.ErrCodeInternalServiceError:
-				// An error occurred on the server side.
-				fmt.Println(secretsmanager.ErrCodeInternalServiceError, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidParameterException:
-				// You provided an invalid value for a parameter.
-				fmt.Println(secretsmanager.ErrCodeInvalidParameterException, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidRequestException:
-				// You provided a parameter value that is not valid for the current state of the resource.
-				fmt.Println(secretsmanager.ErrCodeInvalidRequestException, aerr.Error())
-
-			case secretsmanager.ErrCodeResourceNotFoundException:
-				// We can't find the resource that you asked for.
-				fmt.Println(secretsmanager.ErrCodeResourceNotFoundException, aerr.Error())
-			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
-		}
+		log.Println(err)
 		return nil, err
 	}
-
-	// Decrypts secret using the associated KMS CMK.
-	// Depending on whether the secret is a string or binary, one of these fields will be populated.
-	var secretString, decodedBinarySecret string
-	if result.SecretString != nil {
-		secretString = *result.SecretString
-		return []byte(secretString), nil
-	} else {
-		decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
-		_len, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
-		if err != nil {
-			fmt.Println("Base64 Decode Error:", err)
-			//return
-		}
-		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
-		return []byte(decodedBinarySecret), nil
+	secretData := SecretData{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &secretData)
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
+	return []byte(secretData.SecretData), nil
 }
 
 func RetrieveCloudStorageCredentialInBytes() ([]byte, error) {
 	log.Println("RetrieveCloudStorageCredentialInBytes()")
-	secretName := "cloudstorage-service-account"
 	region := "ap-northeast-1"
+	sess := session.Must(session.NewSession())
+	db := dynamodb.New(sess, aws.NewConfig().WithRegion(region))
 
-	//Create a Secrets Manager client
-	svc := secretsmanager.New(session.New(),
-		aws.NewConfig().WithRegion(region))
-	input := &secretsmanager.GetSecretValueInput{
-		SecretId:     aws.String(secretName),
-		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
+	params := &dynamodb.GetItemInput{
+		TableName: aws.String("secrets"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"secret_name": {
+				S: aws.String("cloudstorage-service-account"),
+			},
+		},
 	}
 
-	result, err := svc.GetSecretValue(input)
+	// データstruct
+	type SecretData struct {
+		SecretData string `dynamodbav:"secret_data"`
+	}
+
+	result, err := db.GetItem(params)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case secretsmanager.ErrCodeDecryptionFailure:
-				// Secrets Manager can't decrypt the protected secret text using the provided KMS key.
-				fmt.Println(secretsmanager.ErrCodeDecryptionFailure, aerr.Error())
-
-			case secretsmanager.ErrCodeInternalServiceError:
-				// An error occurred on the server side.
-				fmt.Println(secretsmanager.ErrCodeInternalServiceError, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidParameterException:
-				// You provided an invalid value for a parameter.
-				fmt.Println(secretsmanager.ErrCodeInvalidParameterException, aerr.Error())
-
-			case secretsmanager.ErrCodeInvalidRequestException:
-				// You provided a parameter value that is not valid for the current state of the resource.
-				fmt.Println(secretsmanager.ErrCodeInvalidRequestException, aerr.Error())
-
-			case secretsmanager.ErrCodeResourceNotFoundException:
-				// We can't find the resource that you asked for.
-				fmt.Println(secretsmanager.ErrCodeResourceNotFoundException, aerr.Error())
-			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
-		}
+		log.Println(err)
 		return nil, err
 	}
-
-	// Decrypts secret using the associated KMS CMK.
-	// Depending on whether the secret is a string or binary, one of these fields will be populated.
-	var secretString, decodedBinarySecret string
-	if result.SecretString != nil {
-		secretString = *result.SecretString
-		return []byte(secretString), nil
-	} else {
-		decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
-		_len, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
-		if err != nil {
-			fmt.Println("Base64 Decode Error:", err)
-			return nil, err
-		}
-		decodedBinarySecret = string(decodedBinarySecretBytes[:_len])
-		return []byte(decodedBinarySecret), nil
+	secretData := SecretData{}
+	err = dynamodbattribute.UnmarshalMap(result.Item, &secretData)
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
-
-	// Your code goes here.
+	return []byte(secretData.SecretData), nil
 }
 
 func IsUserVerified(userId string, idToken string, client *firestore.Client, ctx context.Context) (bool, error) {
@@ -654,6 +599,7 @@ func RetrieveRooms(client *firestore.Client, ctx context.Context) ([]RoomStruct,
 			break
 		}
 		if err != nil {
+			// todo ルームがないとエラーになる
 			log.Printf("Failed to iterate: %v", err)
 			return []RoomStruct{}, err
 		}
@@ -934,6 +880,8 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorH
 		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
 	if err != nil {
+		log.Println("_createできんかった。")
+		log.Println(roomId, roomName, roomType, themeColorHex)
 		log.Println(err)
 	}
 	return err
@@ -1161,6 +1109,8 @@ func UpdateTotalTime(userId string, roomId string, leftDate time.Time, client *f
 		if err != nil {
 			log.Println("Failed to update total-break-time of " + userId)
 		}
+	} else {
+		log.Println("unknown room type: ", roomType)
 	}
 }
 
@@ -1302,12 +1252,14 @@ func (roomLayout RoomLayoutStruct) SetUserName(client *firestore.Client, ctx con
 }
 
 func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Client, ctx context.Context) CustomError {
+	log.Println("CheckRoomLayoutData()")
 	var idList []int
 	var partitionShapeTypeList []string
 
+	// ルーム作成時の roomLayoutData.Version は 1
 	if roomLayoutData.RoomId == "" {
 		return InvalidRoomLayout.New("please specify a valid room id")
-	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); ! isExistRoom {
+	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version > 1 && (! isExistRoom) {
 		return InvalidRoomLayout.New("any room of that room id doesn't exist")
 	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1 + currentVersion {
 		return InvalidRoomLayout.New("please specify a incremented version. latest version is " + strconv.Itoa(currentVersion))

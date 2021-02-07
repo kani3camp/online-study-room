@@ -1,6 +1,10 @@
+# gcloudプロジェクト切り替えコマンド
+# gcloud config set project <project-id>
+
 
 function_name="UpdateUserDoc"
-project_id="online-study-space"
+#project_id="online-study-space"
+project_id="test-online-study-space"
 
 #gcloud functions deploy $function_name \
 #  --trigger-http \

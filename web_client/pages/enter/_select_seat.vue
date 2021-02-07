@@ -118,7 +118,7 @@ export default {
     async fetchRoomInfo() {
       if (this.$store.state.isSignedIn) {
         const vm = this
-        let url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status'
+        let url = common.apiLink.room_status
         let params = { room_id: vm.room_id }
         const resp = await common.httpGet(url, params)
 
