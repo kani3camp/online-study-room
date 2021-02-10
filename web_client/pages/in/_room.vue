@@ -55,25 +55,22 @@
 
         <v-divider />
 
+        <v-list-item>
+          入室時間の上限は2時間となってます。今後伸びる予定です。
+        </v-list-item>
+        <v-list-item>
+          注意：スマホの方は、できるだけこの画面を閉じないようにしてください。通信が切断されて退室してしまいます。
+        </v-list-item>
+        <v-list-item>
+          この問題については、今後のアップデートで解決する予定です。アイデアも募集中です。
+        </v-list-item>
+
+        <v-divider />
+
         <v-subheader>同じ部屋の他のユーザー</v-subheader>
 
       </v-list>
-      <v-container>
-        <audio
-          id="audioElement"
-          src="@/assets/rain1.mp3"
-        />
-        <div
-          style="height: 100px; width: 100px; background-color: pink"
-          @click="playSound"
-        >
-          <button
-            id="audioPlay"
-            type="button"
-            style="width: 1rem; height: 1rem"
-          />
-        </div>
-      </v-container>
+
       <v-container
         style="max-width: 800px"
       >
@@ -197,22 +194,6 @@ export default {
             vm.is_entered = true
             vm.is_socket_open = true
             await vm.stayStudying()
-
-            // audio再生の許可
-            const audio = document.getElementById('audioElement')
-            const playButton = document.getElementById('audioPlay')
-            playButton.onclick = function () {
-              audio.play()
-            }
-            audio.addEventListener(
-              'ended',
-              function () {
-                console.log('ended.')
-                audio.currentTime = 0
-                audio.play()
-              },
-              false
-            )
           }
           vm.room_layout = resp['room_layout']
           let amIin = false
