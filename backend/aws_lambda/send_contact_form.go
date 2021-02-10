@@ -35,11 +35,6 @@ func SendContactForm(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 	userId, idToken, mailAddress := params.UserId, params.IdToken, params.MailAddress
 	message, contactType := params.Message, params.ContactType
 
-	message =
-		"Contact type : " + contactType + "\n\n" +
-			"From : " + mailAddress + "\n\n" +
-			"Message : \n" + message
-
 	if userId == "" || idToken == "" || mailAddress == "" || contactType == "" || message == "" {
 		apiResp.Result = ERROR
 		apiResp.Message = InvalidParams
@@ -47,6 +42,13 @@ func SendContactForm(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 		apiResp.Result = ERROR
 		apiResp.Message = UserAuthFailed
 	} else {
+		// Firestoreに記録
+
+		// LINEに送信
+		message =
+			"Contact type : " + contactType + "\n" +
+				"From : " + mailAddress + "\n" +
+				"Message : \n" + message
 		messageDestinationId := os.Getenv("DESTINATION_LINE_ID")
 		bot, err := linebot.New(
 			os.Getenv("CHANNEL_SECRET"),

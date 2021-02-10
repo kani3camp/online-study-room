@@ -11,10 +11,10 @@
 # test_upload_room_layout, test_user_status
 
 set GOOS=linux
-go build -o main common.go send_live_chat_message.go     user_status.go
+go build -o main common.go send_live_chat_message.go     send_contact_form.go
 C:\Users\momom\go\bin\build-lambda-zip.exe -output main.zip main
-aws lambda create-function --function-name     test_user_status     --runtime go1.x --zip-file fileb://main.zip --handler main --role arn:aws:iam::652333062396:role/service-role/my-first-golang-lambda-function-role-cb8uw4th
-aws lambda update-function-code --function-name     test_user_status     --zip-file fileb://main.zip
+aws lambda create-function --function-name     test_send_contact_form     --runtime go1.x --zip-file fileb://main.zip --handler main --role arn:aws:iam::652333062396:role/service-role/my-first-golang-lambda-function-role-cb8uw4th
+aws lambda update-function-code --function-name     test_send_contact_form     --zip-file fileb://main.zip
 
 
 # Mac OS
