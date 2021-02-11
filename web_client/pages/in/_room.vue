@@ -55,6 +55,18 @@
 
         <v-divider />
 
+        <v-list-item>
+          入室時間の上限は2時間となってます。今後伸びる予定です。
+        </v-list-item>
+        <v-list-item>
+          注意：スマホの方は、できるだけこの画面を閉じないようにしてください。通信が切断されて退室してしまいます。
+        </v-list-item>
+        <v-list-item>
+          この問題については、今後のアップデートで解決する予定です。アイデアも募集中です。
+        </v-list-item>
+
+        <v-divider />
+
         <v-subheader>同じ部屋の他のユーザー</v-subheader>
 
       </v-list>
@@ -151,6 +163,10 @@ export default {
     }
   },
   methods: {
+    playSound() {
+      const audioElement = document.getElementById('audioElement')
+      audioElement.play()
+    },
     showAlert(e) {
       e.returnValue = '退室する場合は退室ボタンを押してください。'
     },

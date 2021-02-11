@@ -22,50 +22,50 @@ import (
 	"time"
 )
 
-
 // リリース時は変更 ==================================================================
 //const ProjectId = "online-study-space"
 //const SecretNameFirestore = "firestore-service-account"
 
 const ProjectId = "test-online-study-space"
 const SecretNameFirestore = "test-firestore-service-account"
+
 // ================================================================================
 
 const (
-	ROOMS = "rooms"
-	USERS = "users"
-	HISTORY = "history"
-	CONFIG = "config"
-	API = "api"
-	ApiGateway = "api-gateway"
+	ROOMS           = "rooms"
+	USERS           = "users"
+	HISTORY         = "history"
+	CONFIG          = "config"
+	CONTACTS        = "contacts"
+	API             = "api"
+	ApiGateway      = "api-gateway"
 	RoomLayoutsInfo = "room-layouts-info"
-	RoomLayouts = "room-layouts"
-	NEWS = "news"
+	RoomLayouts     = "room-layouts"
+	NEWS            = "news"
 
 	TimeLimit = 180 // 秒
 
-	UserId = "user_id"
-	RoomId = "room_id"
+	UserId  = "user_id"
+	RoomId  = "room_id"
 	IdToken = "id_token"
 
 	RoomDoesNotExist = "room does not exist"
-	InvalidParams = "invalid parameters"
-	InvalidUser = "invalid user"
-	InvalidValue = "invalid value"
-	OK = "ok"
-	ERROR = "error"
-	UserAuthFailed = "user authentication failed"
+	InvalidParams    = "invalid parameters"
+	InvalidUser      = "invalid user"
+	InvalidValue     = "invalid value"
+	OK               = "ok"
+	ERROR            = "error"
+	UserAuthFailed   = "user authentication failed"
 	UserDoesNotExist = "user does not exist"
-	Failed = "failed"
+	Failed           = "failed"
 
-	EnterActivity = "entering"
-	LeaveActivity = "leaving"
+	EnterActivity         = "entering"
+	LeaveActivity         = "leaving"
 	NewRoomLayoutActivity = "new-room-layout"
-
 )
 
-
 type ErrorType uint
+
 const (
 	Unknown ErrorType = iota
 	SeatNotAvailable
@@ -85,12 +85,14 @@ type CustomError struct {
 	ErrorType ErrorType
 	Body      error
 }
+
 func (et ErrorType) New(message string) CustomError {
 	return CustomError{ErrorType: et, Body: errors.New(message)}
 }
 func (et ErrorType) Wrap(err error, message string) CustomError {
 	return CustomError{ErrorType: et, Body: errors.Wrap(err, message)}
 }
+
 //func (e CustomError) Error() string {
 //	return e.Body.Error()
 //}
@@ -117,22 +119,21 @@ func (et ErrorType) Wrap(err error, message string) CustomError {
 //	return Unknown
 //}
 
-
 type RoomStruct struct {
 	RoomId string         `json:"room_id"`
 	Body   RoomBodyStruct `json:"room_body"`
 }
 
 type RoomBodyStruct struct {
-	Created       time.Time `firestore:"created" json:"created"`
-	Name          string    `firestore:"name" json:"name"`
+	Created       time.Time           `firestore:"created" json:"created"`
+	Name          string              `firestore:"name" json:"name"`
 	Users         []UserSeatSetStruct `firestore:"users" json:"users"`
-	Type          string    `firestore:"type" json:"type"`
-	ThemeColorHex string    `firestore:"theme-color-hex" json:"theme_color_hex"`
+	Type          string              `firestore:"type" json:"type"`
+	ThemeColorHex string              `firestore:"theme-color-hex" json:"theme_color_hex"`
 }
 
 type UserSeatSetStruct struct {
-	SeatId int `firestore:"seat-id" json:"seat_id"`
+	SeatId int    `firestore:"seat-id" json:"seat_id"`
 	UserId string `firestore:"user-id" json:"user_id"`
 }
 
@@ -144,8 +145,8 @@ type UserStruct struct {
 
 type UserBodyStruct struct {
 	In               string    `firestore:"in" json:"in"`
-	SeatId int `firestore:"seat-id" json:"seat_id"`
-	ConnectionId string `firestore:"connection-id" json:"connection_id"`
+	SeatId           int       `firestore:"seat-id" json:"seat_id"`
+	ConnectionId     string    `firestore:"connection-id" json:"connection_id"`
 	LastAccess       time.Time `firestore:"last-access" json:"last_access"`
 	LastEntered      time.Time `firestore:"last-entered" json:"last_entered"`
 	LastExited       time.Time `firestore:"last-exited" json:"last_exited"`
@@ -169,6 +170,19 @@ type NewsBodyStruct struct {
 	TextBody string    `firestore:"text-body" json:"text_body"`
 }
 
+type ContactStruct struct {
+	ContactId   string            `json:"contact_id"`
+	ContactBody ContactBodyStruct `json:"contact_body"`
+}
+
+type ContactBodyStruct struct {
+	Contacted   time.Time `firestore:"contacted" json:"contacted"`
+	UserId      string    `firestore:"user-id" json:"user_id"`
+	MailAddress string    `firestore:"mail-address" json:"mail_address"`
+	Message     string    `firestore:"message" json:"message"`
+	ContactType string    `firestore:"contact-type" json:"contact_type"`
+}
+
 //type EnteringAndLeavingHistoryStruct struct {
 //	Activity string    `firestore:"activity"`
 //	Room     string    `firestore:"room"`
@@ -182,33 +196,33 @@ type RoomLayoutsInfoConfigStruct struct {
 }
 
 type RoomLayoutStruct struct {
-	RoomId string `json:"room_id" firestore:"room-id"`
-	Version int `json:"version" firestore:"version"`
+	RoomId        string  `json:"room_id" firestore:"room-id"`
+	Version       int     `json:"version" firestore:"version"`
 	FontSizeRatio float32 `json:"font_size_ratio" firestore:"font-size-ratio"`
-	RoomShape struct {
+	RoomShape     struct {
 		Height int `json:"height" firestore:"height"`
-		Width int `json:"width" firestore:"width"`
+		Width  int `json:"width" firestore:"width"`
 	} `json:"room_shape" firestore:"room-shape"`
 	SeatShape struct {
 		Height int `json:"height" firestore:"height"`
-		Width int `json:"width" firestore:"width"`
+		Width  int `json:"width" firestore:"width"`
 	} `json:"seat_shape" firestore:"seat-shape"`
-	PartitionShapes []struct{
-		Name string `json:"name" firestore:"name"`
-		Width int `json:"width" firestore:"width"`
-		Height int `json:"height" firestore:"height"`
+	PartitionShapes []struct {
+		Name   string `json:"name" firestore:"name"`
+		Width  int    `json:"width" firestore:"width"`
+		Height int    `json:"height" firestore:"height"`
 	} `json:"partition_shapes" firestore:"partition-shapes"`
 	Seats []struct {
-		Id int `json:"id" firestore:"id"`
-		X int `json:"x" firestore:"x"`
-		Y int `json:"y" firestore:"y"`
-		IsVacant bool `json:"is_vacant" firestore:"is-vacant"`	// これはfirestoreには保存したくないけど保存される
-		UserName string `json:"user_name" firestore:"user-name"`	// これはfirestoreには保存したくないけど保存される
+		Id       int    `json:"id" firestore:"id"`
+		X        int    `json:"x" firestore:"x"`
+		Y        int    `json:"y" firestore:"y"`
+		IsVacant bool   `json:"is_vacant" firestore:"is-vacant"` // これはfirestoreには保存したくないけど保存される
+		UserName string `json:"user_name" firestore:"user-name"` // これはfirestoreには保存したくないけど保存される
 	} `json:"seats" firestore:"seats"`
 	Partitions []struct {
-		Id int `json:"id" firestore:"id"`
-		X int `json:"x" firestore:"x"`
-		Y int `json:"y" firestore:"y"`
+		Id        int    `json:"id" firestore:"id"`
+		X         int    `json:"x" firestore:"x"`
+		Y         int    `json:"y" firestore:"y"`
 		ShapeType string `json:"shape_type" firestore:"shape-type"`
 	} `json:"partitions" firestore:"partitions"`
 }
@@ -219,12 +233,11 @@ type ApiGatewayConfigStruct struct {
 }
 
 type EnterLeaveHistory struct {
-	Activity string `firestore:"activity"`
-	RoomId string `firestore:"room-id"`
-	UserId string `firestore:"user-id"`
-	Date time.Time `firestore:"date"`
+	Activity string    `firestore:"activity"`
+	RoomId   string    `firestore:"room-id"`
+	UserId   string    `firestore:"user-id"`
+	Date     time.Time `firestore:"date"`
 }
-
 
 func InitializeHttpFuncWithFirestore() (context.Context, *firestore.Client) {
 	log.Println("InitializeHttpFuncWithFirestore()")
@@ -512,7 +525,7 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 		_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
 			"online":       false,
 			"in":           "",
-			"seat-id": 0,
+			"seat-id":      0,
 			"last-studied": time.Now(),
 		}, firestore.MergeAll)
 		if err != nil {
@@ -523,8 +536,8 @@ func LeaveRoom(roomId string, userId string, client *firestore.Client, ctx conte
 		_ = RecordHistory(EnterLeaveHistory{
 			Activity: LeaveActivity,
 			RoomId:   roomId,
-			UserId:  userId,
-			Date:    time.Now(),
+			UserId:   userId,
+			Date:     time.Now(),
 		}, client, ctx)
 		defer UpdateTotalTime(userId, roomId, time.Now(), client, ctx)
 
@@ -802,7 +815,18 @@ func RecordHistory(details interface{}, client *firestore.Client, ctx context.Co
 		details,
 	)
 	if err != nil {
-		log.Println("failed to make a record.")
+		log.Println("failed to make a record of a history.")
+	}
+	return err
+}
+
+func RecordContact(contactBody ContactBodyStruct, client *firestore.Client, ctx context.Context) error {
+	log.Println("RecordContact()")
+	_, _, err := client.Collection(CONTACTS).Add(ctx,
+		contactBody,
+	)
+	if err != nil {
+		log.Println("failed to make a record of a contact.")
 	}
 	return err
 }
@@ -903,11 +927,11 @@ func _UpdateDatabase(client *firestore.Client, ctx context.Context) error {
 			if isInRoom, _, _ := IsInRoom(u.Body.In, u.UserId, client, ctx); !isInRoom {
 				log.Printf("%s is not in the room though online is true.\n", u.UserId)
 				_, _ = client.Collection(USERS).Doc(u.UserId).Set(ctx, map[string]interface{}{
-					"online": false,
+					"online":        false,
 					"connection-id": "",
 				}, firestore.MergeAll)
 			}
-			
+
 			// LastAccessから時間が経ってるのにルームに残ってないか
 			lastAccess := u.Body.LastAccess
 			timeElapsed := time.Now().Sub(lastAccess)
@@ -916,19 +940,19 @@ func _UpdateDatabase(client *firestore.Client, ctx context.Context) error {
 				currentRoom := u.Body.In
 				_ = LeaveRoom(currentRoom, u.UserId, client, ctx)
 			}
-			
+
 			// connection idが設定されているか
 			if u.Body.ConnectionId == "" {
 				log.Printf("%s has no connection id though online is true.\n", u.UserId)
 			}
-			
+
 			// inが設定されているか
 			if u.Body.In == "" {
 				log.Printf("%s's In is not given though online is true.\n", u.UserId)
 			}
 		}
 	}
-	
+
 	// roomsに実際にいるユーザー
 	onlineUsersInRooms, _ := RetrieveOnlineUsersInRooms(client, ctx)
 	log.Println(onlineUsersInRooms)
@@ -944,7 +968,7 @@ func _UpdateDatabase(client *firestore.Client, ctx context.Context) error {
 		}
 		// todo room_layout的に有効な席に座っているかどうか
 	}
-	
+
 	// todo offlineとなっているユーザーのチェック
 	// offlineとなっているユーザー
 	// user statusがofflineなのにルームにいないか
@@ -1024,8 +1048,8 @@ func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Clie
 	}
 	//user statusを更新
 	_, err = client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
-		"online": true,
-		"in":     roomId,
+		"online":  true,
+		"in":      roomId,
 		"seat-id": seatId,
 	}, firestore.MergeAll)
 	if err != nil {
@@ -1037,8 +1061,8 @@ func _EnterRoom(roomId string, userId string, seatId int, client *firestore.Clie
 	_ = RecordEnteredTime(userId, client, ctx)
 	_ = RecordHistory(EnterLeaveHistory{
 		Activity: EnterActivity,
-		RoomId:     roomId,
-		UserId:  userId,
+		RoomId:   roomId,
+		UserId:   userId,
 		Date:     time.Now(),
 	}, client, ctx)
 	roomBody, _ := RetrieveRoomInfo(roomId, client, ctx)
@@ -1145,7 +1169,7 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 	// 履歴を保存
 	var oldRoomLayout RoomLayoutStruct
 	var err error
-	if roomLayout.Version == 1 {	// 最初のアップロードだと既存のレイアウトデータは存在しない
+	if roomLayout.Version == 1 { // 最初のアップロードだと既存のレイアウトデータは存在しない
 		oldRoomLayout = RoomLayoutStruct{}
 	} else {
 		oldRoomLayout, err = RetrieveRoomLayout(roomLayout.RoomId, client, ctx)
@@ -1155,10 +1179,10 @@ func SaveRoomLayout(roomLayout RoomLayoutStruct, client *firestore.Client, ctx c
 		}
 	}
 	_ = RecordHistory(map[string]interface{}{
-		"activity": NewRoomLayoutActivity,
+		"activity":        NewRoomLayoutActivity,
 		"old-room-layout": oldRoomLayout,
 		"new-room-layout": roomLayout,
-		"date": time.Now(),
+		"date":            time.Now(),
 	}, client, ctx)
 
 	// 前後で座席に変更があった場合、現在そのルームにいる人を強制的に退室させる
@@ -1259,9 +1283,9 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 	// ルーム作成時の roomLayoutData.Version は 1
 	if roomLayoutData.RoomId == "" {
 		return InvalidRoomLayout.New("please specify a valid room id")
-	} else if isExistRoom , _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version > 1 && (! isExistRoom) {
+	} else if isExistRoom, _ := IsExistRoom(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version > 1 && (!isExistRoom) {
 		return InvalidRoomLayout.New("any room of that room id doesn't exist")
-	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1 + currentVersion {
+	} else if currentVersion, _ := CurrentRoomLayoutVersion(roomLayoutData.RoomId, client, ctx); roomLayoutData.Version != 1+currentVersion {
 		return InvalidRoomLayout.New("please specify a incremented version. latest version is " + strconv.Itoa(currentVersion))
 	} else if roomLayoutData.FontSizeRatio == 0.0 {
 		return InvalidRoomLayout.New("please specify a valid font size ratio")
@@ -1278,7 +1302,7 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 		for _, p := range roomLayoutData.PartitionShapes {
 			if p.Name == "" || p.Width == 0 || p.Height == 0 {
 				return InvalidRoomLayout.New("please specify partition shapes correctly")
-			}	// ここから正常にifを抜けることがある
+			} // ここから正常にifを抜けることがある
 			for _, other := range partitionShapeTypeList {
 				if other == p.Name {
 					return InvalidRoomLayout.New("some partition shape types are duplicated")
@@ -1311,7 +1335,7 @@ func CheckRoomLayoutData(roomLayoutData RoomLayoutStruct, client *firestore.Clie
 				isContained = true
 			}
 		}
-		if ! isContained {
+		if !isContained {
 			return InvalidRoomLayout.New("please specify valid shape type, at partition id = " + strconv.Itoa(p.Id))
 		}
 	}
