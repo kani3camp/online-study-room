@@ -58,4 +58,7 @@ export default {
   //   base: './'
   // },
   build: {},
+  generate: {
+    fallback: true,
+  },
 }
