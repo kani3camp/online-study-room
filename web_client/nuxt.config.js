@@ -57,15 +57,8 @@ export default {
   // router: {
   //   base: './'
   // },
-  build: {
-    extend(config, _) {
-      config.module.rules.push({
-        test: /\.(ogg|mp3|wav|mpe?g)$/i,
-        loader: 'file-loader',
-        options: {
-          name: '[path][name].[ext]',
-        },
-      })
-    },
+  build: {},
+  generate: {
+    fallback: true,
   },
 }
