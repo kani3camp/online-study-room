@@ -170,6 +170,19 @@ type NewsBodyStruct struct {
 	TextBody string    `firestore:"text-body" json:"text_body"`
 }
 
+type ContactStruct struct {
+	ContactId   string            `json:"contact_id"`
+	ContactBody ContactBodyStruct `json:"contact_body"`
+}
+
+type ContactBodyStruct struct {
+	Contacted   time.Time `firestore:"contacted" json:"contacted"`
+	UserId      string    `firestore:"user-id" json:"user_id"`
+	MailAddress string    `firestore:"mail-address" json:"mail_address"`
+	Message     string    `firestore:"message" json:"message"`
+	ContactType string    `firestore:"contact-type" json:"contact_type"`
+}
+
 //type EnteringAndLeavingHistoryStruct struct {
 //	Activity string    `firestore:"activity"`
 //	Room     string    `firestore:"room"`
@@ -802,7 +815,18 @@ func RecordHistory(details interface{}, client *firestore.Client, ctx context.Co
 		details,
 	)
 	if err != nil {
-		log.Println("failed to make a record.")
+		log.Println("failed to make a record of a history.")
+	}
+	return err
+}
+
+func RecordContact(contactBody ContactBodyStruct, client *firestore.Client, ctx context.Context) error {
+	log.Println("RecordContact()")
+	_, _, err := client.Collection(CONTACTS).Add(ctx,
+		contactBody,
+	)
+	if err != nil {
+		log.Println("failed to make a record of a contact.")
 	}
 	return err
 }

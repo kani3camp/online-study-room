@@ -7,6 +7,7 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 	"log"
 	"os"
+	"time"
 )
 
 type SendContactFormParams struct {
@@ -43,29 +44,43 @@ func SendContactForm(request events.APIGatewayProxyRequest) (events.APIGatewayPr
 		apiResp.Message = UserAuthFailed
 	} else {
 		// Firestoreに記録
-
-		// LINEに送信
-		message =
-			"Contact type : " + contactType + "\n" +
-				"From : " + mailAddress + "\n" +
-				"Message : \n" + message
-		messageDestinationId := os.Getenv("DESTINATION_LINE_ID")
-		bot, err := linebot.New(
-			os.Getenv("CHANNEL_SECRET"),
-			os.Getenv("CHANNEL_TOKEN"),
-		)
+		contactBody := ContactBodyStruct{
+			Contacted:   time.Now(),
+			UserId:      userId,
+			MailAddress: mailAddress,
+			Message:     message,
+			ContactType: contactType,
+		}
+		err := RecordContact(contactBody, client, ctx)
 		if err != nil {
-			log.Println(err)
+			log.Println()
 			apiResp.Result = ERROR
+			apiResp.Message = "failed to record the contact data"
 		} else {
-			if _, err := bot.PushMessage(messageDestinationId, linebot.NewTextMessage(message)).Do(); err != nil {
+			// LINEに送信
+			message =
+				"Contact type : " + contactType + "\n" +
+					"From : " + mailAddress + "\n" +
+					"Message : \n" + message
+			messageDestinationId := os.Getenv("DESTINATION_LINE_ID")
+			bot, err := linebot.New(
+				os.Getenv("CHANNEL_SECRET"),
+				os.Getenv("CHANNEL_TOKEN"),
+			)
+			if err != nil {
 				log.Println(err)
 				apiResp.Result = ERROR
 			} else {
-				apiResp.Result = OK
-				apiResp.Message = "successfully sent your message."
+				if _, err := bot.PushMessage(messageDestinationId, linebot.NewTextMessage(message)).Do(); err != nil {
+					log.Println(err)
+					apiResp.Result = ERROR
+				} else {
+					apiResp.Result = OK
+					apiResp.Message = "successfully sent your message"
+				}
 			}
 		}
+
 	}
 
 	bytes, _ := json.Marshal(apiResp)
