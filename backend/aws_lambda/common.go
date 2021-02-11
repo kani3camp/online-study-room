@@ -164,10 +164,10 @@ type NewsStruct struct {
 }
 
 type NewsBodyStruct struct {
-	Created  time.Time `firestore:"created" json:"created"`
-	Updated  time.Time `firestore:"updated" json:"updated"`
-	Title    string    `firestore:"title" json:"title"`
-	TextBody string    `firestore:"text-body" json:"text_body"`
+	Created   time.Time `firestore:"created" json:"created"`
+	Updated   time.Time `firestore:"updated" json:"updated"`
+	NewsTitle string    `firestore:"news-title" json:"news_title"`
+	TextBody  string    `firestore:"text-body" json:"text_body"`
 }
 
 type ContactStruct struct {
@@ -904,8 +904,25 @@ func _CreateNewRoom(roomId string, roomName string, roomType string, themeColorH
 		"theme-color-hex": themeColorHex,
 	}, firestore.MergeAll)
 	if err != nil {
-		log.Println("_createできんかった。")
+		log.Println("failed to create a room")
 		log.Println(roomId, roomName, roomType, themeColorHex)
+		log.Println(err)
+	}
+	return err
+}
+
+func _CreateNewNews(newsTitle string, textBody string, client *firestore.Client, ctx context.Context) error {
+	log.Println("_CreateNewNews()")
+	newsBody := NewsBodyStruct{
+		Created:   time.Now(),
+		Updated:   time.Now(),
+		NewsTitle: newsTitle,
+		TextBody: textBody,
+	}
+	_, _, err := client.Collection(NEWS).Add(ctx, newsBody)
+	if err != nil {
+		log.Println("failed to create an news")
+		log.Println(newsTitle, textBody)
 		log.Println(err)
 	}
 	return err

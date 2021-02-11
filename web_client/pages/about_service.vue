@@ -9,6 +9,11 @@
         <v-flex>
           <h2>はじめての方へ</h2>
         </v-flex>
+        <v-flex>
+          <p>
+            作業がんばってください。
+          </p>
+        </v-flex>
       </v-container>
     </v-main>
 

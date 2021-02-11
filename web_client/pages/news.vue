@@ -40,8 +40,8 @@
             dense
           >
             <v-card outlined>
-              <v-card-title v-text="news['news_body'].title" />
-              <v-card-subtitle v-text="formatDateString(news['news_body'].updated)" />
+              <v-card-title v-text="news['news_body']['news_title']" />
+              <v-card-subtitle v-text="formatDateString(news['news_body']['updated'])" />
               <v-card-text v-text="news['news_body']['text_body']" />
             </v-card>
           </v-col>
