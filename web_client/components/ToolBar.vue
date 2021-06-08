@@ -40,7 +40,8 @@
             このサイトについて
           </nuxt-link>
         </div>
-        <div class="tool-content">
+
+        <!-- <div class="tool-content">
           <a
             :href="youtubeLink"
             target="_blank"
@@ -48,7 +49,7 @@
           >
             <v-icon>mdi-youtube</v-icon>
             YouTube
-          </a>
+          </a> -->
 
         </div>
         <div class="tool-content">

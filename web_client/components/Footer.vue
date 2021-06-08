@@ -54,7 +54,7 @@
         >
           <h4>APP</h4>
           <ul>
-            <li>Android (開発中)</li>
+            <li>Android (開発予定)</li>
           </ul>
         </v-col>
 

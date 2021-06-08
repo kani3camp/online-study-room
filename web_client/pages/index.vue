@@ -5,7 +5,7 @@
     <ToolBar />
 
     <v-main>
-      <v-container>
+      <!-- <v-container>
         <v-flex>
           <h2 style="display: inline-block">
             <v-icon>mdi-youtube</v-icon>
@@ -22,7 +22,7 @@
             </v-row>
           </v-col>
         </v-flex>
-      </v-container>
+      </v-container> -->
 
       <v-container>
         <v-flex>

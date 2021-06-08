@@ -31,7 +31,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item
+      <!-- <v-list-item
         link
         @click="goToYoutubeLive"
       >
@@ -41,7 +41,7 @@
         <v-list-item-content>
           <v-list-item-title>ライブ配信</v-list-item-title>
         </v-list-item-content>
-      </v-list-item>
+      </v-list-item> -->
 
       <v-list-item
         link
