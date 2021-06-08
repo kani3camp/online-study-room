@@ -4,21 +4,24 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 )
 
 type RoomStatusResponseStruct struct {
 	Result     string       `json:"result"`
 	Message    string       `json:"message"`
 	RoomStatus RoomStruct   `json:"room_status"`
+	RoomLayout RoomLayoutStruct `json:"room_layout"`
 	Users      []UserStruct `json:"users"`
 }
 
 func RoomStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	log.Println("RoomStatus()")
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 
 	var apiResp RoomStatusResponseStruct
-	roomId := request.QueryStringParameters[room_id]
+	roomId := request.QueryStringParameters[RoomId]
 
 	if roomId == "" {
 		apiResp.Result = ERROR
@@ -27,15 +30,23 @@ func RoomStatus(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 		apiResp.Result = ERROR
 		apiResp.Message = RoomDoesNotExist
 	} else {
-		roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
-		apiResp.RoomStatus = RoomStruct{
-			RoomId: roomId,
-			Body:   roomInfo,
-		}
+		roomLayout, err := RetrieveRoomLayout(roomId, client, ctx)
+		if err != nil {
+			apiResp.Result = ERROR
+			apiResp.Message = "failed to retrieve room layout"
+		} else {
+			apiResp.RoomLayout = roomLayout.SetIsVacant(client, ctx).SetUserName(client, ctx)
 
-		users, _ := RetrieveRoomUsers(roomId, client, ctx)
-		apiResp.Users = users
-		apiResp.Result = OK
+			roomInfo, _ := RetrieveRoomInfo(roomId, client, ctx)
+			apiResp.RoomStatus = RoomStruct{
+				RoomId: roomId,
+				Body:   roomInfo,
+			}
+
+			users, _ := RetrieveRoomUsers(roomId, client, ctx)
+			apiResp.Users = users
+			apiResp.Result = OK
+		}
 	}
 	bytes, _ := json.Marshal(apiResp)
 	return Response(bytes)

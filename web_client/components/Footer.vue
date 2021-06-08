@@ -54,7 +54,7 @@
         >
           <h4>APP</h4>
           <ul>
-            <li>Android (開発中)</li>
+            <li>Android (開発予定)</li>
           </ul>
         </v-col>
 
@@ -133,7 +133,7 @@ export default {
 
 <style scoped>
 #footer {
-  background-color: #d3e6f6;
+  background-color: #dfe9f1;
 }
 
 .child-center > * {

@@ -28,7 +28,10 @@
         </v-row>
       </v-container>
 
-      <v-container v-show="! loading">
+      <v-container
+        v-show="! loading"
+        style="max-width: 800px"
+      >
         <v-row dense>
           <v-col
             v-for="news in newsList"
@@ -36,9 +39,9 @@
             cols="12"
             dense
           >
-            <v-card>
-              <v-card-title v-text="news['news_body'].title" />
-              <v-card-subtitle v-text="formatDateString(news['news_body'].updated)" />
+            <v-card outlined>
+              <v-card-title v-text="news['news_body']['news_title']" />
+              <v-card-subtitle v-text="formatDateString(news['news_body']['updated'])" />
               <v-card-text v-text="news['news_body']['text_body']" />
             </v-card>
           </v-col>
@@ -68,7 +71,7 @@ export default {
   }),
   async created() {
     this.loading = true
-    const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/news'
+    const url = common.apiLink.news
     const params = {
       num_news: 10,
     }

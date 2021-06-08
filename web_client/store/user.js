@@ -1,12 +1,7 @@
 export const state = () => ({
-  // user_id: null,
-  // display_name: null,
-  // mail_address: null,
   total_study_time: null,
   registration_date: null,
   status_message: null,
-  // id_token: null,
-  // provider_id: null,
   last_entered: null,
 })
 

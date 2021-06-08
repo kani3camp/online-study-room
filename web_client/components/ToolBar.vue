@@ -36,16 +36,12 @@
         class="tool-menu"
       >
         <div class="tool-content">
-          <nuxt-link to="/all_rooms">
-            ルーム一覧
-          </nuxt-link>
-        </div>
-        <div class="tool-content">
           <nuxt-link to="/about_service">
-            はじめての方
+            このサイトについて
           </nuxt-link>
         </div>
-        <div class="tool-content">
+
+        <!-- <div class="tool-content">
           <a
             :href="youtubeLink"
             target="_blank"
@@ -53,7 +49,7 @@
           >
             <v-icon>mdi-youtube</v-icon>
             YouTube
-          </a>
+          </a> -->
 
         </div>
         <div class="tool-content">

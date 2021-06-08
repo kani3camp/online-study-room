@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 )
 
 type OnlineUsersResponse struct {
@@ -13,11 +14,12 @@ type OnlineUsersResponse struct {
 }
 
 func OnlineUsers(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	log.Println("OnlineUsers()")
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 
 	var apiResp OnlineUsersResponse
-	onlineUsers, _ := RetrieveOnlineUsers(client, ctx)
+	onlineUsers, _ := RetrieveOnlineUsersAsStatus(client, ctx)
 	apiResp.Result = OK
 	apiResp.OnlineUsers = onlineUsers
 

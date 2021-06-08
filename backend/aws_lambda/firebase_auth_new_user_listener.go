@@ -16,14 +16,14 @@ type AuthEvent struct {
 }
 
 func CreateNewUser(userId string, client *firestore.Client, ctx context.Context) error {
-	_, err := client.Collection(USERS).Doc(userId).Set(ctx, map[string]interface{}{
-		"registration-date": time.Now(),
-		"last-access":       time.Now(),
-		"online":            false,
-		"status":            "",
-		"total-study-time": 0,
-		"total-break-time": 0,
-	})
+	newUserStatus := UserBodyStruct{
+		RegistrationDate: time.Now(),
+		LastAccess: time.Now(),
+		Online: false,
+		TotalStudyTime: 0,
+		TotalBreakTime: 0,
+	}
+	_, err := client.Collection(USERS).Doc(userId).Set(ctx, newUserStatus)
 	if err != nil {
 		log.Println("failed to create new user")
 		log.Println(err)
@@ -31,10 +31,11 @@ func CreateNewUser(userId string, client *firestore.Client, ctx context.Context)
 	return err
 }
 
-func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent)  error {
-	_, client := InitializeEventFunc()
-	defer client.Close()
-	
+func FirebaseAuthNewUserListener(ctx context.Context, e AuthEvent) error {
+	log.Println("FirebaseAuthNewUserListener()")
+	_, client := InitializeEventFuncWithFirestore()
+	defer CloseFirestoreClient(client)
+
 	userId := e.UID
 	_ = CreateNewUser(userId, client, ctx)
 	return nil

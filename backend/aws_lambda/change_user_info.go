@@ -5,12 +5,13 @@ import (
 	"firebase.google.com/go/auth"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"log"
 )
 
 type ChangeUserInfoParams struct {
-	UserId string `json:"user_id"`
-	IdToken string `json:"id_token"`
-	DisplayName string `json:"display_name"`
+	UserId        string `json:"user_id"`
+	IdToken       string `json:"id_token"`
+	DisplayName   string `json:"display_name"`
 	StatusMessage string `json:"status_message"`
 }
 
@@ -19,10 +20,10 @@ type ChangeUserInfoResponseStruct struct {
 	Message string `json:"message"`
 }
 
-
 func ChangeUserInfo(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx, client := InitializeHttpFunc()
-	defer client.Close()
+	log.Println("ChangeUserInfo()")
+	ctx, client := InitializeHttpFuncWithFirestore()
+	defer CloseFirestoreClient(client)
 
 	var apiResp ChangeUserInfoResponseStruct
 	body := request.Body

@@ -56,7 +56,7 @@ export default {
 <style scoped>
 #message {
   font-size: 2rem;
-  background-color: #d9f5d9;
+  background-color: #fcf89e;
   width: 1920px;
   height: 100px;
 }

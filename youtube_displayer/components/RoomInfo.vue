@@ -2,41 +2,32 @@
   <div id="roomInfo">
     <transition name="fade">
       <div v-show="show">
-        <div id="room-name">
-          <h2>{{ room_name }}</h2>
-        </div>
-        <h2 id="room-category">
-          ルーム
-        </h2>
-        <div>
-          <div id="studying-users-title">
-            <p>作業中のユーザー</p>
-          </div>
-          <div id="users">
-            <div v-for="user in users" :key="user.userId" class="user">
-              <p><i class="mdi mdi-account" /></p>
-              <p class="user-name">
-                {{ user.userName }}
-              </p>
-            </div>
-          </div>
-        </div>
+        <RoomLayout
+          :room-id="room_id"
+          :layout="room_layout"
+        />
       </div>
     </transition>
   </div>
 </template>
 
 <script>
+import RoomLayout from '@/components/RoomLayout'
 export default {
   name: 'RoomInfo',
+  components: {
+    RoomLayout,
+  },
   data: () => ({
     roomIdList: [],
+    roomNameList: [],
     timeout1: null,
-    timeout2: null,
+    room_id: '',
     room_name: '　　',
+    room_layout: null,
     users: [],
     show: true,
-    switchRoomInterval: 8 * 1000,
+    switchRoomInterval: 6 * 1000,
   }),
   created () {
     this.switchRoom()
@@ -55,13 +46,17 @@ export default {
 
       // room_idを次のものに進める。ない場合はリストの先頭から
       const currentIndex = vm.roomIdList.indexOf(vm.$store.state.roomId)
+      console.log('current index = ', currentIndex)
+      let nextRoomName = ''
       if (currentIndex === -1) {
         await vm.$store.commit('setRoomId', vm.roomIdList[0])
+        nextRoomName = vm.roomNameList[0]
       } else {
         const nextIndex = (currentIndex + 1) % this.roomIdList.length
         await vm.$store.commit('setRoomId', vm.roomIdList[nextIndex])
+        nextRoomName = vm.roomNameList[nextIndex]
       }
-      await vm.fetchRoomInfo()
+      await vm.fetchRoomInfo(nextRoomName)
 
       vm.timeout1 = setTimeout(() => {
         vm.switchRoom()
@@ -74,16 +69,19 @@ export default {
       const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/rooms')
       const resp = await fetch(url.toString(), { method: 'GET' }).then(response => response.json())
       if (resp.result === 'ok') {
-        const list = []
+        const idList = []
+        const nameList = []
         resp.rooms.forEach((room) => {
-          list.push(room.room_id)
+          idList.push(room.room_id)
+          nameList.push(room.room_body.name)
         })
-        vm.roomIdList = list
+        vm.roomIdList = idList
+        vm.roomNameList = nameList
       } else {
-        console.log(resp.message)
+        console.error(resp.message)
       }
     },
-    async fetchRoomInfo () {
+    async fetchRoomInfo (nextRoomName) {
       const vm = this
       const roomId = vm.$store.state.roomId
       const url = new URL('https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/room_status')
@@ -91,28 +89,32 @@ export default {
       const resp = await fetch(url.toString(), { method: 'GET' }).then(response =>
         response.json()
       )
+      this.$store.commit('setRoomName', nextRoomName)
+
       if (resp.result === 'ok') {
-        this.room_name = resp.room_status.room_body.name
-        const userIds = resp.room_status.room_body.users
+        this.room_id = roomId
+        this.room_layout = resp.room_layout
+        const userSeats = resp.room_status.room_body.users
         const users = resp.users
-        if (userIds && users) {
-          if (userIds.length === users.length) {
+        if (userSeats && users) {
+          if (userSeats.length === users.length) {
             const list = []
-            for (let i = 0; i < userIds.length; i++) {
+            for (let i = 0; i < userSeats.length; i++) {
               list.push({
-                userId: userIds[i],
+                userId: userSeats[i].user_id,
                 userName: users[i].display_name,
               })
             }
             this.users = list
           } else {
-            console.log('userIds.length !== users.length')
+            console.error('userSeats.length !== users.length')
           }
         } else {
           this.users = []
         }
       } else {
-        console.log(resp.message)
+        console.error(resp.message)
+        this.room_layout = null
       }
     }
   }
@@ -138,20 +140,10 @@ h2 {
   transition: .3s;
 }
 .fade-leave-active {
-  transition: 1.5s;
+  transition: 2s;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
-}
-
-#room-name {
-  display: inline-block;
-  padding: .3rem .6rem;
-  border: solid 0.2rem #36479f;
-  border-radius: 1rem;
-}
-#room-category {
-  display: inline-block;
 }
 
 #studying-users-title {

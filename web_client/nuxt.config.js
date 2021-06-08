@@ -4,7 +4,7 @@ export default {
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
    */
-  target: 'server',
+  target: 'static',
   /*
    ** Headers of the page
    ** See https://nuxtjs.org/api/configuration-head
@@ -17,20 +17,14 @@ export default {
       {
         hid: 'description',
         name: 'description',
-        content: process.env.npm_package_description || '',
+        content: 'オンラインの作業部屋で集中しよう。Googleアカウントでログインして、各科目・作業内容の自習室を選んで入室しましょう。サービスは全て無料です。',
       },
+      { hid: 'keywords', name: 'keywords', content: 'オンライン作業部屋,オンライン自習室,オンライン勉強部屋,study with me,作業耐久' },
     ],
     script: [],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
-  /*
-   ** Global CSS
-   */
   css: [],
-  /*
-   ** Plugins to load before mounting the App
-   ** https://nuxtjs.org/guide/plugins
-   */
   plugins: [
     {
       src: '~/plugins/ga.js',
@@ -57,5 +51,13 @@ export default {
   // router: {
   //   base: './'
   // },
+  watchers: {
+    webpack: {
+      poll: true
+    }
+  },
   build: {},
+  generate: {
+    fallback: true,
+  },
 }

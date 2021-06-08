@@ -13,7 +13,14 @@
 
 
       <v-container v-show="! ($store.state.isSignedIn)">
-        サインインしてください。
+        <p>
+          <nuxt-link to="/sign_in">サインイン</nuxt-link>するか、
+          <a
+            href="https://twitter.com/sorarideblog"
+            target="_blank"
+          >@sorarideblog</a>
+          までダイレクトメッセージを送ってください。
+        </p>
       </v-container>
 
       <v-container v-show="$store.state.isSignedIn">
@@ -53,23 +60,14 @@
 
     <Footer />
 
-    <v-dialog
-      v-model="if_show_dialog"
-      width="500"
-    >
-      <v-card>
-        <v-card-title>{{ dialog_message }}</v-card-title>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            text
-            @click="if_show_dialog=false"
-          >
-            閉じる
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <Dialog
+      :if-show-dialog="if_show_dialog"
+      :card-title="dialog_message"
+      :loading="submitting"
+      :accept-needed="false"
+      cancel-option-string="閉じる"
+      @cancel="if_show_dialog=false"
+    />
   </v-app>
 </template>
 
@@ -80,17 +78,19 @@ import common from '~/plugins/common'
 import NavigationDrawer from '@/components/NavigationDrawer'
 import ToolBar from '@/components/ToolBar'
 import firebase from '@/plugins/firebase'
+import Dialog from '~/components/Dialog'
 
 export default {
   name: 'ContactForm',
   components: {
     NavigationDrawer,
     ToolBar,
+    Dialog,
   },
   data: () => ({
     // アロー関数でdataを定義している場合は中でthisがundefinedになるので注意
     dialog_message: '',
-    message: null,
+    message: '',
     submitting: false,
     selected_contact_type: null,
     if_show_dialog: false,
@@ -102,7 +102,11 @@ export default {
   computed: {
     mail_address: {
       get() {
-        return firebase.auth().currentUser.email
+        if (this.$store.state.isSignedIn) {
+          return firebase.auth().currentUser.email
+        } else {
+          return ''
+        }
       },
     },
   },
@@ -121,9 +125,11 @@ export default {
     },
     async submit() {
       if (this.selected_contact_type || this.mail_address || this.message) {
+        this.if_show_dialog = true
+        this.dialog_message = '送信中'
         this.submitting = true
 
-        const url = 'https://io551valj4.execute-api.ap-northeast-1.amazonaws.com/send_contact_form'
+        const url = common.apiLink.send_contact_form
         const params = {
           mail_address: this.mail_address.toString(),
           user_id: firebase.auth().currentUser.uid,
@@ -132,17 +138,15 @@ export default {
           message: this.message,
         }
         const resp = await common.httpPost(url, params)
+        this.submitting = false
 
         if (resp.result === 'ok') {
           this.message = null
           this.selected_contact_type = null
           this.dialog_message = '送信が完了しました。お問い合わせ頂きありがとうございます。'
-          this.if_show_dialog = true
         } else {
           this.dialog_message = '送信に失敗しました。'
-          this.if_show_dialog = true
         }
-        this.submitting = false
       } else {
         alert('未記入の項目があります。')
       }
