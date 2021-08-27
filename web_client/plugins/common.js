@@ -51,11 +51,11 @@ const common = {
     twitterLink: 'https://twitter.com/osr_soraride',
   },
   // todo デプロイ時に変更
-  apiLink: productionApiLink,
-  firebaseConfig: productionFirebaseConfig,
+  // apiLink: productionApiLink,
+  // firebaseConfig: productionFirebaseConfig,
 
-  // apiLink: testApiLink,
-  // firebaseConfig: testFirebaseConfig,
+  apiLink: testApiLink,
+  firebaseConfig: testFirebaseConfig,
 }
 
 common.c = (m) => {
