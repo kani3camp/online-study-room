@@ -10,11 +10,11 @@
 # test_send_contact_form, test_start_studying, test_stay_studying, test_update_database,
 # test_upload_room_layout, test_user_status
 
-set GOOS=linux
-go build -o main common.go send_live_chat_message.go     create_new_news.go
+$env:CGO_ENABLED = "0"; $env:GOOS = "linux"; $env:GOARCH = "amd64";
+go build -o main common.go send_live_chat_message.go     change_user_info.go
 C:\Users\momom\go\bin\build-lambda-zip.exe -output main.zip main
-aws lambda create-function --function-name     create_new_news     --runtime go1.x --zip-file fileb://main.zip --handler main --role arn:aws:iam::652333062396:role/service-role/my-first-golang-lambda-function-role-cb8uw4th
-aws lambda update-function-code --function-name     create_new_news     --zip-file fileb://main.zip
+aws lambda create-function --function-name     change_user_info     --runtime go1.x --zip-file fileb://main.zip --handler main --role arn:aws:iam::652333062396:role/service-role/my-first-golang-lambda-function-role-cb8uw4th
+aws lambda update-function-code --function-name     change_user_info     --zip-file fileb://main.zip
 
 
 # Mac OS
