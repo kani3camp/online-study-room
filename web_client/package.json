@@ -1,6 +1,6 @@
 {
   "name": "online-study-room",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "nuxt",
@@ -11,9 +11,10 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@nuxtjs/firebase": "^8.2.0",
     "core-js": "^3.8.0",
     "css-loader": "^4.3.0",
-    "firebase": ">=8.2.4",
+    "firebase": "^8.6.7",
     "firebaseui": "4.8.1",
     "nuxt": "^2.13.0",
     "request": "^2.88.2",
