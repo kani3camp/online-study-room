@@ -3,7 +3,13 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: ['plugin:vue/recommended', 'plugin:prettier-vue/recommended'],
+  extends: [
+    'prettier',
+    'prettier/vue',
+    'plugin:vue/recommended',
+    'plugin:prettier-vue/recommended',
+    'plugin:nuxt/recommended',
+  ],
   settings: {
     'prettier-vue': {
       // Settings for how to process Vue SFC Blocks
