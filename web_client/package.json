@@ -3,24 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "./node_modules/.bin/nuxt",
-    "build": "./node_modules/.bin/nuxt build",
-    "start": "./node_modules/.bin/nuxt start",
-    "export": "./node_modules/.bin/nuxt export",
-    "serve": "./node_modules/.bin/nuxt serve",
-    "generate": "./node_modules/.bin/nuxt generate"
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "export": "nuxt export",
+    "serve": "nuxt serve",
+    "generate": "nuxt generate"
   },
   "dependencies": {
     "core-js": "^3.8.0",
     "css-loader": "^4.3.0",
-    "firebase": "^7.22.0",
-    "firebaseui": "^4.6.1",
+    "firebase": ">=8.2.4",
+    "firebaseui": "4.8.1",
     "nuxt": "^2.13.0",
     "request": "^2.88.2",
     "vue": "^2.6.12",
     "vue-template-compiler": "^2.6.12",
     "vuetify": "^2.3.12",
-    "webpack": "^4.44.2"
+    "webpack": "^5.0.0"
   },
   "devDependencies": {
     "@mdi/font": "^5.4.55",
@@ -29,7 +29,6 @@
     "axios": ">=0.21.1",
     "eslint": "^7.15.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-prettier-vue": "^2.1.1",
     "eslint-plugin-vue": "^7.2.0",
     "prettier": "^2.1.1"

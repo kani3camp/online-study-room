@@ -38,37 +38,23 @@
             </v-flex>
             <v-flex>
               <v-col class="d-flex flex-row-reverse">
-                <v-btn
-                  :disabled="loading"
-                  outlined
-                  @click="loadRooms"
-                >
+                <v-btn :disabled="loading" outlined @click="loadRooms">
                   <v-icon>mdi-reload</v-icon>
                 </v-btn>
               </v-col>
             </v-flex>
           </v-row>
-
         </v-flex>
 
-        <v-container
-          v-show="loading"
-          class="fill-height"
-          fluid
-        >
-          <v-row
-            align="center"
-            justify="center"
-          >
+        <v-container v-show="loading" class="fill-height" fluid>
+          <v-row align="center" justify="center">
             <v-col class="text-center">
-              <div class="big-char">
-                ロード中...
-              </div>
+              <div class="big-char">ロード中...</div>
             </v-col>
           </v-row>
         </v-container>
 
-        <v-container v-show="! loading">
+        <v-container v-show="!loading">
           <v-row>
             <v-col
               v-for="(room, index) in rooms"
@@ -87,10 +73,10 @@
                   @click="enterRoom(index)"
                 >
                   <v-card-title>
-                    {{ room['room_body'].name }}
+                    {{ room["room_body"].name }}
                   </v-card-title>
                   <v-card-subtitle>
-                    {{ room['room_body']['users'].length }}人
+                    {{ room["room_body"]["users"].length }}人
                   </v-card-subtitle>
                 </v-card>
               </v-hover>
@@ -114,7 +100,7 @@
         accept-option-string="サインイン"
         cancel-option-string="閉じる"
         @accept="$router.push('/sign_in')"
-        @cancel="if_show_dialog_2=false"
+        @cancel="if_show_dialog_2 = false"
       />
     </v-main>
     <Footer />

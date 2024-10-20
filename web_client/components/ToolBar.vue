@@ -49,9 +49,9 @@
           >
             <v-icon>mdi-youtube</v-icon>
             YouTube
-          </a> -->
+          </a>
+        </div> -->
 
-        </div>
         <div class="tool-content">
           <nuxt-link to="/news">
             お知らせ
