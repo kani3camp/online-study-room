@@ -1,111 +1,61 @@
 <template>
-  <v-footer
-    id="footer"
-    app
-    absolute
-  >
+  <v-footer id="footer" app absolute>
     <v-container>
       <v-row>
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-          xl="3"
-          class="child-center"
-        >
+        <v-col cols="12" sm="6" md="4" lg="3" xl="3" class="child-center">
           <h4>SERVICE</h4>
           <ul>
             <li>
-              <nuxt-link to="/">
-                サイトトップ
-              </nuxt-link>
+              <nuxt-link to="/"> サイトトップ </nuxt-link>
             </li>
             <li>
-              <nuxt-link to="/about_service">
-                このサイトについて
-              </nuxt-link>
+              <nuxt-link to="/about_service"> このサイトについて </nuxt-link>
             </li>
             <li>
-              <nuxt-link to="/news">
-                お知らせ
-              </nuxt-link>
+              <nuxt-link to="/news"> お知らせ </nuxt-link>
             </li>
             <li>
-              <nuxt-link to="/terms_of_service">
-                利用規約
-              </nuxt-link>
+              <nuxt-link to="/terms_of_service"> 利用規約 </nuxt-link>
             </li>
             <li>
-              <nuxt-link to="/privacy_policy">
-                プライバシーポリシー
-              </nuxt-link>
+              <nuxt-link to="/privacy_policy"> プライバシーポリシー </nuxt-link>
             </li>
           </ul>
         </v-col>
 
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-          xl="3"
-          class="child-center"
-        >
+        <v-col cols="12" sm="6" md="4" lg="3" xl="3" class="child-center">
           <h4>APP</h4>
           <ul>
             <li>Android (開発予定)</li>
           </ul>
         </v-col>
 
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-          xl="3"
-          class="child-center"
-        >
+        <v-col cols="12" sm="6" md="4" lg="3" xl="3" class="child-center">
           <h4>FOLLOW</h4>
           <ul>
             <li>
-              <a
-                :href="youtubeLink"
-                target="_blank"
-                rel="noopener noreferrer"
-              ><v-icon>mdi-youtube</v-icon></a>
+              <a :href="youtubeLink" target="_blank" rel="noopener noreferrer"
+                ><v-icon>mdi-youtube</v-icon></a
+              >
             </li>
             <li>
-              <a
-                :href="twitterLink"
-                target="_blank"
-                rel="noopener noreferrer"
-              ><v-icon>mdi-twitter</v-icon></a>
+              <a :href="twitterLink" target="_blank" rel="noopener noreferrer"
+                ><v-icon>mdi-twitter</v-icon></a
+              >
             </li>
           </ul>
         </v-col>
 
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-          xl="3"
-          class="child-center"
-        >
+        <v-col cols="12" sm="6" md="4" lg="3" xl="3" class="child-center">
           <h4>ABOUT US</h4>
           <ul>
             <li>
-              <a
-                href="https://twitter.com/sorarideblog"
-                target="_blank"
-                rel="noopener noreferrer"
-              >開発・運営者について</a>
+              <a href="https://twitter.com/sorarideblog" target="_blank" rel="noopener noreferrer"
+                >開発・運営者について</a
+              >
             </li>
             <li>
-              <nuxt-link to="/contact_form">
-                お問い合わせ
-              </nuxt-link>
+              <nuxt-link to="/contact_form"> お問い合わせ </nuxt-link>
             </li>
           </ul>
         </v-col>
@@ -118,8 +68,8 @@
   </v-footer>
 </template>
 
-<script>
-import common from '@/plugins/common'
+<script lang="ts">
+import common from '~/plugins/common'
 
 export default {
   name: 'Footer',

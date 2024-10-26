@@ -11,34 +11,17 @@
         </v-flex>
       </v-container>
 
-      <v-container
-        v-show="loading"
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          align="center"
-          justify="center"
-        >
+      <v-container v-show="loading" class="fill-height" fluid>
+        <v-row align="center" justify="center">
           <v-col class="text-center">
-            <div class="big-char">
-              Loading...
-            </div>
+            <div class="big-char">Loading...</div>
           </v-col>
         </v-row>
       </v-container>
 
-      <v-container
-        v-show="! loading"
-        style="max-width: 800px"
-      >
+      <v-container v-show="!loading" style="max-width: 800px">
         <v-row dense>
-          <v-col
-            v-for="news in newsList"
-            :key="news['news_id']"
-            cols="12"
-            dense
-          >
+          <v-col v-for="news in newsList" :key="news['news_id']" cols="12" dense>
             <v-card outlined>
               <v-card-title v-text="news['news_body']['news_title']" />
               <v-card-subtitle v-text="formatDateString(news['news_body']['updated'])" />
@@ -53,56 +36,46 @@
   </v-app>
 </template>
 
-<script>
-import common from '@/plugins/common'
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
+<script setup lang="ts">
+import common from '~/plugins/common'
+import NavigationDrawer from '#components'
+import ToolBar from '#components'
 
-export default {
-  name: 'News',
-  components: {
-    NavigationDrawer,
-    ToolBar,
-  },
-  data: () => ({
-    drawer: null,
-    newsList: [],
-    loading: false,
-  }),
-  async created() {
-    this.loading = true
-    const url = common.apiLink.news
-    const params = {
-      num_news: 10,
-    }
-    const resp = await common.httpGet(url, params)
-    if (resp.result === 'ok') {
-      this.newsList = resp['news_list']
-    } else {
-      console.log(resp.message)
-    }
-    this.loading = false
-  },
-  methods: {
-    goToHomePage() {
-      this.$router.push('/')
-    },
-    goToSettingsPage() {
-      this.$router.push('/settings')
-    },
-    goToContactFormPage() {
-      this.$router.push('/contact_form')
-    },
-    formatDateString(_date) {
-      const date = new Date(_date)
-      const y = date.getFullYear()
-      const mo = date.getMonth() + 1
-      const d = date.getDate()
-      const h = date.getHours()
-      const mi = date.getMinutes()
-      return `${y}/${mo}/${d} ${h}:${mi}`
-    },
-  },
+const router = useRouter()
+
+const drawer = ref(null)
+const newsList = ref([])
+const loading = ref(false)
+
+onMounted(async () => {
+  loading.value = true
+  const url = common.apiLink.news
+  const params = {
+    num_news: 10,
+  }
+  const resp = await common.httpGet(url, params)
+  if (resp.result === 'ok') {
+    newsList.value = resp['news_list']
+  } else {
+    console.log(resp.message)
+  }
+  loading.value = false
+})
+
+const goToHomePage = () => {
+  router.push('/')
+}
+
+const goToSettingsPage = () => router.push('/settings')
+const goToContactFormPage = () => router.push('/contact_form')
+const formatDateString = (_date: string) => {
+  const date = new Date(_date)
+  const y = date.getFullYear()
+  const mo = date.getMonth() + 1
+  const d = date.getDate()
+  const h = date.getHours()
+  const mi = date.getMinutes()
+  return `${y}/${mo}/${d} ${h}:${mi}`
 }
 </script>
 

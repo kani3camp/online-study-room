@@ -1,16 +1,7 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    app
-    right
-    disable-resize-watcher
-    overlay-color="#36479f"
-  >
+  <v-navigation-drawer v-model="drawer" app right disable-resize-watcher overlay-color="#36479f">
     <v-list dense>
-      <v-list-item
-        link
-        @click="goToTopPage"
-      >
+      <v-list-item link @click="goToTopPage">
         <v-list-item-action>
           <v-icon>mdi-home</v-icon>
         </v-list-item-action>
@@ -19,10 +10,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item
-        link
-        @click="goToAboutServicePage"
-      >
+      <v-list-item link @click="goToAboutServicePage">
         <v-list-item-action>
           <v-icon>mdi-account-question</v-icon>
         </v-list-item-action>
@@ -43,10 +31,7 @@
         </v-list-item-content>
       </v-list-item> -->
 
-      <v-list-item
-        link
-        @click="goToNewsPage"
-      >
+      <v-list-item link @click="goToNewsPage">
         <v-list-item-action>
           <v-icon>mdi-bulletin-board</v-icon>
         </v-list-item-action>
@@ -55,10 +40,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item
-        link
-        @click="goToTermsOfServicePage"
-      >
+      <v-list-item link @click="goToTermsOfServicePage">
         <v-list-item-action>
           <v-icon>mdi-file-document-outline</v-icon>
         </v-list-item-action>
@@ -67,10 +49,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item
-        link
-        @click="goToPrivacyPolicyPage"
-      >
+      <v-list-item link @click="goToPrivacyPolicyPage">
         <v-list-item-action>
           <v-icon>mdi-account-lock</v-icon>
         </v-list-item-action>
@@ -79,10 +58,7 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item
-        link
-        @click="goToContactFormPage"
-      >
+      <v-list-item link @click="goToContactFormPage">
         <v-list-item-action>
           <v-icon>mdi-email</v-icon>
         </v-list-item-action>
@@ -94,61 +70,64 @@
   </v-navigation-drawer>
 </template>
 
-<script>
-import common from '@/plugins/common'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import common from '~/plugins/common'
+import { useMainStore } from '#imports'
 
-export default {
-  name: 'NavigationDrawer',
-  data: () => ({
-    youtubeLink: common.key.youtubeLink,
-  }),
-  computed: {
-    drawer: {
-      get() {
-        return this.$store.state.drawer
-      },
-      set(value) {
-        this.$store.commit('setDrawer', value)
-      },
-    },
-  },
-  methods: {
-    CloseDrawer() {
-      this.drawer = false
-    },
-    goToTopPage() {
-      this.$router.push('/')
-      this.CloseDrawer()
-    },
-    goToAboutServicePage() {
-      this.$router.push('/about_service')
-      this.CloseDrawer()
-    },
-    goToYoutubeLive() {
-      window.open(this.youtubeLink, '_blank')
-      this.CloseDrawer()
-    },
-    goToNewsPage() {
-      this.$router.push('/news')
-      this.CloseDrawer()
-    },
-    goToTermsOfServicePage() {
-      this.$router.push('/terms_of_service')
-      this.CloseDrawer()
-    },
-    goToPrivacyPolicyPage() {
-      this.$router.push('/privacy_policy')
-      this.CloseDrawer()
-    },
-    goToSettingsPage() {
-      this.$router.push('/settings')
-      this.CloseDrawer()
-    },
-    goToContactFormPage() {
-      this.$router.push('/contact_form')
-      this.CloseDrawer()
-    },
-  },
+// ルーターとストアのインスタンスを取得
+const router = useRouter()
+const store = useMainStore()
+
+// プロパティの定義
+const youtubeLink = common.key.youtubeLink
+
+// drawerの状態をPiniaストアと同期させるコンピューテッドプロパティ
+const drawer = computed({
+  get: () => store.drawer,
+  set: (value: boolean) => store.setDrawer(value),
+})
+
+// ダイアログを閉じる関数
+const closeDrawer = () => {
+  store.setDrawer(false)
+}
+
+// 各ページへの遷移関数
+const goToTopPage = async () => {
+  await router.push('/')
+  closeDrawer()
+}
+
+const goToAboutServicePage = async () => {
+  await router.push('/about_service')
+  closeDrawer()
+}
+
+const goToYoutubeLive = () => {
+  window.open(youtubeLink, '_blank')
+  closeDrawer()
+}
+
+const goToNewsPage = async () => {
+  await router.push('/news')
+  closeDrawer()
+}
+
+const goToTermsOfServicePage = async () => {
+  await router.push('/terms_of_service')
+  closeDrawer()
+}
+
+const goToPrivacyPolicyPage = async () => {
+  await router.push('/privacy_policy')
+  closeDrawer()
+}
+
+const goToContactFormPage = async () => {
+  await router.push('/contact_form')
+  closeDrawer()
 }
 </script>
 

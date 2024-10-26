@@ -67,17 +67,11 @@
               dense
             >
               <v-hover v-slot="{ hover }">
-                <v-card
-                  class="ma-2 pa-3"
-                  :elevation="hover ? 10 : 2"
-                  @click="enterRoom(index)"
-                >
+                <v-card class="ma-2 pa-3" :elevation="hover ? 10 : 2" @click="enterRoom(index)">
                   <v-card-title>
-                    {{ room["room_body"].name }}
+                    {{ room['room_body'].name }}
                   </v-card-title>
-                  <v-card-subtitle>
-                    {{ room["room_body"]["users"].length }}人
-                  </v-card-subtitle>
+                  <v-card-subtitle> {{ room['room_body']['users'].length }}人 </v-card-subtitle>
                 </v-card>
               </v-hover>
             </v-col>
@@ -107,72 +101,75 @@
   </v-app>
 </template>
 
-<script>
-import common from '~/plugins/common'
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
-import firebase from '@/plugins/firebase'
-import RoomLayout from '~/components/RoomLayout'
-import Dialog from '~/components/Dialog'
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import common from '../plugins/common'
+import NavigationDrawer from '#components'
+import ToolBar from '#components'
+import RoomLayout from '#components'
+import Dialog from '#components'
+import { useMainStore } from '#imports'
 
-export default {
-  components: {
-    Dialog,
-    NavigationDrawer,
-    ToolBar,
-  },
-  data: () => ({
-    rooms: null,
-    if_show_dialog: false,
-    if_show_dialog_2: false,
-    dialog_message: '',
-    loading: false,
-    youtubeLink: common.key.youtubeLink,
-  }),
-  computed: {
-    drawer: {
-      get() {
-        return this.$store.state.drawer
-      },
-      set(value) {
-        this.$store.commit('setDrawer', value)
-      },
-    },
-  },
-  async created() {
-    common.onAuthStateChanged(this)
+const router = useRouter()
+const store = useMainStore()
 
-    await this.loadRooms()
-  },
-  methods: {
-    async enterRoom(roomIndex) {
-      const selected_room_id = this.rooms[roomIndex].room_id
-      const selected_room_name = this.rooms[roomIndex].room_body.name
+type Room = {
+  room_body: {
+    created: Date
+    name: string
+    theme_color_hex: string
+    type: string
+    users: []
+  }
+  room_id: string
+}
 
-      this.dialog_message = selected_room_name + 'の部屋 に入室しますか？'
+// Reactive state
+const rooms = ref<Room[]>([])
+const if_show_dialog = ref(false)
+const if_show_dialog_2 = ref(false)
+const dialog_message = ref('')
+const loading = ref(false)
+const youtubeLink = common.key.youtubeLink
 
-      if (this.$store.state.isSignedIn) {
-        const vm = this
-        this.$store.commit('setRoomId', selected_room_id)
-        this.$store.commit('setRoomName', selected_room_name)
-        await this.$router.push('/enter/' + vm.rooms[roomIndex].room_id)
-      } else {
-        this.dialog_message = 'サインインしてください。'
-        this.if_show_dialog_2 = true
-      }
-    },
-    async loadRooms() {
-      this.loading = true
-      const url = common.apiLink.rooms
-      const resp = await common.httpGet(url, {})
-      if (resp.result === 'ok') {
-        this.rooms = resp.rooms
-      } else {
-        console.log(resp.message)
-      }
-      this.loading = false
-    },
-  },
+const drawer = computed({
+  get: () => store.drawer,
+  set: (value: boolean) => store.setDrawer(value),
+})
+
+onMounted(async () => {
+  common.onAuthStateChanged()
+
+  await loadRooms()
+})
+
+const enterRoom = async (roomIndex: number) => {
+  const selected_room_id = rooms.value[roomIndex].room_id
+  const selected_room_name = rooms.value[roomIndex].room_body.name
+
+  dialog_message.value = `${selected_room_name}の部屋 に入室しますか？`
+
+  if (store.isSignedIn) {
+    const vm = this
+    store.setRoomId(selected_room_id)
+    store.setRoomName(selected_room_name)
+    await router.push(`/enter/${selected_room_id}`)
+  } else {
+    dialog_message.value = 'サインインしてください。'
+    if_show_dialog_2.value = true
+  }
+}
+
+const loadRooms = async () => {
+  loading.value = true
+  const url = common.apiLink.rooms
+  const resp = await common.httpGet(url, {})
+  if (resp.result === 'ok') {
+    rooms.value = resp.rooms
+  } else {
+    console.log(resp.message)
+  }
+  loading.value = false
 }
 </script>
 

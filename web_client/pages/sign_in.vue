@@ -11,28 +11,15 @@
         </v-flex>
       </v-container>
 
-      <v-container v-show="! ($store.state.isSignedIn)">
+      <v-container v-show="!store.isSignedIn">
         <p>登録・サインインともに下のボタンから行えます。</p>
         <p>
-          <a
-            href="/terms_of_service"
-            target="_blank"
-          >
-            利用規約
-          </a>
+          <a href="/terms_of_service" target="_blank"> 利用規約 </a>
           および
-          <a
-            href="/privacy_policy"
-            target="_blank"
-          >
-            プライバシーポリシー
-          </a>
+          <a href="/privacy_policy" target="_blank"> プライバシーポリシー </a>
           に同意したうえで、当サービスをご利用ください。
         </p>
-        <v-row
-          id="google-sign-in-button"
-          justify="center"
-        >
+        <v-row id="google-sign-in-button" justify="center">
           <img
             :src="imageSource"
             alt="google sign in button"
@@ -40,11 +27,11 @@
             @mouseover="changeImageToHovered"
             @mousedown="changeImageToPressed"
             @mouseout="changeImageToNormal"
-          >
+          />
         </v-row>
       </v-container>
 
-      <v-container v-show="($store.state.isSignedIn)">
+      <v-container v-show="store.isSignedIn">
         <p>すでにサインイン済みです。</p>
         <p>アカウント設定ページからサインアウトできます。</p>
       </v-container>
@@ -62,62 +49,57 @@
   </v-app>
 </template>
 
-<script>
+<script setup lang="ts">
 import normalImage from '~/assets/google_signin_buttons/web/2x/btn_google_signin_light_normal_web@2x.png'
 import hoveredImage from '~/assets/google_signin_buttons/web/2x/btn_google_signin_light_focus_web@2x.png'
 import pressedImage from '~/assets/google_signin_buttons/web/2x/btn_google_signin_light_pressed_web@2x.png'
-import firebase from '@/plugins/firebase'
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
-import Dialog from '~/components/Dialog'
+import firebase from '~/plugins/firebase'
+import NavigationDrawer from '#components'
+import ToolBar from '#components'
+import Dialog from '#components'
 
-export default {
-  name: 'SignIn',
-  components: {
-    NavigationDrawer,
-    ToolBar,
-    Dialog,
-  },
-  data: () => ({
-    imageSource: '',
-    if_show_dialog: false,
-    dialog_message: '',
-  }),
-  created() {
-    this.imageSource = normalImage
-  },
-  methods: {
-    goToTopPage() {
-      this.$router.push('/')
-    },
-    changeImageToHovered() {
-      console.log('changeImageToHovered()')
-      this.imageSource = hoveredImage
-    },
-    changeImageToPressed() {
-      console.log('changeImageToPressed()')
-      this.imageSource = pressedImage
-    },
-    changeImageToNormal() {
-      console.log('changeImageToNormal()')
-      this.imageSource = normalImage
-    },
-    async signInWithGoogle() {
-      const vm = this
-      const provider = new firebase.auth.GoogleAuthProvider()
-      await firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(function () {
-          vm.dialog_message = 'ログインに成功しました。'
-        })
-        .catch(function (error) {
-          console.log(error)
-          vm.dialog_message = 'ログインに失敗しました。'
-        })
-      vm.if_show_dialog = true
-    },
-  },
+const router = useRouter()
+const store = useMainStore()
+
+const imageSource = ref('')
+const if_show_dialog = ref(false)
+const dialog_message = ref('')
+
+onMounted(() => {
+  imageSource.value = normalImage
+})
+
+const goToTopPage = () => {
+  router.push('/')
+}
+const changeImageToHovered = () => {
+  console.log('changeImageToHovered()')
+  imageSource.value = hoveredImage
+}
+
+const changeImageToPressed = () => {
+  console.log('changeImageToPressed()')
+  imageSource.value = pressedImage
+}
+
+const changeImageToNormal = () => {
+  console.log('changeImageToNormal()')
+  imageSource.value = normalImage
+}
+
+const signInWithGoogle = async () => {
+  const provider = new firebase.auth.GoogleAuthProvider()
+  await firebase
+    .auth()
+    .signInWithPopup(provider)
+    .then(function () {
+      dialog_message.value = 'ログインに成功しました。'
+    })
+    .catch(function (error) {
+      console.log(error)
+      dialog_message.value = 'ログインに失敗しました。'
+    })
+  if_show_dialog.value = true
 }
 </script>
 

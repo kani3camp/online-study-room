@@ -1,40 +1,18 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      flat
-    >
-      <v-btn
-        icon
-        @click="goToHomePage"
-      >
+    <v-app-bar app flat>
+      <v-btn icon @click="goToHomePage">
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-layout
-        justify-center
-      >
+      <v-layout justify-center>
         <v-toolbar-title>設定</v-toolbar-title>
       </v-layout>
-      <v-btn
-        v-show="$store.state.isSignedIn"
-        outlined
-        @click="signOut"
-      >
-        サインアウト
-      </v-btn>
+      <v-btn v-show="store.isSignedIn" outlined @click="signOut"> サインアウト </v-btn>
     </v-app-bar>
 
     <v-main>
-      <v-card
-        class="mx-auto"
-        max-width="500px"
-        outlined
-      >
-        <v-list
-          id="setting-list"
-          two-line
-          subheader
-        >
+      <v-card class="mx-auto" max-width="500px" outlined>
+        <v-list id="setting-list" two-line subheader>
           <v-subheader>設定</v-subheader>
           <v-list-item two-line>
             <v-list-item-content>
@@ -98,9 +76,7 @@
             <v-list-item-content>
               <v-btn
                 color="primary"
-                :disabled="
-                  !is_some_value_changed || is_some_value_blank || saving
-                "
+                :disabled="!is_some_value_changed || is_some_value_blank || saving"
                 @click="saveNewValues"
               >
                 保存
@@ -124,145 +100,149 @@
   </v-app>
 </template>
 
-<script>
+<script setup lang="ts">
+import { watch } from 'vue'
 import firebase from '../plugins/firebase'
-import common from '@/plugins/common'
-import Dialog from '~/components/Dialog'
+import common from '~/plugins/common'
+import Dialog from '#components'
 
-export default {
-  name: 'Settings',
-  components: {
-    Dialog,
-  },
-  data: () => ({
-    display_name: '',
-    status_message: '',
-    if_show_dialog: false,
-    dialog_message: '',
-    saving: false,
-  }),
-  computed: {
-    is_some_value_changed: function () {
-      const bool1 = this.display_name !== this.firebase_display_name
-      const bool2 = this.status_message !== this.firebase_status_message
-      return bool1 || bool2
-    },
-    is_some_value_blank: function () {
-      return !this.display_name || !this.status_message
-    },
-    firebase_display_name: function () {
-      return firebase.auth().currentUser.displayName
-    },
-    firebase_status_message: function () {
-      return this.$store.state.user.status_message
-    },
-    registration_date_str: function () {
-      const registration_date = this.$store.state.user.registration_date
-      if (registration_date) {
-        return (
-          registration_date.getFullYear() +
-          '年' +
-          (registration_date.getMonth() + 1) +
-          '月' +
-          registration_date.getDate() +
-          '日'
-        )
-      } else {
-        return null
-      }
-    },
-    mail_address: function () {
-      return firebase.auth().currentUser.email
-    },
-    provider_id: function () {
-      return firebase.auth().currentUser.providerData[0].providerId
-    },
-    total_study_time: function () {
-      const total_seconds = this.$store.state.user.total_study_time
-      if (total_seconds !== null) {
-        const hours = Math.floor(total_seconds / 3600)
-        const total_minutes = Math.floor(total_seconds / 60)
-        const minutes = total_minutes % 60
-        return hours + '時間' + minutes + '分'
-      }
-      return null
-    },
-  },
-  watch: {
-    firebase_display_name: function (newValue, oldValue) {
-      console.log('watch: ' + this.display_name + ': new: ' + newValue + ', old: ' + oldValue)
-      if (oldValue === null && newValue !== null) {
-        this.display_name = newValue
-      } else if (oldValue !== newValue) {
-        this.display_name = newValue
-      }
-    },
-    firebase_status_message: function (newValue, oldValue) {
-      console.log('watch')
-      if ((oldValue === null && newValue !== null) || oldValue !== newValue) {
-        this.status_message = newValue
-      } else if (oldValue !== newValue) {
-        this.display_name = newValue
-      }
-    },
-  },
-  async created() {
-    await common.onAuthStateChanged(this)
-  },
-  async mounted() {
-    this.display_name = this.firebase_display_name
-    this.status_message = this.firebase_status_message
-  },
-  methods: {
-    goToHomePage() {
-      this.$router.push('/')
-    },
-    async signOut() {
-      const vm = this
-      await firebase
-        .auth()
-        .signOut()
-        .then(function () {
-          console.log('Sign-out successful.')
-          vm.dialog_message = 'サインアウトしました。'
-          vm.if_show_dialog = true
-        })
-        .catch(function (error) {
-          console.log(error)
-          vm.dialog_message = 'サインアウトに失敗しました。'
-          vm.if_show_dialog = true
-        })
-    },
-    async saveNewValues() {
-      console.log('saveNewValues()')
-      this.saving = true
-      this.dialog_message = '保存中'
-      this.if_show_dialog = true
+const router = useRouter()
+const store = useMainStore()
+const userStore = useUserStore()
 
-      const url = common.apiLink.change_user_info
-      const params = {
-        user_id: firebase.auth().currentUser.uid,
-        id_token: await firebase.auth().currentUser.getIdToken(false),
-        display_name: this.display_name,
-        status_message: this.status_message,
-      }
-      const resp = await common.httpPost(url, params)
-      if (resp.result === 'ok') {
-        this.dialog_message = '完了！'
-        const new_display_name = this.display_name
-        await firebase.auth().currentUser.updateProfile({
-          displayName: new_display_name,
-        })
-        this.$store.commit('user/setStatusMessage', this.status_message)
-      } else {
-        console.log(resp)
-        this.dialog_message = 'エラー。もう一度試してみてください。'
-        this.display_name = this.firebase_display_name
-        this.status_message = this.firebase_status_message
-      }
-      this.saving = false
-    },
-  },
+const display_name = ref<string | null>(null)
+const status_message = ref<string | null>(null)
+const if_show_dialog = ref(false)
+const dialog_message = ref<string | null>(null)
+const saving = ref(false)
+
+const is_some_value_changed = computed(() => {
+  const bool1 = display_name !== firebase_display_name
+  const bool2 = status_message !== firebase_status_message
+  return bool1 || bool2
+})
+
+const is_some_value_blank = computed(() => {
+  return !display_name || !status_message
+})
+
+const firebase_display_name = computed(() => {
+  return firebase.auth().currentUser?.displayName
+})
+
+const firebase_status_message = computed(() => {
+  return userStore.status_message
+})
+
+const registration_date_str = computed(() => {
+  const registration_date = userStore.registration_date
+  if (registration_date) {
+    return (
+      registration_date.getFullYear() +
+      '年' +
+      (registration_date.getMonth() + 1) +
+      '月' +
+      registration_date.getDate() +
+      '日'
+    )
+  } else {
+    return null
+  }
+})
+
+const mail_address = computed(() => {
+  return firebase.auth().currentUser?.email
+})
+
+const provider_id = computed(() => {
+  return firebase.auth().currentUser?.providerData[0]?.providerId
+})
+
+const total_study_time = computed(() => {
+  const total_seconds = userStore.total_study_time
+  if (total_seconds !== null) {
+    const hours = Math.floor(total_seconds / 3600)
+    const total_minutes = Math.floor(total_seconds / 60)
+    const minutes = total_minutes % 60
+    return hours + '時間' + minutes + '分'
+  }
+  return null
+})
+
+watch(firebase_status_message, (newValue, oldValue) => {
+  console.log('watch: ' + display_name.value + ': new: ' + newValue + ', old: ' + oldValue)
+  if (oldValue === null && newValue !== null) {
+    display_name.value = newValue
+  } else if (oldValue !== newValue && newValue !== null) {
+    display_name.value = newValue
+  }
+})
+
+watch(firebase_status_message, (newValue, oldValue) => {
+  console.log('watch')
+  if ((oldValue === null && newValue !== null) || oldValue !== newValue) {
+    status_message.value = newValue
+  } else if (oldValue !== newValue && newValue !== null) {
+    display_name.value = newValue
+  }
+})
+
+onMounted(() => {
+  common.onAuthStateChanged()
+})
+onMounted(() => {
+  display_name.value = firebase_display_name.value
+  status_message.value = firebase_status_message.value
+})
+
+const goToHomePage = () => {
+  router.push('/')
+}
+
+const signOut = async () => {
+  await firebase
+    .auth()
+    .signOut()
+    .then(function () {
+      console.log('Sign-out successful.')
+      dialog_message.value = 'サインアウトしました。'
+      if_show_dialog.value = true
+    })
+    .catch(function (error) {
+      console.log(error)
+      dialog_message.value = 'サインアウトに失敗しました。'
+      if_show_dialog.value = true
+    })
+}
+
+const saveNewValues = async () => {
+  console.log('saveNewValues()')
+  saving.value = true
+  dialog_message.value = '保存中'
+  if_show_dialog.value = true
+
+  const url = common.apiLink.change_user_info
+  const params = {
+    user_id: firebase.auth().currentUser?.uid,
+    id_token: await firebase.auth().currentUser?.getIdToken(false),
+    display_name: display_name,
+    status_message: status_message,
+  }
+  const resp = await common.httpPost(url, params)
+  if (resp.result === 'ok') {
+    dialog_message.value = '完了！'
+    const new_display_name = display_name
+    await firebase.auth().currentUser?.updateProfile({
+      displayName: new_display_name.value ?? '',
+    })
+    userStore.setStatusMessage(status_message.value)
+  } else {
+    console.log(resp)
+    dialog_message.value = 'エラー。もう一度試してみてください。'
+    display_name.value = firebase_display_name.value
+    status_message.value = firebase_status_message.value
+  }
+  saving.value = false
 }
 </script>
 
