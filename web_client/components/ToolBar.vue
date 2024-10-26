@@ -1,21 +1,8 @@
 <template>
-  <v-app-bar
-    app
-    flat
-    color="white"
-    min-height="60"
-  >
-    <v-layout
-      fill-height
-      pb-0
-      pt-0
-      pl-0
-    >
+  <v-app-bar app flat color="white" min-height="60">
+    <v-layout fill-height pb-0 pt-0 pl-0>
       <nuxt-link to="/">
-        <v-flex
-          align-self-center
-          @click="goToTopPage"
-        >
+        <v-flex align-self-center @click="goToTopPage">
           <Logo />
         </v-flex>
       </nuxt-link>
@@ -23,22 +10,10 @@
 
     <v-spacer />
 
-    <v-layout
-      id="tool-right"
-      fill-height
-      pb-0
-      pt-0
-      pl-0
-      wrap
-    >
-      <div
-        v-show="!($vuetify.breakpoint.mobile)"
-        class="tool-menu"
-      >
+    <v-layout id="tool-right" fill-height pb-0 pt-0 pl-0 wrap>
+      <div v-show="!$vuetify.breakpoint.mobile" class="tool-menu">
         <div class="tool-content">
-          <nuxt-link to="/about_service">
-            このサイトについて
-          </nuxt-link>
+          <nuxt-link to="/about_service"> このサイトについて </nuxt-link>
         </div>
 
         <!-- <div class="tool-content">
@@ -53,41 +28,29 @@
         </div> -->
 
         <div class="tool-content">
-          <nuxt-link to="/news">
-            お知らせ
-          </nuxt-link>
+          <nuxt-link to="/news"> お知らせ </nuxt-link>
         </div>
       </div>
-      <div
-        v-show="! ($store.state.isSignedIn)"
-        class="tool-content"
-      >
-        <v-btn
-          v-show="!($store.state.isSignedIn)"
-          outlined
-          @click="goToSignInPage"
-        >
+      <div v-show="!$store.state.isSignedIn" class="tool-content">
+        <v-btn v-show="!$store.state.isSignedIn" outlined @click="goToSignInPage">
           サインイン
         </v-btn>
       </div>
-      <div v-show="($store.state.isSignedIn)">
-        <v-btn
-          icon
-          @click="goToSettingsPage"
-        >
+      <div v-show="$store.state.isSignedIn">
+        <v-btn icon @click="goToSettingsPage">
           <v-icon>mdi-account-cog</v-icon>
         </v-btn>
       </div>
-      <div v-show="($vuetify.breakpoint.mobile)">
+      <div v-show="$vuetify.breakpoint.mobile">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       </div>
     </v-layout>
   </v-app-bar>
 </template>
 
-<script>
+<script lang="ts">
 import Logo from '@/components/Logo'
-import common from '@/plugins/common'
+import common from '~/plugins/common'
 
 export default {
   name: 'ToolBar',

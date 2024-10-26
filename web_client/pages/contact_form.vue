@@ -11,19 +11,15 @@
         </v-flex>
       </v-container>
 
-
-      <v-container v-show="! ($store.state.isSignedIn)">
+      <v-container v-show="!store.isSignedIn">
         <p>
           <nuxt-link to="/sign_in">サインイン</nuxt-link>するか、
-          <a
-            href="https://twitter.com/sorarideblog"
-            target="_blank"
-          >@sorarideblog</a>
+          <a href="https://twitter.com/sorarideblog" target="_blank">@sorarideblog</a>
           までダイレクトメッセージを送ってください。
         </p>
       </v-container>
 
-      <v-container v-show="$store.state.isSignedIn">
+      <v-container v-show="store.isSignedIn">
         <v-form class="mx-auto">
           <v-select
             v-model="selected_contact_type"
@@ -33,16 +29,8 @@
             label="問い合わせの種類"
             outlined
           />
-          <v-text-field
-            v-model="mail_address"
-            label="あなたのメールアドレス"
-            outlined
-          />
-          <v-textarea
-            v-model="message"
-            label="本文"
-            outlined
-          />
+          <v-text-field v-model="mail_address" label="あなたのメールアドレス" outlined />
+          <v-textarea v-model="message" label="本文" outlined />
           <div>
             <v-btn
               color="primary"
@@ -66,92 +54,76 @@
       :loading="submitting"
       :accept-needed="false"
       cancel-option-string="閉じる"
-      @cancel="if_show_dialog=false"
+      @cancel="if_show_dialog = false"
     />
   </v-app>
 </template>
 
-<script>
+<script setup lang="ts">
 // Regular expression from W3C HTML5.2 input specification:
 // https://www.w3.org/TR/html/sec-forms.html#email-state-typeemail
 import common from '~/plugins/common'
-import NavigationDrawer from '@/components/NavigationDrawer'
-import ToolBar from '@/components/ToolBar'
-import firebase from '@/plugins/firebase'
-import Dialog from '~/components/Dialog'
+import NavigationDrawer from '#components'
+import ToolBar from '#components'
+import firebase from '~/plugins/firebase'
+import Dialog from '#components'
+import { useMainStore } from '~/stores'
 
-export default {
-  name: 'ContactForm',
-  components: {
-    NavigationDrawer,
-    ToolBar,
-    Dialog,
-  },
-  data: () => ({
-    // アロー関数でdataを定義している場合は中でthisがundefinedになるので注意
-    dialog_message: '',
-    message: '',
-    submitting: false,
-    selected_contact_type: null,
-    if_show_dialog: false,
-    contact_types: [
-      { mode: 'feedback', ss: '意見' },
-      { mode: 'contact', ss: '問い合わせ' },
-    ],
-  }),
-  computed: {
-    mail_address: {
-      get() {
-        if (this.$store.state.isSignedIn) {
-          return firebase.auth().currentUser.email
-        } else {
-          return ''
-        }
-      },
-    },
-  },
-  mounted() {
-    common.onAuthStateChanged(this)
-  },
-  methods: {
-    goToHomePage() {
-      this.$router.push('/')
-    },
-    goToSettingsPage() {
-      this.$router.push('/settings')
-    },
-    goToNewsPage() {
-      this.$router.push('/news')
-    },
-    async submit() {
-      if (this.selected_contact_type || this.mail_address || this.message) {
-        this.if_show_dialog = true
-        this.dialog_message = '送信中'
-        this.submitting = true
+const router = useRouter()
+const store = useMainStore()
 
-        const url = common.apiLink.send_contact_form
-        const params = {
-          mail_address: this.mail_address.toString(),
-          user_id: firebase.auth().currentUser.uid,
-          id_token: await firebase.auth().currentUser.getIdToken(false),
-          contact_type: this.selected_contact_type,
-          message: this.message,
-        }
-        const resp = await common.httpPost(url, params)
-        this.submitting = false
+const dialog_message = ref('')
+const message = ref<string | null>('')
+const submitting = ref(false)
+const selected_contact_type = ref(null)
+const if_show_dialog = ref(false)
+const contact_types = ref([
+  { mode: 'feedback', ss: '意見' },
+  { mode: 'contact', ss: '問い合わせ' },
+])
 
-        if (resp.result === 'ok') {
-          this.message = null
-          this.selected_contact_type = null
-          this.dialog_message = '送信が完了しました。お問い合わせ頂きありがとうございます。'
-        } else {
-          this.dialog_message = '送信に失敗しました。'
-        }
-      } else {
-        alert('未記入の項目があります。')
-      }
-    },
-  },
+const mail_address = computed(() => {
+  if (store.isSignedIn) {
+    return firebase.auth().currentUser?.email
+  } else {
+    return ''
+  }
+})
+
+onMounted(() => {
+  common.onAuthStateChanged()
+})
+
+const goToHomePage = () => router.push('/')
+const goToSettingsPage = () => router.push('/settings')
+const goToNewsPage = () => router.push('/news')
+const submit = async () => {
+  if (selected_contact_type || mail_address || message) {
+    if_show_dialog.value = true
+    dialog_message.value = '送信中'
+    submitting.value = true
+
+    const url = common.apiLink.send_contact_form
+    const params = {
+      mail_address: mail_address.toString(),
+      user_id: firebase.auth().currentUser?.uid,
+      id_token: await firebase.auth().currentUser?.getIdToken(false),
+      contact_type: selected_contact_type,
+      message: message,
+    }
+    const resp = await common.httpPost(url, params)
+    submitting.value = false
+
+    if (resp.result === 'ok') {
+      message.value = null
+      selected_contact_type.value = null
+      dialog_message.value = '送信が完了しました。お問い合わせ頂きありがとうございます。'
+    } else {
+      dialog_message.value = '送信に失敗しました。'
+    }
+  } else {
+    alert('未記入の項目があります。')
+  }
 }
 </script>
 

@@ -6,7 +6,8 @@ module.exports = {
   extends: [
     'prettier',
     'prettier/vue',
-    'plugin:vue/recommended',
+    'plugin:vue/base',
+    'plugin:vuetify/base',
     'plugin:prettier-vue/recommended',
     'plugin:nuxt/recommended',
   ],
